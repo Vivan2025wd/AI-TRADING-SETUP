@@ -1,0 +1,12 @@
+# requirements.txt
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+joblib
+requests
+python-dotenv
+httpx
+python-binance
+loguru

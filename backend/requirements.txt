@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+pandas
+numpy
+scikit-learn
+joblib
+requests
+ta
+aiohttp
+httpx
+python-binance
+loguru
+pytest
+pytest-asyncio
