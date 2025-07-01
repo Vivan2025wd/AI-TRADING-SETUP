@@ -1,69 +1,88 @@
-// src/components/ChartDisplay.jsx
 import React from "react";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
+  LineElement,
+  PointElement,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
   Title,
   Tooltip,
   Legend,
-  TimeScale,
+  Filler,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  TimeScale
-);
+ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend, Filler);
 
-const mockPriceData = {
-  labels: [
-    "2025-06-20",
-    "2025-06-21",
-    "2025-06-22",
-    "2025-06-23",
-    "2025-06-24",
-    "2025-06-25",
-    "2025-06-26",
-  ],
-  datasets: [
-    {
-      label: "Price",
-      data: [100, 102, 101, 105, 107, 110, 108],
-      borderColor: "rgb(75, 192, 192)",
-      backgroundColor: "rgba(75, 192, 192, 0.2)",
-      tension: 0.3,
-      fill: true,
+export default function ChartDisplay({ balanceHistory }) {
+  const formattedLabels = balanceHistory.map((point) =>
+    new Date(point.time).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+  );
+
+  const chartData = {
+    labels: formattedLabels,
+    datasets: [
+      {
+        label: "Balance Over Time",
+        data: balanceHistory.map((point) => point.value),
+        fill: true,
+        borderColor: "#2563eb", // blue-600
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, "rgba(37, 99, 235, 0.4)");
+          gradient.addColorStop(1, "rgba(37, 99, 235, 0.05)");
+          return gradient;
+        },
+        pointRadius: 3,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { 
+        position: "bottom", 
+        labels: { color: "white" } 
+      },
+      title: {
+        display: true,
+        text: "Profit Curve by Mother AI",
+        font: { size: 18 },
+        color: "white",
+      },
+      tooltip: {
+        backgroundColor: "#111827", // gray-900
+        titleColor: "white",
+        bodyColor: "white",
+        callbacks: {
+          label: (context) => `$${context.parsed.y.toFixed(2)}`,
+        },
+      },
     },
-  ],
-};
+    scales: {
+      y: {
+        ticks: {
+          color: "white",
+          callback: (value) => `$${value}`,
+        },
+        title: { display: true, text: "Balance ($)", color: "white" },
+        grid: { color: "#374151" }, // gray-700 grid lines
+      },
+      x: {
+        ticks: { color: "white" },
+        title: { display: true, text: "Date", color: "white" },
+        grid: { color: "#374151" },
+      },
+    },
+  };
 
-// Mock Mother AI summary stats
-const mockMotherAIStats = {
-  totalTrades: 15,
-  winRate: 80, // %
-  totalProfitPercent: 24.5, // %
-};
-
-export default function ChartDisplay({ symbol = "BTCUSDT" }) {
   return (
-    <div className="w-full max-w-3xl mx-auto p-4 border rounded shadow">
-      <h3 className="text-lg font-semibold mb-2">Chart: {symbol}</h3>
-      <Line data={mockPriceData} />
-      <div className="mt-4 p-4 bg-gray-100 rounded">
-        <h4 className="font-semibold mb-2">Mother AI Summary</h4>
-        <p>Total Trades: {mockMotherAIStats.totalTrades}</p>
-        <p>Win Rate: {mockMotherAIStats.winRate}%</p>
-        <p>Total Profit: {mockMotherAIStats.totalProfitPercent}%</p>
-      </div>
+    <div className="bg-gray-900 rounded-xl shadow-lg p-6 h-[400px]">
+      <Line data={chartData} options={chartOptions} />
     </div>
   );
 }
