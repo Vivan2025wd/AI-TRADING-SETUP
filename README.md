@@ -1,0 +1,2 @@
+# AI TRADING SETUP
+
