@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import StrategyBuilder from "./components/StrategyBuilder";
 import BacktestResults from "./components/BacktestResults";
+import StrategyPerformance from "./components/StrategyPerformance"; // <-- Added import
 
 export default function App() {
   return (
@@ -42,6 +43,16 @@ export default function App() {
           >
             Backtest Results
           </NavLink>
+          <NavLink
+            to="/strategy-performance"
+            className={({ isActive }) =>
+              isActive
+                ? "text-blue-400 border-b-2 border-blue-400 pb-1"
+                : "text-gray-400 hover:text-blue-300 transition"
+            }
+          >
+            Strategy Performance
+          </NavLink>
         </nav>
       </header>
 
@@ -50,6 +61,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/strategy-builder" element={<StrategyBuilder />} />
           <Route path="/backtest-results" element={<BacktestResults />} />
+          <Route path="/strategy-performance" element={<StrategyPerformance />} />
         </Routes>
       </main>
     </BrowserRouter>
