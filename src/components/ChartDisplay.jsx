@@ -1,88 +1,45 @@
-import React from "react";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
+import React, { useEffect, useState } from "react";
+import ChartDisplay from "./ChartDisplay";
 
-ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend, Filler);
+export default function MotherAIBalanceChart() {
+  const [balanceHistory, setBalanceHistory] = useState([]); // empty initially
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default function ChartDisplay({ balanceHistory }) {
-  const formattedLabels = balanceHistory.map((point) =>
-    new Date(point.time).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-  );
+  useEffect(() => {
+    async function fetchTradeHistory() {
+      try {
+        const response = await fetch("/api/mother-ai/trades"); // Replace with your API
+        if (!response.ok) throw new Error("Failed to fetch trade data");
+        const data = await response.json();
 
-  const chartData = {
-    labels: formattedLabels,
-    datasets: [
-      {
-        label: "Balance Over Time",
-        data: balanceHistory.map((point) => point.value),
-        fill: true,
-        borderColor: "#2563eb", // blue-600
-        backgroundColor: (context) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, "rgba(37, 99, 235, 0.4)");
-          gradient.addColorStop(1, "rgba(37, 99, 235, 0.05)");
-          return gradient;
-        },
-        pointRadius: 3,
-        tension: 0.4,
-      },
-    ],
-  };
+        const formattedData = data.map(trade => ({
+          time: trade.timestamp,
+          value: trade.balance,
+        }));
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { 
-        position: "bottom", 
-        labels: { color: "white" } 
-      },
-      title: {
-        display: true,
-        text: "Profit Curve by Mother AI",
-        font: { size: 18 },
-        color: "white",
-      },
-      tooltip: {
-        backgroundColor: "#111827", // gray-900
-        titleColor: "white",
-        bodyColor: "white",
-        callbacks: {
-          label: (context) => `$${context.parsed.y.toFixed(2)}`,
-        },
-      },
-    },
-    scales: {
-      y: {
-        ticks: {
-          color: "white",
-          callback: (value) => `$${value}`,
-        },
-        title: { display: true, text: "Balance ($)", color: "white" },
-        grid: { color: "#374151" }, // gray-700 grid lines
-      },
-      x: {
-        ticks: { color: "white" },
-        title: { display: true, text: "Date", color: "white" },
-        grid: { color: "#374151" },
-      },
-    },
-  };
+        setBalanceHistory(formattedData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTradeHistory();
+  }, []);
 
   return (
-    <div className="bg-gray-900 rounded-xl shadow-lg p-6 h-[400px]">
-      <Line data={chartData} options={chartOptions} />
+    <div>
+      {/* Always show the chart, even if no data yet */}
+      <ChartDisplay balanceHistory={balanceHistory} />
+
+      {/* Show loading or error messages below the chart */}
+      {loading && <p className="text-white mt-2">Loading balance chart...</p>}
+      {error && <p className="text-red-500 mt-2">Error: {error}</p>}
+      {!loading && !error && balanceHistory.length === 0 && (
+        <p className="text-gray-400 mt-2">No trade data available to display.</p>
+      )}
     </div>
   );
 }

@@ -1,0 +1,10 @@
+{
+  "symbol": "BTC",
+  "indicators": {
+    "rsi": {
+      "buy_below": [
+        30
+      ]
+    }
+  }
+}

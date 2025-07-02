@@ -1,40 +1,4 @@
-import React from "react";
-
-const mockAgentData = [
-  {
-    agentName: "BTC Agent",
-    prediction: "Buy",
-    confidence: 78,
-    tradeDetails: {
-      symbol: "BTCUSDT",
-      entryPrice: 30100,
-      targetPrice: 32500,
-      stopLoss: 29200,
-    },
-  },
-  {
-    agentName: "ETH Agent",
-    prediction: "Hold",
-    confidence: 65,
-    tradeDetails: {
-      symbol: "ETHUSDT",
-      entryPrice: 1980,
-      targetPrice: 2100,
-      stopLoss: 1900,
-    },
-  },
-  {
-    agentName: "Generic Agent",
-    prediction: "Sell",
-    confidence: 81,
-    tradeDetails: {
-      symbol: "SOLUSDT",
-      entryPrice: 88,
-      targetPrice: 77,
-      stopLoss: 92,
-    },
-  },
-];
+import React, { useEffect, useState } from "react";
 
 const getEmoji = (prediction) => {
   if (prediction === "Buy") return "🟢";
@@ -43,13 +7,36 @@ const getEmoji = (prediction) => {
 };
 
 export default function AgentPredictionCard() {
+  const [agentData, setAgentData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchAgentData() {
+      try {
+        const res = await fetch("/api/agent-predictions");
+        if (!res.ok) throw new Error("Failed to fetch agent predictions");
+        const data = await res.json();
+        setAgentData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAgentData();
+  }, []);
+
+  if (loading) return <p>Loading agent predictions...</p>;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
+
   return (
     <div className="space-y-6 max-w-md mx-auto">
       <h3 className="text-2xl font-bold text-white border-b border-gray-600 pb-2 mb-4">
         Agent Predictions
       </h3>
 
-      {mockAgentData.map((agent, index) => (
+      {agentData.map((agent, index) => (
         <div
           key={index}
           className="bg-gray-900 border border-gray-700 shadow-md rounded-xl p-6 transition-shadow duration-300 hover:shadow-lg"

@@ -1,0 +1,10 @@
+{
+  "symbol": "SOL",
+  "indicators": {
+    "macd": {
+      "buy_below": [
+        30
+      ]
+    }
+  }
+}

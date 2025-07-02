@@ -13,19 +13,26 @@
 
 
 # frontend
-frontend/
+src/
+├── components/
+│   ├── (various .js/.jsx and .d.ts files)
+│   ├── functions/
+│   │   ├── get-array.js
+│   │   ├── group-files.js
+│   │   └── ... (other utility JS and TS files)
+│   └── builder/
+│       ├── api-builder.js
+│       └── index.js
+│
+├── pages/
+│   └── Dashboard.jsx
+│
 ├── public/
-│   └── index.html
-├── src/
-│   ├── App.jsx             # Main app with routing
-│   ├── main.jsx            # React DOM render
-│   ├── components/         # All reusable components here
-│   ├── pages/              # Route-level page components
-│   ├── services/           # API logic
-│   └── styles/
-│       └── index.css
-├── package.json
-└── vite.config.js
+│   └── vite.svg
+│
+└── styles/
+    └── index.css
+
 
 
 src/
@@ -88,7 +95,7 @@ backend/
 
 # storage
 storage/
-├── trade_logs/
+├── Performance_logs/
 │   ├── BTCUSDT_trades.json
 │   └── ETHUSDT_trades.json
 ├── strategies/

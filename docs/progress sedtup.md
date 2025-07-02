@@ -1,220 +1,114 @@
-✅ Phase 1: Initial Setup
-1. Project Structure
-bash
-Copy
-Edit
-ai-trading-system/
-├── frontend/            # React + Tailwind app
-│   ├── src/
-│   │   ├── components/         # UI Components
-│   │   ├── pages/              # Dashboard, Strategy, Backtest
-│   │   ├── context/            # State (e.g. AgentContext)
-│   │   ├── services/           # API calls (Axios)
-│   │   └── main.jsx            # Entry point
-│   ├── public/
-│   └── tailwind.config.js
-│
-├── backend/             # FastAPI app
-│   ├── agents/                 # Agent logic per symbol
-│   ├── strategies/            # Strategy engine + user strategies
-│   ├── routes/                # API routes
-│   ├── mother_ai/             # Portfolio manager
-│   ├── utils/                 # Indicators, data fetch, logs
-│   ├── models/                # Pydantic + DB models
-│   ├── main.py
-│   └── strategy_registry.py
-│
-├── data/                # OHLCV data, logs, models
-├── docker/              # Dockerfiles + docker-compose
-├── .env
-├── README.md
-└── requirements.txt
+# 📁 `backend/` — AI Trading System Backend
 
-
-✅ Phase 2: Build Plan (Modular)
-🔹 Backend Plan:
- /strategies/create: Accept JSON strategy from frontend(done)
-
- /agents/predict: Generate signals per symbol(done)
-
- /mother-ai/decision: Choose best trade(s)(done)
-
- /backtest: Run on historical data(done)
-
- strategy_parser.py: Convert JSON logic to executable code(done)
-
- strategy_health.py: Track success/failure of logic(done)
-
-🔹 Frontend Plan:
- Strategy Builder UI → converts logic into JSON
-
- Dashboard with TradingView/ChartJS for symbol display
-
- Backtest panel showing historical trade performance
-
- Agent prediction card + Mother AI decision card
-
-✅ Phase 3: Focused Targets (Next Steps)
-Kick off with Backend:
-
-Set up FastAPI boilerplate (main.py, CORS, test route)
-
-Build /strategies/create route (accepts JSON and stores)
-
-Frontend Init:
-
-React + Tailwind setup with Vite
-
-Basic routing: /dashboard, /strategies, /backtest
-
-Axios setup to hit test endpoint
-
-Strategy Parser v1:
-
-Accepts logic like:
-
-json
-Copy
-Edit
-{
-  "indicators": ["rsi", "ema"],
-  "buy": "rsi < 30 and ema_trend_up",
-  "sell": "rsi > 70 or ema_trend_down"
-}
-Converts into Python-executable rules.
-
-
-
-
-
-
-
-
-
-
-
-Great — since your backend is complete and you're focusing on the frontend UI/UX, here’s a clean breakdown of the frontend you'll want to build to match your backend capabilities:
-
+This backend powers your **AI-driven trading dashboard**. It's built with **FastAPI**, has a **multi-agent architecture**, and includes **strategy parsing**, **backtesting**, **machine learning**, and **trade execution**.
 
 ---
 
-🧩 Core Frontend Modules (React + Tailwind)
+## 🧠 Root Files
 
-1. Dashboard Page
-
-Live trading chart (Chart.js or TradingView)
-
-Agent prediction cards
-
-Mother AI decision card
-
-Quick stats (mock balance, win rate, etc.)
-
-
-2. Strategy Builder Page
-
-Visual logic builder (select indicators, conditions)
-
-Converts UI input into strategy JSON
-
-Save / View / Delete buttons
-
-
-3. Backtest Results Page
-
-Table of historical trades
-
-Chart of balance over time
-
-Profit/loss breakdown
-
-
-4. Navigation
-
-Sticky top navbar: Dashboard | Strategy Builder | Backtest Results
-
-
+| File                   | Purpose                                                                                   |
+| ---------------------- | ----------------------------------------------------------------------------------------- |
+| `main.py`              | FastAPI entry point. Loads all routes: agent, strategy, mother AI, backtest, and Binance. |
+| `.env`                 | Holds environment variables like API keys, DB config, etc.                                |
+| `requirements.txt`     | Lists Python dependencies.                                                                |
+| `strategy_registry.py` | Central strategy loader/registry used across modules.                                     |
+| `__init__.py`          | Marks this folder as a Python package.                                                    |
 
 ---
 
-⚙️ Components to Build
+## 🔌 `routes/` – API Endpoints
 
-Component	Purpose
-
-ChartDisplay.jsx	Trading chart UI
-AgentPredictionCard.jsx	Buy/Sell/Hold from each agent
-MotherAIDecisionCard.jsx	Final decision with agent reference
-StrategyBuilder.jsx	UI to create logic-based strategies
-BacktestResults.jsx	Shows simulated trades
-DashboardPanel.jsx	Wraps the Dashboard widgets
-
-
+| File           | Purpose                                               |
+| -------------- | ----------------------------------------------------- |
+| `agent.py`     | Endpoints to run or fetch AI agents (e.g., BTC, ETH). |
+| `backtest.py`  | API to run backtests with selected strategies.        |
+| `strategy.py`  | Save, load, update strategies from frontend.          |
+| `mother_ai.py` | Trigger Mother AI decisions or evaluations.           |
+| `binance.py`   | Fetch market data from Binance (candles, prices).     |
 
 ---
 
-✅ Features to Implement
+## 🤖 `agents/` – Symbol-Specific AI Modules
 
-⏱️ Poll or simulate live predictions (mocked for now)
-
-📉 Render TradingView chart with dummy data
-
-🧠 Display agent confidence & symbol
-
-🧮 Mother AI panel: best pick, logic why
-
-🔧 Strategy builder: UI-only logic builder (no JSON exposed)
-
-📊 Backtest result chart with win %, PnL, etc.
-
-
+| File                           | Purpose                                        |
+| ------------------------------ | ---------------------------------------------- |
+| `btc_agent.py`, `eth_agent.py` | Symbol-specific agents for prediction.         |
+| `generic_agent.py`             | Base logic shared across all agents.           |
+| `models/`                      | ML model files (likely saved `.pkl` or `.pt`). |
 
 ---
 
-🛠️ Dev Approach
+## 📊 `backtester/` – Strategy Simulation
 
-You already have this folder structure:
-
-src/
-├── App.jsx
-├── main.jsx
-├── components/
-│   ├── ChartDisplay.jsx
-│   ├── AgentPredictionCard.jsx
-│   ├── MotherAIDecisionCard.jsx
-│   ├── BacktestResults.jsx
-│   ├── StrategyBuilder.jsx
-│   └── DashboardPanel.jsx
-├── pages/
-│   ├── Dashboard.jsx
-├── styles/
-│   └── index.css
-
-From here, we can:
-
-1. Setup react-router with 3 pages (already done ✅)
-
-
-2. Finalize each page one by one with mock data
-
-
-3. Add smooth transitions, dark mode, and responsive layout if you want
-
-
-
+| File          | Purpose                                               |
+| ------------- | ----------------------------------------------------- |
+| `runner.py`   | Runs a strategy over OHLCV data and simulates trades. |
+| `data/`       | CSV or OHLCV data for different trading pairs.        |
+| `strategies/` | Built-in strategies (e.g., SMA crossover).            |
+| `utils/`      | Helper functions (e.g., indicators, math ops).        |
 
 ---
 
-Let me know which one you'd like to improve or build next:
+## 🧠 `ml_engine/` – Machine Learning Core
 
-[ ] Style/UX of dashboard
+| File                   | Purpose                                         |
+| ---------------------- | ----------------------------------------------- |
+| `trainer.py`           | Trains AI models on past market data.           |
+| `indicators.py`        | Compute RSI, MACD, SMA, etc. for use in models. |
+| `feature_extractor.py` | Converts raw data into ML-ready features.       |
 
-[ ] Add agent trade history
+---
 
-[ ] Add mother AI confidence + logic
+## 🧬 `mother_ai/` – Central Decision Brain
 
-[ ] Strategy builder UI upgrade
+| File                     | Purpose                                             |
+| ------------------------ | --------------------------------------------------- |
+| `mother_ai.py`           | Combines predictions from agents, selects the best. |
+| `performance_tracker.py` | Tracks agent or system performance over time.       |
+| `trade_executer.py`      | Simulates or places trades (mock or real).          |
+| `logs/`                  | Stores decision logs or trade history.              |
 
-[ ] Backtest PnL chart
+---
 
+## 🗃️ `db/` – Local Database Layer
 
-Just say “next” or name the component and we’ll keep going.
+| File         | Purpose                                        |
+| ------------ | ---------------------------------------------- |
+| `models.py`  | SQLAlchemy models for trades, strategies, etc. |
+| `storage.py` | Save/load data from local storage or DB.       |
+
+---
+
+## 🧹 `strategy_engine/` – Custom Strategy System
+
+| File                      | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| `strategy_parser.py`      | Parses and executes user-defined JSON strategies.          |
+| `json_strategy_parser.py` | Converts UI strategy blocks into backend-executable logic. |
+| `strategy_health.py`      | Validates and scores strategies before use.                |
+
+---
+
+## 💾 `storage/` – Local Strategy & Trade Data
+
+| Folder                | Purpose                                     |
+| --------------------- | ------------------------------------------- |
+| `strategies/BTCUSDT/` | Saved strategy files for BTC.               |
+| `trade_logs/`         | Simulated or real trade logs for analytics. |
+
+---
+
+## 🛠️ `utils/` – Shared Utilities
+
+| File             | Purpose                                        |
+| ---------------- | ---------------------------------------------- |
+| `binance_api.py` | Fetch OHLCV, symbols, and prices from Binance. |
+| `logger.py`      | Logging utilities for backend monitoring.      |
+
+---
+
+## ✅ Integration Ready
+
+* All APIs are registered in `main.py` with clean `/api/*` routes.
+* Modular and scalable for new agents, models, or exchanges.
+* Fully supports self-hosted, local-first SaaS design.

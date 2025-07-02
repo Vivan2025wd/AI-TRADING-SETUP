@@ -5,7 +5,8 @@ import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import StrategyBuilder from "./components/StrategyBuilder";
 import BacktestResults from "./components/BacktestResults";
-import StrategyPerformance from "./components/StrategyPerformance"; // <-- Added import
+import StrategyPerformance from "./components/StrategyPerformance"; 
+import BinanceAPISetup from "./components/BinanceAPISetup";  // <-- Added import
 
 export default function App() {
   return (
@@ -53,6 +54,18 @@ export default function App() {
           >
             Strategy Performance
           </NavLink>
+
+          {/* New NavLink for Binance API Setup */}
+          <NavLink
+            to="/binance-api-setup"
+            className={({ isActive }) =>
+              isActive
+                ? "text-blue-400 border-b-2 border-blue-400 pb-1"
+                : "text-gray-400 hover:text-blue-300 transition"
+            }
+          >
+            Binance API Setup
+          </NavLink>
         </nav>
       </header>
 
@@ -62,6 +75,9 @@ export default function App() {
           <Route path="/strategy-builder" element={<StrategyBuilder />} />
           <Route path="/backtest-results" element={<BacktestResults />} />
           <Route path="/strategy-performance" element={<StrategyPerformance />} />
+
+          {/* New route for Binance API Setup */}
+          <Route path="/binance-api-setup" element={<BinanceAPISetup />} />
         </Routes>
       </main>
     </BrowserRouter>

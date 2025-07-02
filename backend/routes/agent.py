@@ -1,27 +1,47 @@
 from fastapi import APIRouter, HTTPException
 from backend.agents.generic_agent import GenericAgent
 from backend.strategy_registry import get_strategy_by_symbol
-from backend.backtester.runner import BacktestRunner  # To load OHLCV data
+from backend.backtester.runner import BacktestRunner
+from typing import List
 
-router = APIRouter(prefix="/ai/agent", tags=["Agent"])
+router = APIRouter(prefix="/agent", tags=["Agent"])
 
 @router.get("/{symbol}/predict")
 def get_agent_prediction(symbol: str):
+    """
+    Return a prediction (BUY/SELL/HOLD + confidence) from an agent based on the latest OHLCV data and strategy.
+    """
     try:
-        # Load user's strategy JSON (parsed)
+        # 🔁 Load parsed strategy JSON for the given symbol
         strategy_json = get_strategy_by_symbol(symbol)
-        
-        # Load OHLCV data for symbol (needed by agent)
+        if not strategy_json:
+            raise HTTPException(status_code=404, detail=f"No strategy found for symbol: {symbol}")
+
+        # 📊 Load OHLCV data for symbol
         backtest_runner = BacktestRunner()
         ohlcv_data = backtest_runner.load_ohlcv(symbol)
-        
-        # Create agent with parsed strategy object (should be parsed accordingly)
-        # Assuming strategy_json is already parsed or you parse it before passing
-        agent = GenericAgent(symbol, strategy_json)
-        
-        # Call predict with OHLCV data
-        prediction = agent.predict(ohlcv_data)
-        
-        return {"symbol": symbol, "prediction": prediction}
+        if ohlcv_data is None or len(ohlcv_data) == 0:
+            raise HTTPException(status_code=400, detail=f"No OHLCV data found for symbol: {symbol}")
+
+        # 🧠 Create agent instance with symbol and strategy logic
+        agent = GenericAgent(symbol=symbol, strategy_logic=strategy_json)
+
+        # 🧾 Get prediction (returns tuple: (action, confidence))
+        signal, confidence = agent.predict(ohlcv_data)
+
+        return {
+            "symbol": symbol,
+            "signal": signal,
+            "confidence": confidence
+        }
+
+    except HTTPException:
+        raise  # Re-raise known HTTP exceptions
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+AVAILABLE_AGENTS = ["BTC", "ETH", "SOL", "AAPL", "TSLA", "GOOG"]
+
+@router.get("", response_model=List[str])
+def list_available_agents():
+    return AVAILABLE_AGENTS

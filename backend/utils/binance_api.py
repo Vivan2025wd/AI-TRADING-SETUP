@@ -1,50 +1,62 @@
-# utils/binance_api.py
-
 import os
 from binance.client import Client
 from dotenv import load_dotenv
-from utils.logger import log
+from backend.utils.logger import log
+from typing import Optional
+import sys
 
 load_dotenv()
 
-# Optional fallback from .env (can be overridden by user injection)
+# Global (single-user) Binance client instance
+user_binance_client: Optional[Client] = None
+
+# Optional fallback from .env
 DEFAULT_API_KEY = os.getenv("BINANCE_API_KEY", "")
 DEFAULT_API_SECRET = os.getenv("BINANCE_API_SECRET", "")
 
-# Store active client per user/session (dict for simplicity)
-client_sessions = {}
-
-
-from typing import Optional
-
-def init_binance_client(user_id: str, api_key: Optional[str] = None, api_secret: Optional[str] = None):
+def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = None) -> dict:
     """
-    Initializes or updates a Binance client instance for a user.
+    Initializes the Binance client using provided or default API keys.
+    Returns a dict with 'success': True/False and a message.
     """
+    global user_binance_client
+
+    key = api_key or DEFAULT_API_KEY
+    secret = secret_key or DEFAULT_API_SECRET
+
+    if not key or not secret:
+        log.error("[Binance Init Error] Missing API key or secret.")
+        return {"success": False, "message": "Missing API key or secret."}
+
     try:
-        key = api_key or DEFAULT_API_KEY
-        secret = api_secret or DEFAULT_API_SECRET
-        client_sessions[user_id] = Client(api_key=key, api_secret=secret)
-        log.info(f"[Binance] Client initialized for user: {user_id}")
+        client = Client(api_key=key, api_secret=secret)
+        client.get_account()  # Test credentials
+
+        user_binance_client = client
+        log.info("[Binance] API connection successful.")
+        return {"success": True, "message": "Binance API connected successfully."}
+
     except Exception as e:
         log.error(f"[Binance Init Error] {e}")
-        raise
+        return {"success": False, "message": f"Connection failed: {str(e)}"}
 
 
-def get_client(user_id: str) -> Client:
+def get_binance_client() -> Client:
     """
-    Returns an existing Binance client instance for a given user.
+    Returns the connected Binance client, or raises error if not connected.
     """
-    if user_id not in client_sessions:
-        raise ValueError("Client not initialized. Call init_binance_client() first.")
-    return client_sessions[user_id]
+    if user_binance_client is None:
+        raise Exception("Binance API client not initialized.")
+    return user_binance_client
 
-
-def fetch_ohlcv(user_id: str, symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limit: int = 100):
+def fetch_ohlcv(symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limit: int = 100):
+    """
+    Fetches OHLCV candle data for a given symbol and interval.
+    """
     try:
-        client = get_client(user_id)
+        client = get_binance_client()
         klines = client.get_klines(symbol=symbol.upper(), interval=interval, limit=limit)
-        ohlcv = [
+        return [
             {
                 "timestamp": int(k[0]),
                 "open": float(k[1]),
@@ -55,7 +67,7 @@ def fetch_ohlcv(user_id: str, symbol: str, interval: str = Client.KLINE_INTERVAL
             }
             for k in klines
         ]
-        return ohlcv
     except Exception as e:
-        log.error(f"[Binance Fetch Error] {e}")
+        log.error(f"[Binance OHLCV Error] {e}")
         return []
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))

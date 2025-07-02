@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from backend.strategy_engine.strategy_parser import StrategyParser
 from datetime import datetime
+from typing import Optional
 
 class BacktestRunner:
     def __init__(self, data_dir="data"):
@@ -19,8 +20,24 @@ class BacktestRunner:
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
         return df
 
-    def run(self, symbol: str, strategy_json: str, initial_balance: float = 1000.0):
+    def run(
+        self,
+        symbol: str,
+        strategy_json: str,
+        initial_balance: float = 1000.0,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None
+    ):
         df = self.load_ohlcv(symbol)
+
+        # Filter by date range if provided
+        if start_date:
+            df = df[df.index >= pd.to_datetime(start_date)]
+        if end_date:
+            df = df[df.index <= pd.to_datetime(end_date)]
+
+        if df.empty:
+            raise ValueError("No data available in the specified date range.")
 
         strategy_dict = json.loads(strategy_json)
         parser = StrategyParser(strategy_dict)
@@ -36,7 +53,6 @@ class BacktestRunner:
             decision = signals[-1] if signals and len(signals) > 0 else None  # last signal for current window
 
             timestamp = row.name
-            # Ensure timestamp is a pandas Timestamp or datetime object
             try:
                 timestamp_dt = pd.to_datetime(str(timestamp))
                 timestamp_str = timestamp_dt.isoformat() if timestamp_dt is not None else ""
@@ -70,11 +86,17 @@ class BacktestRunner:
             "trades": trades,
             "total_trades": len(trades),
             "symbol": symbol,
-            "start_date": df.index[0].isoformat() if df.index[0] is not None else "",
-            "end_date": df.index[-1].isoformat() if df.index[-1] is not None else ""
+            "start_date": df.index[0].isoformat() if not df.empty else "",
+            "end_date": df.index[-1].isoformat() if not df.empty else ""
         }
 
-# Helper function for external calls or FastAPI
-def run_backtest(symbol: str, strategy_json: str, initial_balance: float = 1000.0):
+# Helper function for FastAPI
+def run_backtest(
+    symbol: str,
+    strategy_json: str,
+    initial_balance: float = 1000.0,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+):
     runner = BacktestRunner()
-    return runner.run(symbol, strategy_json, initial_balance)
+    return runner.run(symbol, strategy_json, initial_balance, start_date, end_date)
