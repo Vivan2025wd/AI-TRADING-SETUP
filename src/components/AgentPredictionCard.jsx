@@ -14,7 +14,7 @@ export default function AgentPredictionCard() {
   useEffect(() => {
     async function fetchAgentData() {
       try {
-        const res = await fetch("/api/agent-predictions");
+        const res = await fetch("/api/agent/predictions"); // Updated endpoint
         if (!res.ok) throw new Error("Failed to fetch agent predictions");
         const data = await res.json();
         setAgentData(data);
