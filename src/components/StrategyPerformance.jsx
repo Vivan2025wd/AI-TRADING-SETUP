@@ -18,7 +18,8 @@ export default function StrategyPerformance() {
   useEffect(() => {
     const fetchStrategies = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/strategies/list");
+        // Use proxy path for API calls
+        const res = await fetch("/api/strategies/list");
         const data = await res.json();
 
         const enriched = await Promise.all(
@@ -27,8 +28,9 @@ export default function StrategyPerformance() {
 
             let winRate = 0.0;
             try {
+              // Use proxy path for API calls
               const perfRes = await fetch(
-                `http://localhost:8000/api/strategies/${symbol}/${strategy_id}/performance`
+                `/api/strategies/${symbol}/${strategy_id}/performance`
               );
               if (perfRes.ok) {
                 const perf = await perfRes.json();
@@ -86,8 +88,9 @@ export default function StrategyPerformance() {
       return;
 
     try {
+      // Use proxy path for API calls
       const res = await fetch(
-        `http://localhost:8000/api/strategies/${symbol}/${id}`,
+        `/api/strategies/${symbol}/${id}`,
         {
           method: "DELETE",
         }

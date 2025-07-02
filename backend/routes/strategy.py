@@ -64,9 +64,23 @@ def list_strategies_by_symbol(symbol: str):
 # ✅ Delete strategy file
 @router.delete("/strategies/{symbol}/{strategy_id}")
 def remove_strategy(symbol: str, strategy_id: str):
-    success = delete_strategy(symbol.upper(), strategy_id)
+    # The strategy_id from the path is the full file stem, e.g., "BTC_strategy_st2"
+    # The delete_strategy function expects the symbol and the actual ID part, e.g., "BTC", "st2"
+    # We need to extract the actual ID part if the full stem is passed.
+    # Expected filename format: {symbol}_strategy_{actual_id}.json
+
+    normalized_symbol = symbol.upper()
+    actual_id_part = strategy_id
+
+    # If strategy_id from path looks like "SYMBOL_strategy_IDPART"
+    # and symbol from path matches SYMBOL, extract IDPART.
+    prefix_to_check = f"{normalized_symbol}_strategy_"
+    if strategy_id.startswith(prefix_to_check):
+        actual_id_part = strategy_id[len(prefix_to_check):]
+
+    success = delete_strategy(normalized_symbol, actual_id_part)
     if not success:
-        raise HTTPException(status_code=404, detail="Strategy not found or could not be deleted.")
+        raise HTTPException(status_code=404, detail=f"Strategy {actual_id_part} for {normalized_symbol} not found or could not be deleted.")
     return {"message": f"Strategy {strategy_id} for {symbol.upper()} deleted successfully."}
 
 # ✅ Load performance data for a given strategy
