@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from backend.mother_ai.mother_ai import MotherAI
 
-router = APIRouter(prefix="/mother-ai", tags=["Mother AI"])
+router = APIRouter(tags=["Mother AI"])
 
 # Create a MotherAI instance with example agent symbols
 mother_ai_instance = MotherAI(agent_symbols=["AAPL", "TSLA", "GOOG"])

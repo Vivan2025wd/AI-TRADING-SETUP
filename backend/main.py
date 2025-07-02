@@ -40,4 +40,4 @@ app.include_router(backtest_router, prefix="/api/backtest", tags=["Backtesting"]
 app.include_router(binance_router, prefix="/api/binance", tags=["Binance"])
 app.include_router(agents_router, prefix="/api/agents", tags=["Agent Registry"])
 app.include_router(strategy_file_loader_router, prefix="/api/strategies", tags=["Strategy Files"])  # ✅ JSON list endpoint
-app.include_router(strategy_router, prefix="/api", tags=["Strategy"])
+# app.include_router(strategy_router, prefix="/api", tags=["Strategy"]) # Removed duplicate
