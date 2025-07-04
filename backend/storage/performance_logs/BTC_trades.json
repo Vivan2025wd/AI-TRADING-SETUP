@@ -1,0 +1,31 @@
+[
+  {
+      "timestamp": "2025-07-03T12:34:56Z",
+      "balance": 1050,
+      "price": 32000,
+      "type": "BUY",
+      "profit_percent": 2.5,
+      "symbol": "BTC"
+    },
+  {
+    "timestamp": "2025-07-03T15:30:00Z",
+    "balance": 1023.75,
+    "price": 31500,
+    "profit_percent": -2.5,
+    "symbol": "BTC"
+  },
+  {
+    "timestamp": "2025-07-04T10:15:00Z",
+    "balance": 1056.51,
+    "price": 31000,
+    "profit_percent": 3.2,
+    "symbol": "BTC"
+  },{
+    "timestamp": "2025-07-04T10:15:00Z",
+    "balance": 1056.51,
+    "price": 31000,
+    "type": "SELL",
+    "profit_percent": 3.2,
+    "symbol": "BTC"
+  }
+]

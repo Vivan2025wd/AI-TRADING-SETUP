@@ -8,8 +8,8 @@ STRATEGY_DIR.mkdir(parents=True, exist_ok=True)
 
 def load_strategy_for_symbol(symbol: str) -> Dict[str, Any]:
     """
-    Load a default strategy JSON file for the given symbol.
-    The file is expected to be named as e.g. 'BTCUSDT_strategy_default.json'
+    Load the default strategy JSON file for a given symbol.
+    File format: '{symbol}_strategy_default.json'
     """
     filename = f"{symbol}_strategy_default.json"
     file_path = STRATEGY_DIR / filename
@@ -24,8 +24,8 @@ def load_strategy_for_symbol(symbol: str) -> Dict[str, Any]:
 
 def load_strategy_from_file(symbol: str, strategy_id: str) -> Dict[str, Any]:
     """
-    Load a user strategy JSON file and return it as a dict.
-    Expects files named like: BTCUSDT_strategy_001.json
+    Load a user strategy JSON file.
+    File format: '{symbol}_strategy_{strategy_id}.json'
     """
     file_path = STRATEGY_DIR / f"{symbol}_strategy_{strategy_id}.json"
     if not file_path.exists():
@@ -39,20 +39,20 @@ def load_strategy_from_file(symbol: str, strategy_id: str) -> Dict[str, Any]:
 
 def load_strategy_from_json_string(json_str: str) -> Dict[str, Any]:
     """
-    Load and validate a strategy from a raw JSON string (e.g., from frontend)
+    Load and validate a strategy from a JSON string, typically from frontend input.
     """
     try:
         strategy = json.loads(json_str)
-        validate_strategy(strategy)
-        return strategy
-    except json.JSONDecodeError:
-        raise ValueError("Invalid JSON format")
-    except Exception as e:
-        raise ValueError(f"Strategy validation failed: {str(e)}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON format: {str(e)}")
 
-def validate_strategy(strategy: Dict[str, Any]):
+    validate_strategy(strategy)
+    return strategy
+
+def validate_strategy(strategy: Dict[str, Any]) -> None:
     """
-    Validate that the JSON strategy contains required keys
+    Ensure strategy dict contains required keys and correct types.
+    Raises ValueError if invalid.
     """
     if "symbol" not in strategy:
         raise ValueError("Missing 'symbol' in strategy")
@@ -63,6 +63,6 @@ def validate_strategy(strategy: Dict[str, Any]):
 
 def parse_strategy_json(json_str: str) -> Dict[str, Any]:
     """
-    Frontend entry: parse JSON string and return validated strategy dict.
+    Entry point to parse and validate JSON strategy string.
     """
     return load_strategy_from_json_string(json_str)

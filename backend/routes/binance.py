@@ -1,9 +1,8 @@
 # backend/routes/binance.py
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from backend.utils.binance_api import connect_user_api
+from backend.utils.binance_api import connect_user_api, user_binance_client
 
-# Removed prefix to avoid redundancy — route will be /api/binance/connect after inclusion in main.py
 router = APIRouter(tags=["BinanceAPI"])
 
 class APIKeys(BaseModel):
@@ -19,3 +18,16 @@ def connect_to_binance(keys: APIKeys):
         return {"message": result.get("message", "Connected to Binance")}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/price")
+def get_latest_price(symbol: str = Query(..., description="Trading symbol like ADAUSDT")):
+    try:
+        symbol = symbol.upper()
+        if user_binance_client is None:
+            raise HTTPException(status_code=503, detail="Binance client not connected")
+        ticker = user_binance_client.get_symbol_ticker(symbol=symbol)
+        price = float(ticker.get("price", 0))
+        return {"symbol": symbol, "price": price}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error fetching price for {symbol}: {e}")

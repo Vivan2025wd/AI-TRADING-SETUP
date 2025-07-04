@@ -13,8 +13,9 @@ export default function StrategyBuilder() {
     { indicator: "RSI", condition: "<", value: "30", action: "BUY" },
   ]);
   const [loading, setLoading] = useState(false);
+  const [savedStrategies, setSavedStrategies] = useState([]);
+  const [error, setError] = useState(null); // <-- Error state
 
-  // ✅ useEffect is inside component, no syntax errors
   useEffect(() => {
     const fetchAgents = async () => {
       try {
@@ -24,20 +25,33 @@ export default function StrategyBuilder() {
         setAgents(data);
         setSelectedAgent(data[0] || "");
       } catch (err) {
-        console.error("Error fetching agents:", err.message);
+        console.error(err);
+        setError("Error loading agents. Using fallback list.");
         const fallback = ["BTC", "ETH", "SOL"];
         setAgents(fallback);
         setSelectedAgent(fallback[0]);
       }
     };
+
+    const fetchStrategies = async () => {
+      try {
+        const res = await fetch("/api/strategy/list");
+        if (!res.ok) throw new Error("Failed to fetch strategies");
+        const data = await res.json();
+        setSavedStrategies(data.data || []);
+      } catch (err) {
+        console.error("Error fetching strategies:", err.message);
+        setError("Failed to load saved strategies.");
+        setSavedStrategies([]);
+      }
+    };
+
     fetchAgents();
+    fetchStrategies();
   }, []);
 
   const addRule = () => {
-    setRules([
-      ...rules,
-      { indicator: "RSI", condition: "<", value: "30", action: "BUY" },
-    ]);
+    setRules([...rules, { indicator: "RSI", condition: "<", value: "30", action: "BUY" }]);
   };
 
   const updateRule = (index, field, value) => {
@@ -52,7 +66,6 @@ export default function StrategyBuilder() {
 
   const convertRulesToIndicators = () => {
     const indicatorsObj = {};
-
     rules.forEach((rule) => {
       const key = rule.indicator.toLowerCase();
       const val = parseFloat(rule.value);
@@ -109,9 +122,8 @@ export default function StrategyBuilder() {
       strategy_json: convertRulesToIndicators(),
     };
 
-    console.log("Submitting strategy:", payload);
-
     try {
+      setError(null);
       setLoading(true);
       const res = await fetch("/api/strategy/save", {
         method: "POST",
@@ -126,21 +138,64 @@ export default function StrategyBuilder() {
 
       alert(`✅ Saved strategy "${strategyName}"`);
       setStrategyName("");
-      setRules([
-        { indicator: "RSI", condition: "<", value: "30", action: "BUY" },
-      ]);
+      setRules([{ indicator: "RSI", condition: "<", value: "30", action: "BUY" }]);
+      fetchSavedStrategies();
     } catch (err) {
-      alert("Error saving: " + err.message);
+      setError("Error saving strategy: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchSavedStrategies = async () => {
+    try {
+      const res = await fetch("/api/strategy/list");
+      if (!res.ok) throw new Error("Failed to fetch strategies");
+      const data = await res.json();
+      setSavedStrategies(data.data || []);
+    } catch (err) {
+      console.error("Error fetching strategies:", err.message);
+      setError("Error refreshing saved strategies.");
+      setSavedStrategies([]);
+    }
+  };
+
+  const deleteStrategy = async (strategyKey) => {
+    if (!window.confirm(`Are you sure you want to delete "${strategyKey}"?`)) return;
+
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/strategy/${strategyKey}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.detail || "Failed to delete");
+      }
+
+      alert(`Deleted strategy "${strategyKey}"`);
+      fetchSavedStrategies();
+    } catch (err) {
+      setError("Error deleting strategy: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredStrategies = savedStrategies.filter(
+    (s) => s.strategy_id && s.symbol && agents.includes(s.symbol)
+  );
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-lg space-y-6 border border-gray-700 text-white">
-      <h2 className="text-2xl font-bold flex items-center gap-2">
-        Strategy Builder
-      </h2>
+      <h2 className="text-2xl font-bold flex items-center gap-2">Strategy Builder</h2>
+
+      {error && (
+        <div className="bg-red-800 text-red-100 p-3 rounded border border-red-500">
+          ⚠️ {error}
+        </div>
+      )}
 
       {/* Strategy Name */}
       <div>
@@ -150,7 +205,7 @@ export default function StrategyBuilder() {
           value={strategyName}
           onChange={(e) => setStrategyName(e.target.value)}
           placeholder="Enter strategy name"
-          className="w-full max-w-sm px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full max-w-sm px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
           disabled={loading}
         />
       </div>
@@ -161,7 +216,7 @@ export default function StrategyBuilder() {
         <select
           value={selectedAgent}
           onChange={(e) => setSelectedAgent(e.target.value)}
-          className="w-full max-w-sm px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full max-w-sm px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white"
           disabled={loading}
         >
           {agents.map((agent) => (
@@ -172,13 +227,12 @@ export default function StrategyBuilder() {
         </select>
       </div>
 
-      {/* Rules */}
+      {/* Rule Builder */}
       {rules.map((rule, index) => (
         <div
           key={index}
           className="flex flex-wrap items-center gap-4 p-4 bg-gray-800 rounded border border-gray-700"
         >
-          {/* Indicator */}
           <div>
             <label className="block text-sm text-gray-300">Indicator</label>
             <select
@@ -193,7 +247,6 @@ export default function StrategyBuilder() {
             </select>
           </div>
 
-          {/* Condition */}
           <div>
             <label className="block text-sm text-gray-300">Condition</label>
             <select
@@ -208,7 +261,6 @@ export default function StrategyBuilder() {
             </select>
           </div>
 
-          {/* Value */}
           <div>
             <label className="block text-sm text-gray-300">Value</label>
             <input
@@ -220,13 +272,12 @@ export default function StrategyBuilder() {
             />
           </div>
 
-          {/* Action */}
           <div>
             <label className="block text-sm text-gray-300">Action</label>
             <select
               value={rule.action}
               onChange={(e) => updateRule(index, "action", e.target.value)}
-              className={`px-2 py-1 mt-1 border rounded focus:outline-none ${
+              className={`px-2 py-1 mt-1 border rounded ${
                 rule.action === "BUY"
                   ? "bg-green-700 text-green-300"
                   : rule.action === "SELL"
@@ -241,7 +292,6 @@ export default function StrategyBuilder() {
             </select>
           </div>
 
-          {/* Remove Rule */}
           <button
             onClick={() => removeRule(index)}
             className="ml-auto text-red-500 hover:text-red-700"
@@ -253,7 +303,7 @@ export default function StrategyBuilder() {
         </div>
       ))}
 
-      {/* Action Buttons */}
+      {/* Actions */}
       <div className="flex gap-4">
         <button
           onClick={addRule}
@@ -271,6 +321,37 @@ export default function StrategyBuilder() {
           <Save className="w-5 h-5" />
           {loading ? "Saving..." : "Save Strategy"}
         </button>
+      </div>
+
+      {/* Saved Strategies */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Saved Strategies</h3>
+
+        {filteredStrategies.length === 0 && (
+          <p className="text-gray-400">No saved strategies found.</p>
+        )}
+
+        {filteredStrategies.map((strategy) => (
+          <div
+            key={`${strategy.symbol}-${strategy.strategy_id}`}
+            className="flex items-center justify-between bg-gray-800 p-4 rounded border border-gray-700 mb-2"
+          >
+            <div>
+              <p className="font-semibold">{strategy.strategy_id}</p>
+              <p className="text-gray-400 text-sm">Agent: {strategy.symbol}</p>
+            </div>
+            <button
+              onClick={() =>
+                deleteStrategy(`${strategy.symbol}_strategy_${strategy.strategy_id}`)
+              }
+              className="text-red-500 hover:text-red-700"
+              disabled={loading}
+              title="Delete strategy"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

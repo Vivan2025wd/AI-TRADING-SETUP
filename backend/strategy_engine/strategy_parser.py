@@ -1,17 +1,16 @@
-# strategy_engine/strategy_parser.py
-
 import pandas as pd
 from backend.ml_engine.indicators import calculate_rsi, calculate_ema
 
 class StrategyParser:
-    def __init__(self, strategy_json):
+    def __init__(self, strategy_json: dict):
         self.strategy = strategy_json
         self.symbol = strategy_json.get("symbol", "")
         self.indicators = strategy_json.get("indicators", {})
 
-    def apply_indicators(self, df):
+    def apply_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Adds indicator columns (e.g., RSI, EMA) to the OHLCV dataframe based on strategy
+        Adds indicator columns (e.g., RSI, EMA) to the OHLCV dataframe based on strategy.
+        Assumes df has 'close' price column.
         """
         if "rsi" in self.indicators:
             period = self.indicators["rsi"].get("period", 14)
@@ -23,10 +22,10 @@ class StrategyParser:
 
         return df
 
-    def evaluate_conditions(self, df):
+    def evaluate_conditions(self, df: pd.DataFrame) -> list[str]:
         """
-        Evaluate buy/sell/hold logic row by row.
-        Returns a list of signals: ["buy", "hold", "sell", ...]
+        Evaluate buy/sell/hold logic for each row in the dataframe.
+        Returns a list of signals (strings): ["buy", "hold", "sell", ...]
         """
         signals = []
 
@@ -38,10 +37,12 @@ class StrategyParser:
             if "rsi" in self.indicators:
                 rsi_val = row.get("rsi", None)
                 rsi_conf = self.indicators["rsi"]
-                if rsi_val:
-                    if rsi_val < rsi_conf.get("buy_below", 30):
+                if rsi_val is not None:
+                    buy_below = rsi_conf.get("buy_below", 30)
+                    sell_above = rsi_conf.get("sell_above", 70)
+                    if rsi_val < buy_below:
                         buy_signal = True
-                    elif rsi_val > rsi_conf.get("sell_above", 70):
+                    elif rsi_val > sell_above:
                         sell_signal = True
 
             # EMA logic
@@ -49,13 +50,18 @@ class StrategyParser:
                 price = row.get("close", None)
                 ema_val = row.get("ema", None)
                 ema_conf = self.indicators["ema"]
-                if price and ema_val:
-                    if price > ema_conf.get("buy_crosses_above", ema_val):
+                if price is not None and ema_val is not None:
+                    # Use boolean flags from config (True/False) to control buy/sell signals
+                    buy_crosses = ema_conf.get("buy_crosses_above", False)
+                    sell_crosses = ema_conf.get("sell_crosses_below", False)
+
+                    # Note: Original code compared with ema_val which looks wrong; fix to boolean logic:
+                    if buy_crosses and price > ema_val:
                         buy_signal = True
-                    elif price < ema_conf.get("sell_crosses_below", ema_val):
+                    elif sell_crosses and price < ema_val:
                         sell_signal = True
 
-            # Combine conditions
+            # Combine conditions to determine final signal
             if buy_signal and not sell_signal:
                 signals.append("buy")
             elif sell_signal and not buy_signal:
@@ -63,20 +69,19 @@ class StrategyParser:
             else:
                 signals.append("hold")
 
+        return signals
+
     @staticmethod
     def parse(strategy_json: dict) -> "StrategyParser":
         """
-        Static method to initialize the parser from a strategy dict.
+        Static factory method to create an instance from a strategy dict.
         """
         return StrategyParser(strategy_json)
 
     def evaluate(self, df: pd.DataFrame) -> str:
         """
-        Evaluates the most recent row and returns one of: 'buy', 'sell', 'hold'
+        Evaluates the latest row and returns one of: 'buy', 'sell', 'hold'.
         """
         df = self.apply_indicators(df)
         signals = self.evaluate_conditions(df)
         return signals[-1] if signals else "hold"
-
-
-        return signals

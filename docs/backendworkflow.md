@@ -262,3 +262,120 @@ Only high-confidence trades executed/logged
    ↓
 Logs saved locally → visible in dashboard
 
+
+
+
+Backend Workflow Overview
+1. User or System Input
+User interacts via API routes (FastAPI endpoints).
+
+Inputs include symbol names, strategy JSONs, dates, Binance API keys, or requests for predictions/trades/backtests.
+
+2. Strategy Management & Loading
+Strategy Management Routes handle saving, listing, deleting, and retrieving strategies.
+
+Uses Strategy Registry to:
+
+Register/unregister strategies.
+
+Load strategies by symbol or ID.
+
+Manage strategy files on disk.
+
+Strategies are parsed and validated using Strategy Engine JSON Parser.
+
+3. Data Acquisition & Preparation
+Binance Connector:
+
+Connects to Binance with user keys.
+
+Fetches OHLCV candlestick data for requested symbols.
+
+Storage Utilities:
+
+Save/load trade logs and strategies as JSON.
+
+Support data persistence for backtests and performance tracking.
+
+4. Strategy Evaluation & Signal Generation
+Trading Agents (BTCUSDTAgent, ETHUSDTAgent, GenericAgent):
+
+Load symbol-specific strategy via registry or loader.
+
+Use StrategyParser to apply indicators (RSI, EMA, etc.) on OHLCV data.
+
+Evaluate buy/sell/hold signals for the current market data.
+
+Return trading action with confidence and timestamp.
+
+ML Engine (optional/advanced):
+
+Extracts features (RSI, EMA, MACD).
+
+Can train models to enhance prediction accuracy.
+
+5. Aggregation and Decision Making
+MotherAI:
+
+Loads multiple trading agents.
+
+Aggregates their predictions and confidence scores.
+
+Combines live prediction confidence with historical win rates (via PerformanceTracker).
+
+Computes weighted confidence scores.
+
+Makes portfolio-level trade decisions, selects best trades to execute.
+
+6. Execution and Simulation
+MockTradeExecutor:
+
+Simulates trade execution using mock portfolio balances.
+
+Executes buy/sell logic based on agent signals.
+
+Updates mock portfolio state.
+
+Logs trade outcomes.
+
+PerformanceTracker:
+
+Logs and retrieves trade performance.
+
+Summarizes win/loss rates and trade history.
+
+7. Backtesting
+BacktestRunner:
+
+Loads historical OHLCV data for a symbol.
+
+Runs strategy on historical data.
+
+Simulates trades and computes balance/performance metrics.
+
+Returns detailed backtest results.
+
+Backtest routes allow users to start backtests and retrieve results.
+
+8. Logging & Monitoring
+Logger Utility:
+
+Centralized logging for debugging and info.
+
+Logs saved to console and file with timestamps.
+
+Monitoring of system activity and errors.
+
+Summary of API Routes Workflow
+Route Group	Key Operations	Connects to
+Agent Routes	List available agents	Agent registry
+Agent Prediction Routes	Get predictions per symbol or aggregate	Trading Agents, StrategyParser, OHLCV data
+Backtest Routes	Run backtests, get backtest logs	BacktestRunner, Storage Utilities
+Binance Routes	Connect to Binance API, fetch OHLCV	Binance Connector
+Mother AI Routes	Get portfolio trade decisions and aggregated trade logs	MotherAI, PerformanceTracker
+Strategy Routes	List available strategies	Strategy Registry, JSON Parser
+Strategy Management	Save, delete, list strategies; get performance	Strategy Registry, Strategy Health
+
+This workflow ensures a modular, clear flow:
+
+Input → Strategy Load → Data Fetch → Signal Generation → Aggregation → Execution/Simulation → Logging/Backtesting

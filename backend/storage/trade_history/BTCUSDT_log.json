@@ -1,0 +1,34 @@
+[
+  {
+    "timestamp": "2025-06-30T10:00:00Z",
+    "type": "BUY",
+    "agent": "BTCUSDT",
+    "price": 31000.5,
+    "balance": 101000.75,
+    "result": "loss"
+  },
+  {
+    "timestamp": "2025-07-02T12:00:00Z",
+    "type": "SELL",
+    "agent": "BTCUSDT",
+    "price": 31500.0,
+    "balance": 102500.0,
+    "result": "win"
+  },
+  {
+    "timestamp": "2025-07-03T10:00:00Z",
+    "type": "BUY",
+    "agent": "BTCUSDT",
+    "price": 30000.5,
+    "balance": 103500.75,
+    "result": "loss"
+  },
+  {
+    "timestamp": "2025-07-04T12:15:00Z",
+    "type": "SELL",
+    "agent": "BTCUSDT",
+    "price": 31000.0,
+    "balance": 106000.00,
+    "result": "win"
+  }
+]

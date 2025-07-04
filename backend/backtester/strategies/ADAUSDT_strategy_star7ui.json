@@ -1,5 +1,5 @@
 {
-  "symbol": "BTC",
+  "symbol": "ADAUSDT",
   "indicators": {
     "rsi": {
       "buy_below": [

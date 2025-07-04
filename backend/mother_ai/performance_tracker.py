@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 class PerformanceTracker:
-    def __init__(self, log_dir="backend/mother_ai/logs"):
+    def __init__(self, log_dir="backend/storage/trade_history"):
         self.log_dir = log_dir
         os.makedirs(self.log_dir, exist_ok=True)
 

@@ -1,84 +1,128 @@
-// src/App.jsx
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
 
-import Dashboard from "./pages/Dashboard";
-import StrategyBuilder from "./components/StrategyBuilder";
-import BacktestResults from "./components/BacktestResults";
-import StrategyPerformance from "./components/StrategyPerformance"; 
-import BinanceAPISetup from "./components/BinanceAPISetup";  // <-- Added import
+// Lazy load each page/component
+const AgentPredictionCard = lazy(() => import("./components/AgentPredictionCard"));
+const BacktestResults = lazy(() => import("./components/BacktestResults"));
+const BinanceAPISetup = lazy(() => import("./components/BinanceAPISetup"));
+const ChartDisplay = lazy(() => import("./components/ChartDisplay"));
+const MotherAIDecisionCard = lazy(() => import("./components/MotherAIDecisionCard"));
+const StrategyBuilder = lazy(() => import("./components/StrategyBuilder"));
+const StrategyPerformance = lazy(() => import("./components/StrategyPerformance"));
+
+const getNavClass = ({ isActive }) =>
+  isActive
+    ? "text-blue-400 border-b-2 border-blue-400 pb-1"
+    : "text-gray-400 hover:text-blue-300 transition";
+
+// Simple Suspense wrapper with fallback
+const SuspenseWrapper = ({ children }) => (
+  <Suspense fallback={<div className="text-gray-300 text-center p-6">Loading...</div>}>
+    {children}
+  </Suspense>
+);
 
 export default function App() {
   return (
     <BrowserRouter>
       <header className="bg-gray-900 text-white shadow-sm sticky top-0 z-50">
-        <nav className="flex items-center space-x-6 px-6 py-4 text-sm font-medium">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              isActive
-                ? "text-blue-400 border-b-2 border-blue-400 pb-1"
-                : "text-gray-400 hover:text-blue-300 transition"
-            }
-          >
-            Dashboard
+        <nav className="flex items-center space-x-6 px-6 py-4 text-sm font-medium overflow-x-auto whitespace-nowrap">
+          <NavLink to="/agent-predictions" className={getNavClass}>
+            Binance API Setup
           </NavLink>
-          <NavLink
-            to="/strategy-builder"
-            className={({ isActive }) =>
-              isActive
-                ? "text-blue-400 border-b-2 border-blue-400 pb-1"
-                : "text-gray-400 hover:text-blue-300 transition"
-            }
-          >
-            Strategy Builder
-          </NavLink>
-          <NavLink
-            to="/backtest-results"
-            className={({ isActive }) =>
-              isActive
-                ? "text-blue-400 border-b-2 border-blue-400 pb-1"
-                : "text-gray-400 hover:text-blue-300 transition"
-            }
-          >
+          <NavLink to="/backtest-results" className={getNavClass}>
             Backtest Results
           </NavLink>
-          <NavLink
-            to="/strategy-performance"
-            className={({ isActive }) =>
-              isActive
-                ? "text-blue-400 border-b-2 border-blue-400 pb-1"
-                : "text-gray-400 hover:text-blue-300 transition"
-            }
-          >
-            Strategy Performance
+          <NavLink to="/binance-api-setup" className={getNavClass}>
+            Agent Predictions
           </NavLink>
-
-          {/* New NavLink for Binance API Setup */}
-          <NavLink
-            to="/binance-api-setup"
-            className={({ isActive }) =>
-              isActive
-                ? "text-blue-400 border-b-2 border-blue-400 pb-1"
-                : "text-gray-400 hover:text-blue-300 transition"
-            }
-          >
-            Binance API Setup
+          <NavLink to="/chart-display" className={getNavClass}>
+            Chart Display
+          </NavLink>
+          <NavLink to="/mother-ai-decision" className={getNavClass}>
+            Mother AI Decision
+          </NavLink>
+          <NavLink to="/strategy-builder" className={getNavClass}>
+            Strategy Builder
+          </NavLink>
+          <NavLink to="/strategy-performance" className={getNavClass}>
+            Strategy Performance
           </NavLink>
         </nav>
       </header>
 
       <main className="p-6 bg-gray-950 min-h-screen text-white">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/strategy-builder" element={<StrategyBuilder />} />
-          <Route path="/backtest-results" element={<BacktestResults />} />
-          <Route path="/strategy-performance" element={<StrategyPerformance />} />
+        <ErrorBoundary>
+          <Routes>
+            <Route
+              path="/agent-predictions"
+              element={
+                <SuspenseWrapper>
+                  <BinanceAPISetup />
+                </SuspenseWrapper>
+              }
+            />
+            <Route
+              path="/backtest-results"
+              element={
+                <SuspenseWrapper>
+                  <BacktestResults />
+                </SuspenseWrapper>
+              }
+            />
+            <Route
+              path="/binance-api-setup"
+              element={
+                <SuspenseWrapper>
+                  <AgentPredictionCard />
+                </SuspenseWrapper>
+              }
+            />
+            <Route
+              path="/chart-display"
+              element={
+                <SuspenseWrapper>
+                  <ChartDisplay />
+                </SuspenseWrapper>
+              }
+            />
+            <Route
+              path="/mother-ai-decision"
+              element={
+                <SuspenseWrapper>
+                  <MotherAIDecisionCard />
+                </SuspenseWrapper>
+              }
+            />
+            <Route
+              path="/strategy-builder"
+              element={
+                <SuspenseWrapper>
+                  <StrategyBuilder />
+                </SuspenseWrapper>
+              }
+            />
+            <Route
+              path="/strategy-performance"
+              element={
+                <SuspenseWrapper>
+                  <StrategyPerformance />
+                </SuspenseWrapper>
+              }
+            />
 
-          {/* New route for Binance API Setup */}
-          <Route path="/binance-api-setup" element={<BinanceAPISetup />} />
-        </Routes>
+            {/* Optional: Redirect root or fallback 
+            <Route
+              path="/"
+              element={
+                <div className="text-center text-gray-400 mt-20">
+                  <h2>Welcome! Please select a page from the navigation.</h2>
+                </div>
+              }
+            />*/}
+          </Routes>
+        </ErrorBoundary>
       </main>
     </BrowserRouter>
   );

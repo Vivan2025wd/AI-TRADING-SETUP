@@ -71,3 +71,15 @@ def fetch_ohlcv(symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limi
         log.error(f"[Binance OHLCV Error] {e}")
         return []
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+def get_symbol_price(symbol: str) -> float:
+    """
+    Fetches the current ticker price for the given symbol from Binance.
+    """
+    try:
+        client = get_binance_client()
+        ticker = client.get_symbol_ticker(symbol=symbol.upper())
+        return float(ticker['price'])
+    except Exception as e:
+        log.error(f"[Binance Price Fetch Error] {e}")
+        raise e
