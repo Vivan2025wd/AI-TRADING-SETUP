@@ -1,44 +1,37 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Dict
+from pathlib import Path
+import json
 
-router = APIRouter()
+router = APIRouter(tags=["StrategyLoader"])
 
-# In-memory stores (replace with DB in production)
-strategies_store = {
-    "BTC_strategy1": {
-        "strategy_id": "strategy1",
-        "symbol": "BTC",
-        "strategy_json": {
-            "indicators": {
-                "rsi": {"buy_below": [30]},
-                "macd": {"sell_above": [0]}
-            }
-        },
-    },
-    "ETH_strategy2": {
-        "strategy_id": "strategy2",
-        "symbol": "ETH",
-        "strategy_json": {
-            "indicators": {
-                "sma": {"buy_above": [50]},
-                "macd": {"sell_below": [-0.5]}
-            }
-        },
-    },
-    # Add more strategies here
-}
+STRATEGY_DIR = Path("backend/storage/strategies")
+PERFORMANCE_DIR = Path("backend/storage/performance_logs")
 
-performance_data = {
-    "BTC_strategy1": {"win_rate": 0.75},
-    "ETH_strategy2": {"win_rate": 0.6}
-}
+
+def load_all_strategies() -> List[Dict]:
+    strategies = []
+    for file in STRATEGY_DIR.glob("*.json"):
+        try:
+            with open(file, "r") as f:
+                data = json.load(f)
+                symbol, strategy_id = file.stem.split("_strategy_", 1)
+                strategies.append({
+                    "strategy_id": strategy_id,
+                    "symbol": symbol,
+                    "strategy_json": data.get("indicators", {}),
+                })
+        except Exception as e:
+            print(f"[Error loading strategy] {file.name}: {e}")
+    return strategies
+
 
 @router.get("/list")
 async def list_strategies(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1)
 ):
-    all_strategies = list(strategies_store.values())
+    all_strategies = load_all_strategies()
     total = len(all_strategies)
     start = (page - 1) * limit
     end = start + limit
@@ -52,19 +45,38 @@ async def list_strategies(
         "data": paginated_strategies
     }
 
+
 @router.get("/{symbol}/{strategy_id}/performance")
 async def get_strategy_performance(symbol: str, strategy_id: str):
-    key = f"{symbol}_{strategy_id}"
-    perf = performance_data.get(key)
-    if perf is None:
+    symbol = symbol.upper()
+    path = PERFORMANCE_DIR / f"{symbol}_strategy_{strategy_id}.json"
+    if not path.exists():
         raise HTTPException(status_code=404, detail="Performance data not found")
-    return perf
+    try:
+        with open(path, "r") as f:
+            data = json.load(f)
+            wins = sum(1 for trade in data if trade["result"] == "win")
+            total = len(data)
+            win_rate = wins / total if total else 0
+            return {"win_rate": round(win_rate, 4), "total_trades": total}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read performance log: {e}")
+
 
 @router.delete("/{symbol}/{strategy_id}")
 async def delete_strategy(symbol: str, strategy_id: str):
-    key = f"{symbol}_{strategy_id}"
-    if key not in strategies_store:
-        raise HTTPException(status_code=404, detail="Strategy not found")
-    strategies_store.pop(key)
-    performance_data.pop(key, None)
+    symbol = symbol.upper()
+    strategy_path = STRATEGY_DIR / f"{symbol}_strategy_{strategy_id}.json"
+    perf_path = PERFORMANCE_DIR / f"{symbol}_strategy_{strategy_id}.json"
+
+    if not strategy_path.exists():
+        raise HTTPException(status_code=404, detail="Strategy file not found")
+
+    try:
+        strategy_path.unlink()
+        if perf_path.exists():
+            perf_path.unlink()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete: {e}")
+
     return {"message": f"Strategy '{strategy_id}' for '{symbol}' deleted"}

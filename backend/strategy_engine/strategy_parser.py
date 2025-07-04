@@ -51,14 +51,11 @@ class StrategyParser:
                 ema_val = row.get("ema", None)
                 ema_conf = self.indicators["ema"]
                 if price is not None and ema_val is not None:
-                    # Use boolean flags from config (True/False) to control buy/sell signals
-                    buy_crosses = ema_conf.get("buy_crosses_above", False)
-                    sell_crosses = ema_conf.get("sell_crosses_below", False)
-
-                    # Note: Original code compared with ema_val which looks wrong; fix to boolean logic:
-                    if buy_crosses and price > ema_val:
+                    # Buy when price crosses above EMA if buy_crosses_above is True
+                    if ema_conf.get("buy_crosses_above", False) and price > ema_val:
                         buy_signal = True
-                    elif sell_crosses and price < ema_val:
+                    # Sell when price crosses below EMA if sell_crosses_below is True
+                    elif ema_conf.get("sell_crosses_below", False) and price < ema_val:
                         sell_signal = True
 
             # Combine conditions to determine final signal

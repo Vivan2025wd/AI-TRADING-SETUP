@@ -1,50 +1,67 @@
 import os
 import json
 from typing import Any, Dict, List
+from pathlib import Path
 
-# Base local directory for storage (relative to root of project)
-BASE_DIR = os.path.join(os.path.dirname(__file__), '..', 'storage')
-TRADE_LOGS_DIR = os.path.join(BASE_DIR, 'trade_logs')
-STRATEGIES_DIR = os.path.join(BASE_DIR, 'strategies')
+# Base directory
+BASE_DIR = Path(__file__).resolve().parent.parent / "storage"
+TRADE_LOGS_DIR = BASE_DIR / "trade_logs"
+STRATEGIES_DIR = BASE_DIR / "strategies"
 
 # Ensure directories exist
-os.makedirs(TRADE_LOGS_DIR, exist_ok=True)
-os.makedirs(STRATEGIES_DIR, exist_ok=True)
+TRADE_LOGS_DIR.mkdir(parents=True, exist_ok=True)
+STRATEGIES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ========== TRADE LOGS ==========
 
 def save_trade_log(symbol: str, trade_data: Dict[str, Any]):
-    file_path = os.path.join(TRADE_LOGS_DIR, f'{symbol}_trades.json')
+    """
+    Appends a trade to the symbol's trade log JSON file.
+    """
+    file_path = TRADE_LOGS_DIR / f"{symbol}_trades.json"
     trades = load_trade_logs(symbol)
     trades.append(trade_data)
-    with open(file_path, 'w') as f:
+    with open(file_path, "w") as f:
         json.dump(trades, f, indent=4)
 
 def load_trade_logs(symbol: str) -> List[Dict[str, Any]]:
-    file_path = os.path.join(TRADE_LOGS_DIR, f'{symbol}_trades.json')
-    if not os.path.exists(file_path):
+    """
+    Loads trade history for a symbol from local storage.
+    """
+    file_path = TRADE_LOGS_DIR / f"{symbol}_trades.json"
+    if not file_path.exists():
         return []
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         return json.load(f)
 
-# ========== STRATEGIES ==========
 
-def save_strategy(symbol: str, strategy_name: str, strategy_data: Dict[str, Any]):
-    symbol_dir = os.path.join(STRATEGIES_DIR, symbol)
-    os.makedirs(symbol_dir, exist_ok=True)
-    file_path = os.path.join(symbol_dir, f'{strategy_name}.json')
-    with open(file_path, 'w') as f:
+# ========== STRATEGIES (Flat Format) ==========
+
+def save_strategy(symbol: str, strategy_id: str, strategy_data: Dict[str, Any]):
+    """
+    Saves a strategy to the strategies folder (flat structure).
+    """
+    filename = f"{symbol}_strategy_{strategy_id}.json"
+    file_path = STRATEGIES_DIR / filename
+    with open(file_path, "w") as f:
         json.dump(strategy_data, f, indent=4)
 
-def load_strategy(symbol: str, strategy_name: str) -> Dict[str, Any]:
-    file_path = os.path.join(STRATEGIES_DIR, symbol, f'{strategy_name}.json')
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f'Strategy "{strategy_name}" for {symbol} not found.')
-    with open(file_path, 'r') as f:
+def load_strategy(symbol: str, strategy_id: str) -> Dict[str, Any]:
+    """
+    Loads a specific strategy from disk.
+    """
+    file_path = STRATEGIES_DIR / f"{symbol}_strategy_{strategy_id}.json"
+    if not file_path.exists():
+        raise FileNotFoundError(f"Strategy '{strategy_id}' for {symbol} not found.")
+    with open(file_path, "r") as f:
         return json.load(f)
 
 def list_strategies(symbol: str) -> List[str]:
-    symbol_dir = os.path.join(STRATEGIES_DIR, symbol)
-    if not os.path.exists(symbol_dir):
-        return []
-    return [f.replace('.json', '') for f in os.listdir(symbol_dir) if f.endswith('.json')]
+    """
+    Lists all strategy IDs for a given symbol.
+    """
+    strategy_files = STRATEGIES_DIR.glob(f"{symbol}_strategy_*.json")
+    return [
+        file.stem.replace(f"{symbol}_strategy_", "")
+        for file in strategy_files
+    ]

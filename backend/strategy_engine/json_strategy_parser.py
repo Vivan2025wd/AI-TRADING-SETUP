@@ -3,8 +3,24 @@ from pathlib import Path
 from typing import Dict, Any
 
 # Base directory where strategy JSON files are stored
-STRATEGY_DIR = Path(__file__).resolve().parent.parent / "backtester" / "strategies"
+STRATEGY_DIR = Path(__file__).resolve().parent.parent / "storage" / "strategies"
 STRATEGY_DIR.mkdir(parents=True, exist_ok=True)
+
+def save_strategy_to_file(symbol: str, strategy_id: str, strategy: Dict[str, Any]) -> None:
+    """
+    Save the strategy dict to a JSON file.
+    File format: '{symbol}_strategy_{strategy_id}.json'
+    """
+    validate_strategy(strategy)
+
+    filename = f"{symbol}_strategy_{strategy_id}.json"
+    file_path = STRATEGY_DIR / filename
+
+    try:
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(strategy, f, indent=4)
+    except Exception as e:
+        raise IOError(f"Failed to save strategy file {file_path}: {e}")
 
 def load_strategy_for_symbol(symbol: str) -> Dict[str, Any]:
     """
@@ -13,10 +29,11 @@ def load_strategy_for_symbol(symbol: str) -> Dict[str, Any]:
     """
     filename = f"{symbol}_strategy_default.json"
     file_path = STRATEGY_DIR / filename
+
     if not file_path.exists():
         raise FileNotFoundError(f"Strategy file not found: {file_path}")
 
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         strategy = json.load(f)
 
     validate_strategy(strategy)
@@ -27,11 +44,13 @@ def load_strategy_from_file(symbol: str, strategy_id: str) -> Dict[str, Any]:
     Load a user strategy JSON file.
     File format: '{symbol}_strategy_{strategy_id}.json'
     """
-    file_path = STRATEGY_DIR / f"{symbol}_strategy_{strategy_id}.json"
+    filename = f"{symbol}_strategy_{strategy_id}.json"
+    file_path = STRATEGY_DIR / filename
+
     if not file_path.exists():
         raise FileNotFoundError(f"Strategy file not found: {file_path}")
 
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         strategy = json.load(f)
 
     validate_strategy(strategy)
