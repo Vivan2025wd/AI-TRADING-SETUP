@@ -4,19 +4,13 @@ import json
 from pathlib import Path
 
 from backend.strategy_engine.json_strategy_parser import parse_strategy_json
-from backend.strategy_registry import (
-    save_strategy,
-    register_strategy,
-    get_registered_strategies,
-    get_strategy_by_symbol,
-    delete_strategy,
-)
 from backend.strategy_engine.strategy_health import StrategyHealth
 
 router = APIRouter(tags=["Strategies"])
 
-STRATEGY_DIR = Path("backend/backtester/strategies")
+STRATEGY_DIR = Path("backend/storage/strategies")
 PERFORMANCE_DIR = Path("backend/storage/performance_logs")
+STRATEGY_DIR.mkdir(parents=True, exist_ok=True)
 
 class StrategyPayload(BaseModel):
     strategy_id: str
@@ -24,95 +18,107 @@ class StrategyPayload(BaseModel):
     strategy_json: dict
 
 
+def get_strategy_file_path(symbol: str, strategy_id: str) -> Path:
+    return STRATEGY_DIR / f"{symbol}_strategy_{strategy_id}.json"
+
+
 # Save & register strategy
 @router.post("/save")
 def save_user_strategy(payload: StrategyPayload):
-    STRATEGY_DIR.mkdir(parents=True, exist_ok=True)
-
+    symbol = payload.symbol.upper()
     strategy_to_validate = {
-        "symbol": payload.symbol,
+        "symbol": symbol,
         "indicators": payload.strategy_json,
     }
 
+    # Validate the strategy format
     try:
         parse_strategy_json(json.dumps(strategy_to_validate))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    success = save_strategy(payload.symbol, payload.strategy_id, strategy_to_validate)
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to save strategy.")
+    # Save to disk
+    path = get_strategy_file_path(symbol, payload.strategy_id)
+    try:
+        with open(path, "w") as f:
+            json.dump(strategy_to_validate, f, indent=2)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save: {e}")
 
-    register_strategy(payload.symbol, payload.strategy_id)
-    return {"message": "Strategy saved and registered successfully."}
+    return {"message": f"Strategy {symbol}_{payload.strategy_id} saved successfully."}
 
 
-# List all registered strategies with pagination
+# List all saved strategies with pagination
 @router.get("/list")
 def list_registered_strategies(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1),
 ):
-    all_strategies = get_registered_strategies()  # Dict[symbol, List[str]]
-    # Flatten all strategy IDs into a list of dicts {symbol, strategy_id}
-    flattened = []
-    for symbol, strategy_ids in all_strategies.items():
-        for sid in strategy_ids:
-            flattened.append({"symbol": symbol, "strategy_id": sid})
+    strategy_files = list(STRATEGY_DIR.glob("*.json"))
 
-    total = len(flattened)
+    parsed = []
+    for file in strategy_files:
+        name = file.stem
+        if "_strategy_" in name:
+            symbol, strategy_id = name.split("_strategy_", 1)
+            parsed.append({"symbol": symbol, "strategy_id": strategy_id})
+
+    total = len(parsed)
     start = (page - 1) * limit
     end = start + limit
-    paginated = flattened[start:end]
-
     return {
         "page": page,
         "limit": limit,
         "total": total,
         "totalPages": (total + limit - 1) // limit,
-        "data": paginated,
+        "data": parsed[start:end],
     }
 
 
-# List strategies for a specific symbol
+# List all strategies for a specific symbol
 @router.get("/{symbol}")
 def list_strategies_by_symbol(symbol: str):
     symbol = symbol.upper()
-    strategies = get_strategy_by_symbol(symbol)
-    if not strategies:
+    files = list(STRATEGY_DIR.glob(f"{symbol}_strategy_*.json"))
+    if not files:
         raise HTTPException(status_code=404, detail="No strategies found for this symbol.")
-    return strategies
+    return [{"strategy_id": f.stem.split("_strategy_", 1)[1]} for f in files]
 
 
-# Delete strategy using combined strategy_key (symbol_strategy_strategyId)
+# Delete strategy
 @router.delete("/{strategy_key}")
 async def delete_strategy_api(strategy_key: str):
-    """
-    Delete a strategy by strategy_key formatted as 'SYMBOL_strategy_strategyId'.
-    """
     if "_strategy_" not in strategy_key:
         raise HTTPException(status_code=400, detail="Invalid strategy key format")
 
     symbol, strategy_id = strategy_key.split("_strategy_", 1)
-    symbol = symbol.upper()
+    path = get_strategy_file_path(symbol.upper(), strategy_id)
 
-    success = delete_strategy(symbol, strategy_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Strategy not found or could not be deleted")
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Strategy not found")
+
+    try:
+        path.unlink()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete: {e}")
 
     return {"detail": f"Strategy {strategy_key} deleted successfully"}
 
 
-# Load performance data for a given strategy
+# Performance summary for a strategy
 @router.get("/{symbol}/{strategy_id}/performance")
 def get_strategy_performance(symbol: str, strategy_id: str):
     symbol = symbol.upper()
     log_path = PERFORMANCE_DIR / f"{symbol}_strategy_{strategy_id}.json"
+
     if not log_path.exists():
         raise HTTPException(status_code=404, detail="No performance log found.")
 
-    with open(log_path, "r") as f:
-        trades = json.load(f)
+    try:
+        with open(log_path, "r") as f:
+            trades = json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load log: {e}")
 
     stats = StrategyHealth(trades).summary()
     return stats
