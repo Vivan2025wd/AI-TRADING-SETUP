@@ -17,12 +17,10 @@ class StrategyPayload(BaseModel):
     symbol: str
     strategy_json: dict
 
-
 def get_strategy_file_path(symbol: str, strategy_id: str) -> Path:
     return STRATEGY_DIR / f"{symbol}_strategy_{strategy_id}.json"
 
-
-# Save & register strategy
+# ✅ Save & register strategy (also save fallback as _default)
 @router.post("/save")
 def save_user_strategy(payload: StrategyPayload):
     symbol = payload.symbol.upper()
@@ -37,7 +35,7 @@ def save_user_strategy(payload: StrategyPayload):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    # Save to disk
+    # Save main strategy
     path = get_strategy_file_path(symbol, payload.strategy_id)
     try:
         with open(path, "w") as f:
@@ -45,18 +43,26 @@ def save_user_strategy(payload: StrategyPayload):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save: {e}")
 
+    # ✅ Save default fallback if not already present
+    default_path = STRATEGY_DIR / f"{symbol}_strategy_default.json"
+    if not default_path.exists():
+        try:
+            with open(default_path, "w") as f:
+                json.dump(strategy_to_validate, f, indent=2)
+        except Exception as e:
+            print(f"[Warning] Failed to save default strategy for {symbol}: {e}")
+
     return {"message": f"Strategy {symbol}_{payload.strategy_id} saved successfully."}
 
-
-# List all saved strategies with pagination
+# ✅ List all saved strategies with pagination
 @router.get("/list")
 def list_registered_strategies(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1),
 ):
     strategy_files = list(STRATEGY_DIR.glob("*.json"))
-
     parsed = []
+
     for file in strategy_files:
         name = file.stem
         if "_strategy_" in name:
@@ -74,8 +80,7 @@ def list_registered_strategies(
         "data": parsed[start:end],
     }
 
-
-# List all strategies for a specific symbol
+# ✅ List all strategies for a specific symbol
 @router.get("/{symbol}")
 def list_strategies_by_symbol(symbol: str):
     symbol = symbol.upper()
@@ -84,8 +89,7 @@ def list_strategies_by_symbol(symbol: str):
         raise HTTPException(status_code=404, detail="No strategies found for this symbol.")
     return [{"strategy_id": f.stem.split("_strategy_", 1)[1]} for f in files]
 
-
-# Delete strategy
+# ✅ Delete strategy by key (symbol_strategy_id)
 @router.delete("/{strategy_key}")
 async def delete_strategy_api(strategy_key: str):
     if "_strategy_" not in strategy_key:
@@ -104,8 +108,7 @@ async def delete_strategy_api(strategy_key: str):
 
     return {"detail": f"Strategy {strategy_key} deleted successfully"}
 
-
-# Performance summary for a strategy
+# ✅ Performance summary for a strategy
 @router.get("/{symbol}/{strategy_id}/performance")
 def get_strategy_performance(symbol: str, strategy_id: str):
     symbol = symbol.upper()

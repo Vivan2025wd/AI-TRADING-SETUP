@@ -25,15 +25,20 @@ class GenericAgent:
             dict: A dictionary containing symbol, action, confidence, and timestamp.
                 Action is one of 'buy', 'sell', or 'hold'.
         """
+        print(f"🧠 Evaluating agent for {self.symbol}...")
+
         if ohlcv_data.empty:
+            print(f"⚠️ OHLCV data for {self.symbol} is empty!")
             raise ValueError(f"OHLCV data for {self.symbol} is empty")
 
         # Make sure the DataFrame is sorted by datetime ascending
         ohlcv_data = ohlcv_data.sort_index()
+        print(f"✅ Received {len(ohlcv_data)} rows of OHLCV data for {self.symbol}")
 
         # Evaluate strategy
         action = self.strategy_logic.evaluate(ohlcv_data)
         if action not in {"buy", "sell", "hold"}:
+            print(f"❗ Invalid action '{action}' returned. Defaulting to 'hold'")
             action = "hold"  # fallback to 'hold' on invalid action
 
         # Confidence is a placeholder; customize if your StrategyParser can return confidence
@@ -41,6 +46,8 @@ class GenericAgent:
 
         # Use the timestamp of the latest candle in ISO format
         timestamp = pd.to_datetime(ohlcv_data.index[-1]).isoformat()
+
+        print(f"📈 Agent for {self.symbol} suggests to '{action.upper()}' at {timestamp} with confidence {confidence}")
 
         return {
             "symbol": self.symbol,

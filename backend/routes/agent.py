@@ -49,10 +49,16 @@ def list_available_agents():
 def get_agent_prediction(symbol: str):
     try:
         symbol = symbol.upper()
-        strategy_dict = load_strategy_for_symbol(symbol)
+        try:
+            strategy_dict = load_strategy_for_symbol(symbol + "USDT")
+        except FileNotFoundError:
+            strategy_dict = load_strategy_for_symbol(symbol)
+
         strategy_runner = StrategyParser(strategy_dict)
 
         ohlcv_data = fetch_ohlcv(f"{symbol}/USDT")
+        print(f"[Agent] Fetched OHLCV for {symbol}: {ohlcv_data.shape} rows")
+
         if ohlcv_data is None or ohlcv_data.empty:
             raise HTTPException(status_code=400, detail=f"No OHLCV data found for symbol: {symbol}")
 
@@ -88,9 +94,14 @@ def get_all_agent_predictions(
 
     for symbol in agents_slice:
         try:
-            strategy_dict = load_strategy_for_symbol(symbol)
+            try:
+                strategy_dict = load_strategy_for_symbol(symbol + "USDT")
+            except FileNotFoundError:
+                strategy_dict = load_strategy_for_symbol(symbol)
+
             strategy_runner = StrategyParser(strategy_dict)
-            ohlcv_data = fetch_ohlcv(f"{symbol}/USDT")
+            ohlcv_data = fetch_ohlcv(symbol)
+            print(f"[Agent] Fetched OHLCV for {symbol}: {ohlcv_data.shape} rows")
 
             if ohlcv_data is None or ohlcv_data.empty:
                 predictions.append({
