@@ -46,7 +46,6 @@ class MotherAI:
 
             agent_module_path = os.path.join(self.agents_dir, agent_file)
 
-            # FIXED: Remove "agents." prefix, use only base_name as module name
             spec = importlib.util.spec_from_file_location(base_name, agent_module_path)
             if spec is None or spec.loader is None:
                 print(f"Could not load spec or loader for module '{base_name}', skipping.")
@@ -69,9 +68,22 @@ class MotherAI:
         results = []
         for agent in agents:
             try:
-                signal, confidence = agent.predict()
+                # Format symbol for fetch_ohlcv e.g. "ADAUSDT" -> "ADA/USDT"
+                symbol_ccxt = agent.symbol[:-4] + "/USDT"
+
+                # Fetch live OHLCV data here
+                ohlcv_data = fetch_ohlcv(symbol_ccxt, interval="1h", limit=100)
+                if ohlcv_data.empty:
+                    print(f"⚠️ No OHLCV data for {agent.symbol}, skipping evaluation.")
+                    continue
+
+                # Pass OHLCV to agent predict method
+                prediction = agent.predict(ohlcv_data)
+                signal = prediction.get("action", "hold").lower()
+                confidence = prediction.get("confidence", 0.0)
+
             except Exception as e:
-                signal, confidence = "HOLD", 0.0
+                signal, confidence = "hold", 0.0
                 print(f"Error in predict for {agent.symbol}: {e}")
 
             history = self.performance_tracker.get_agent_log(agent.symbol)
@@ -100,13 +112,45 @@ class MotherAI:
 
     def make_portfolio_decision(self, min_score=0.7):
         top_trades = self.decide_trades(top_n=1, min_score=min_score)
+        timestamp = self.performance_tracker.current_time()
+
         if not top_trades:
-            return {}
-        # Return only the single highest scoring trade
-        return {
-            "decision": top_trades[0],
-            "timestamp": self.performance_tracker.current_time()
+            # Return empty decision but with timestamp
+            return {"decision": [], "timestamp": timestamp}
+
+        trade = top_trades[0]
+
+        # Fetch latest close price from Binance
+        symbol_ccxt = trade["symbol"][:-4] + "/USDT"  # e.g. "BTCUSDT" -> "BTC/USDT"
+        df = fetch_ohlcv(symbol_ccxt, interval="1h", limit=1)
+        last_price = None
+        if not df.empty:
+            last_price = df["close"].iloc[-1]
+
+        # Compose decision object with live price included
+        decision_obj = {
+            "symbol": trade["symbol"],
+            "signal": trade["signal"],
+            "confidence": trade["confidence"],
+            "win_rate": trade["win_rate"],
+            "score": trade["score"],
+            "last_price": last_price,
         }
+
+        # Log this trade decision (simulate execution)
+        trade_log_entry = {
+            "timestamp": timestamp,
+            "symbol": trade["symbol"],
+            "signal": trade["signal"],
+            "price": last_price,
+            "confidence": trade["confidence"],
+            "win_rate": trade["win_rate"],
+            "score": trade["score"]
+        }
+        self.performance_tracker.log_trade(trade["symbol"], trade_log_entry)
+
+
+        return {"decision": decision_obj, "timestamp": timestamp}
 
 
 @router.get("/trades")
@@ -137,44 +181,3 @@ async def get_decision():
     if not decision or not decision.get("decision"):
         raise HTTPException(status_code=404, detail="No decision found")
     return decision
-
-def make_portfolio_decision(self, min_score=0.7):
-    top_trades = self.decide_trades(top_n=1, min_score=min_score)
-    timestamp = self.performance_tracker.current_time()
-
-    if not top_trades:
-        # Return empty decision but with timestamp
-        return {"decision": [], "timestamp": timestamp}
-
-    trade = top_trades[0]
-
-    # Fetch latest close price from Binance
-    symbol_ccxt = trade["symbol"][:-4] + "/USDT"  # e.g. "BTCUSDT" -> "BTC/USDT"
-    df = fetch_ohlcv(symbol_ccxt, interval="1h", limit=1)
-    last_price = None
-    if not df.empty:
-        last_price = df["close"].iloc[-1]
-
-    # Compose decision object with live price included
-    decision_obj = {
-        "symbol": trade["symbol"],
-        "signal": trade["signal"],
-        "confidence": trade["confidence"],
-        "win_rate": trade["win_rate"],
-        "score": trade["score"],
-        "last_price": last_price,
-    }
-
-    # Log this trade decision (simulate execution)
-    trade_log_entry = {
-        "timestamp": timestamp,
-        "symbol": trade["symbol"],
-        "signal": trade["signal"],
-        "price": last_price,
-        "confidence": trade["confidence"],
-        "win_rate": trade["win_rate"],
-        "score": trade["score"]
-    }
-    self.performance_tracker.log_trade(trade_log_entry)
-
-    return {"decision": decision_obj, "timestamp": timestamp}
