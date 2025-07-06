@@ -1,8 +1,9 @@
-from backend.agents.generic_agent import GenericAgent 
-from backend.strategy_engine.json_strategy_parser import load_strategy_for_symbol
+from backend.agents.generic_agent import GenericAgent
 from backend.strategy_engine.strategy_parser import StrategyParser
+from backend.strategy_engine.json_strategy_parser import load_strategy_for_symbol
 
 class ADAUSDTAgent(GenericAgent):
+    symbol = "ADAUSDT"
     def __init__(self, symbol=None, strategy_logic=None):
         if symbol is None:
             symbol = "ADAUSDT"

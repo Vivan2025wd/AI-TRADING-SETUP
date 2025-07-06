@@ -24,19 +24,29 @@ def get_real_agents() -> List[str]:
             continue
 
         module_name = f"backend.agents.{file.stem}"
+        print(f"📦 Importing module: {module_name}")
+
         spec = importlib.util.spec_from_file_location(module_name, file)
         if not spec or not spec.loader:
+            print(f"⚠️ Failed to load spec for {file}")
             continue
 
         module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        try:
+            spec.loader.exec_module(module)
+        except Exception as e:
+            print(f"❌ Failed to import {module_name}: {e}")
+            continue
 
         for name, cls in inspect.getmembers(module, inspect.isclass):
+            print(f"🔍 Found class: {name}")
             if issubclass(cls, GenericAgent) and cls is not GenericAgent:
                 symbol = getattr(cls, "symbol", None)
+                print(f"✅ Registered agent class: {name}, symbol: {symbol}")
                 if symbol:
                     agent_symbols.append(symbol.upper())
 
+    print(f"🎯 Final detected agent symbols: {agent_symbols}")
     return sorted(set(agent_symbols))
 
 
@@ -49,14 +59,19 @@ def list_available_agents():
 def get_agent_prediction(symbol: str):
     try:
         symbol = symbol.upper()
+
+        # ✅ Updated fallback logic
         try:
             strategy_dict = load_strategy_for_symbol(symbol + "USDT")
         except FileNotFoundError:
-            strategy_dict = load_strategy_for_symbol(symbol)
+            try:
+                strategy_dict = load_strategy_for_symbol(symbol)
+            except FileNotFoundError:
+                raise HTTPException(status_code=404, detail=f"No strategy found for {symbol}")
 
         strategy_runner = StrategyParser(strategy_dict)
-
         ohlcv_data = fetch_ohlcv(f"{symbol}/USDT")
+
         print(f"[Agent] Fetched OHLCV for {symbol}: {ohlcv_data.shape} rows")
 
         if ohlcv_data is None or ohlcv_data.empty:
@@ -78,13 +93,7 @@ def get_agent_prediction(symbol: str):
 
 
 @router.get("/predictions")
-def get_all_agent_predictions(
-    page: int = Query(1, ge=1),
-    limit: int = Query(5, ge=1)
-):
-    """
-    Paginated predictions from all custom agents.
-    """
+def get_all_agent_predictions(page: int = Query(1, ge=1), limit: int = Query(5, ge=1)):
     predictions = []
     all_agents = get_real_agents()
     total_agents = len(all_agents)
@@ -94,10 +103,14 @@ def get_all_agent_predictions(
 
     for symbol in agents_slice:
         try:
+            # ✅ Updated fallback logic
             try:
                 strategy_dict = load_strategy_for_symbol(symbol + "USDT")
             except FileNotFoundError:
-                strategy_dict = load_strategy_for_symbol(symbol)
+                try:
+                    strategy_dict = load_strategy_for_symbol(symbol)
+                except FileNotFoundError:
+                    raise FileNotFoundError(f"No strategy found for {symbol}")
 
             strategy_runner = StrategyParser(strategy_dict)
             ohlcv_data = fetch_ohlcv(symbol)
@@ -156,3 +169,7 @@ def get_all_agent_predictions(
         "totalPages": (total_agents + limit - 1) // limit,
         "data": predictions
     }
+@router.get("/debug/agents")
+def debug_loaded_agents():
+    import os
+    return {"files": os.listdir(str(AGENTS_DIR))}
