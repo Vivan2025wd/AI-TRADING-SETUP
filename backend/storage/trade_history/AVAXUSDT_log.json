@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2025-07-07T03:53:00.559144",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "price": 18.4,
+    "confidence": 0.7991090864705799,
+    "win_rate": 0.5,
+    "score": 0.75
+  }
+]

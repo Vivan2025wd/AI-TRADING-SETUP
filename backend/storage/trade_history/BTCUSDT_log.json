@@ -28,7 +28,151 @@
     "type": "SELL",
     "agent": "BTCUSDT",
     "price": 31000.0,
-    "balance": 106000.00,
+    "balance": 106000.0,
     "result": "win"
+  },
+  {
+    "timestamp": "2025-07-07T03:53:13.753090",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109400.01,
+    "confidence": 0.7723038628169067,
+    "win_rate": 0.5,
+    "score": 0.736
+  },
+  {
+    "timestamp": "2025-07-07T03:53:32.735405",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109400.0,
+    "confidence": 0.787874637502455,
+    "win_rate": 0.4,
+    "score": 0.714
+  },
+  {
+    "timestamp": "2025-07-07T04:01:28.669978",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109447.36,
+    "confidence": 0.7371633911739466,
+    "win_rate": 0.333,
+    "score": 0.668
+  },
+  {
+    "timestamp": "2025-07-07T04:01:32.106876",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109447.37,
+    "confidence": 0.7862920376129033,
+    "win_rate": 0.286,
+    "score": 0.679
+  },
+  {
+    "timestamp": "2025-07-07T04:29:48.653983",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109232.0,
+    "confidence": 0.754592187598472,
+    "win_rate": 0.25,
+    "score": 0.652
+  },
+  {
+    "timestamp": "2025-07-07T04:29:51.675852",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109232.0,
+    "confidence": 0.7049944126807715,
+    "win_rate": 0.222,
+    "score": 0.619
+  },
+  {
+    "timestamp": "2025-07-07T04:30:38.575982",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109232.0,
+    "confidence": 0.7348105822274088,
+    "win_rate": 0.2,
+    "score": 0.627
+  },
+  {
+    "timestamp": "2025-07-07T04:30:50.440755",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109220.99,
+    "confidence": 0.7897710207254953,
+    "win_rate": 0.182,
+    "score": 0.649
+  },
+  {
+    "timestamp": "2025-07-07T04:30:53.467127",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109220.99,
+    "confidence": 0.7426679959981213,
+    "win_rate": 0.167,
+    "score": 0.621
+  },
+  {
+    "timestamp": "2025-07-07T04:31:14.628786",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109232.0,
+    "confidence": 0.7670730874478138,
+    "win_rate": 0.154,
+    "score": 0.63
+  },
+  {
+    "timestamp": "2025-07-07T04:31:17.759233",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109231.99,
+    "confidence": 0.7389400277909597,
+    "win_rate": 0.143,
+    "score": 0.612
+  },
+  {
+    "timestamp": "2025-07-07T04:49:46.588319",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109196.22,
+    "confidence": 0.7751800029197065,
+    "win_rate": 0.133,
+    "score": 0.627
+  },
+  {
+    "timestamp": "2025-07-07T04:49:46.801033",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109196.22,
+    "confidence": 0.7449564012459924,
+    "win_rate": 0.133,
+    "score": 0.612
+  },
+  {
+    "timestamp": "2025-07-07T04:49:49.416825",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109196.22,
+    "confidence": 0.707814904247769,
+    "win_rate": 0.118,
+    "score": 0.589
+  },
+  {
+    "timestamp": "2025-07-07T04:59:27.185264",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109128.72,
+    "confidence": 0.7250436853858854,
+    "win_rate": 0.111,
+    "score": 0.596
+  },
+  {
+    "timestamp": "2025-07-07T04:59:29.892255",
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "price": 109128.73,
+    "confidence": 0.7548130085776487,
+    "win_rate": 0.105,
+    "score": 0.609
   }
 ]

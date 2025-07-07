@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2025-07-07T03:53:21.271404",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "price": 497.2,
+    "confidence": 0.7915420357476761,
+    "win_rate": 0.5,
+    "score": 0.746
+  }
+]

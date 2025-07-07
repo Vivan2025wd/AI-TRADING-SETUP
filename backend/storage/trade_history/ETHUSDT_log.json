@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2025-07-07T03:53:24.705908",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "price": 2577.63,
+    "confidence": 0.7386685808589794,
+    "win_rate": 0.5,
+    "score": 0.719
+  }
+]

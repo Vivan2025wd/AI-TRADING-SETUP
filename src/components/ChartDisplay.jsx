@@ -13,225 +13,209 @@ import {
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function MotherAIBalanceChart() {
-  const [balanceHistory, setBalanceHistory] = useState([]);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [limit, setLimit] = useState(100);
   const [refreshToggle, setRefreshToggle] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchTradeHistory() {
+    async function fetchData() {
       setLoading(true);
       setError(null);
-
       try {
-        const response = await fetch(`/api/mother-ai/trades?limit=${limit}`);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: Failed to fetch trade data`);
-        }
-
-        const data = await response.json();
-
-        if (!data || !Array.isArray(data.data)) {
-          throw new Error("Invalid data format received");
-        }
-
+        // Fetch all trades combined from backend
+        const res = await fetch(`/api/mother-ai/trades`);
+        if (!res.ok) throw new Error(`Failed to load trade logs`);
+        const data = await res.json();
         if (!isMounted) return;
 
-        // Sort data here ascending by timestamp to assign sequence properly
-        const sortedRaw = [...data.data].sort(
+        // Sort by timestamp ascending
+        const sorted = [...data.data].sort(
           (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
 
-        // Add trade sequence number for buy/sell separately
         let buyCount = 0;
         let sellCount = 0;
-        const formattedData = sortedRaw.map((trade) => {
-          let labelType = trade.type.toUpperCase();
-          if (labelType === "BUY") buyCount += 1;
-          else if (labelType === "SELL") sellCount += 1;
+
+        const formatted = sorted.map((trade) => {
+          const type = (trade.signal || "").toUpperCase(); // 'signal' field used here
+          if (type === "BUY") buyCount++;
+          else if (type === "SELL") sellCount++;
 
           return {
-            time: trade.timestamp ? new Date(trade.timestamp).toLocaleString() : "Unknown",
-            rawTime: trade.timestamp ? new Date(trade.timestamp).getTime() : 0,
-            value: typeof trade.balance === "number" ? trade.balance : 0,
-            type: labelType,
-            agent: trade.agent || "Unknown Agent",
+            time: new Date(trade.timestamp).toLocaleString(),
+            rawTime: new Date(trade.timestamp).getTime(),
+            type,
             price: trade.price || 0,
-            result: trade.result || "N/A",
+            value: trade.balance || 0,
+            profit: trade.profit_percent ?? null,
+            symbol: trade.symbol || "N/A",    // Include symbol from backend log
             sequenceLabel:
-              labelType === "BUY"
+              type === "BUY"
                 ? `Buy #${buyCount}`
-                : labelType === "SELL"
+                : type === "SELL"
                 ? `Sell #${sellCount}`
-                : labelType,
+                : "Balance",
           };
         });
 
-        setBalanceHistory(formattedData);
+        setHistory(formatted);
       } catch (err) {
         if (!isMounted) return;
-        console.error("Fetch error:", err);
-        setError(err.message || "Unknown error while fetching trade data");
-        setBalanceHistory([]);
+        setError(err.message);
+        setHistory([]);
       } finally {
         if (isMounted) setLoading(false);
       }
     }
 
-    fetchTradeHistory();
+    fetchData();
 
     return () => {
       isMounted = false;
     };
-  }, [limit, refreshToggle]);
+  }, [refreshToggle]);
 
-  // Sort data ascending by rawTime for chart correctness
-  const sortedData = [...balanceHistory].sort((a, b) => a.rawTime - b.rawTime);
-
+  const sortedData = [...history].sort((a, b) => a.rawTime - b.rawTime);
   const labels = sortedData.map((d) => d.time);
 
   const balanceDataset = {
-    label: "Balance Over Time",
+    label: "Balance",
     data: sortedData.map((d) => d.value),
-    fill: true,
     borderColor: "rgb(34,197,94)",
     backgroundColor: "rgba(34,197,94,0.2)",
-    tension: 0.3,
+    tension: 0.4,
+    fill: true,
     spanGaps: true,
   };
 
   const buyPoints = sortedData
     .map((d, i) =>
-      d.type === "BUY" ? { x: labels[i], y: d.value, agent: d.agent, sequenceLabel: d.sequenceLabel } : null
+      d.type === "BUY"
+        ? {
+            x: labels[i],
+            y: d.value,
+            sequenceLabel: d.sequenceLabel,
+            price: d.price,
+            profit: d.profit,
+          }
+        : null
     )
     .filter(Boolean);
 
-  const buyPointsDataset = {
-    label: "Buy Trades",
-    data: buyPoints.map((point) => ({
-      x: point.x,
-      y: point.y,
-      agent: point.agent,
-      sequenceLabel: point.sequenceLabel,
-    })),
-    showLine: false,
-    backgroundColor: "blue",
-    pointRadius: 6,
-    pointHoverRadius: 8,
-  };
+  const sellPoints = sortedData
+    .map((d, i) =>
+      d.type === "SELL"
+        ? {
+            x: labels[i],
+            y: d.value,
+            sequenceLabel: d.sequenceLabel,
+            price: d.price,
+            profit: d.profit,
+          }
+        : null
+    )
+    .filter(Boolean);
 
-  const data = {
+  const chartData = {
     labels,
-    datasets: [balanceDataset, buyPointsDataset],
+    datasets: [
+      balanceDataset,
+      {
+        label: "Buy",
+        data: buyPoints,
+        backgroundColor: "blue",
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        showLine: false,
+      },
+      {
+        label: "Sell",
+        data: sellPoints,
+        backgroundColor: "red",
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        showLine: false,
+      },
+    ],
   };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    interaction: {
-      mode: "nearest",
-      intersect: true,
-    },
+    interaction: { mode: "nearest", intersect: true },
     plugins: {
       legend: { labels: { color: "white" } },
       tooltip: {
         callbacks: {
-          label: (context) => {
-            const datasetLabel = context.dataset.label || "";
-            if (datasetLabel === "Buy Trades") {
-              const agent = context.raw.agent || "Unknown Agent";
-              const seqLabel = context.raw.sequenceLabel || "Buy";
-              return `${seqLabel} by: ${agent}\nBalance: $${context.parsed.y.toFixed(2)}`;
+          label: (ctx) => {
+            const point = ctx.raw;
+            if (ctx.dataset.label === "Buy" || ctx.dataset.label === "Sell") {
+              return `${point.sequenceLabel}\nPrice: $${point.price}\nProfit: ${
+                point.profit ?? "?"
+              }%\nBalance: $${point.y}`;
             }
-            return `${datasetLabel}: $${context.parsed.y.toFixed(2)}`;
+            return `Balance: $${ctx.parsed.y.toFixed(2)}`;
           },
-          title: (context) => context[0].label || "",
         },
-        backgroundColor: "#111827",
-        titleColor: "white",
-        bodyColor: "white",
       },
     },
     scales: {
-      x: {
-        ticks: { color: "white" },
-        grid: { color: "#374151" },
-      },
-      y: {
-        ticks: { color: "white" },
-        grid: { color: "#374151" },
-        position: "left",
-      },
+      x: { ticks: { color: "white" }, grid: { color: "#374151" } },
+      y: { ticks: { color: "white" }, grid: { color: "#374151" } },
     },
   };
 
-  function loadMore() {
-    setLimit((prev) => prev + 100);
-  }
-
-  function refresh() {
-    setRefreshToggle((prev) => !prev);
-  }
-
   return (
     <div className="space-y-4">
+      <h2 className="text-white text-xl font-semibold">Performance for All Symbols</h2>
+
       <div style={{ height: 300 }}>
-        {loading && <p className="text-blue-400">Loading balance chart...</p>}
+        {loading && <p className="text-blue-400">Loading...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
-        <Line data={data} options={options} />
+        {!loading && !error && <Line data={chartData} options={options} />}
       </div>
 
-      <div className="flex space-x-2">
-        {!loading && !error && balanceHistory.length >= limit && (
-          <button
-            onClick={loadMore}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Load More
-          </button>
-        )}
-        <button
-          onClick={refresh}
-          disabled={loading}
-          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-        >
-          Refresh
-        </button>
-      </div>
+      <button
+        onClick={() => setRefreshToggle((v) => !v)}
+        className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
+      >
+        Refresh
+      </button>
 
-      {/* Trade Logs Table */}
-      <div className="overflow-x-auto mt-6">
-        <table className="min-w-full bg-gray-800 text-white rounded">
+      {/* Table */}
+      <div className="overflow-x-auto mt-4">
+        <table className="min-w-full text-white bg-gray-800 rounded">
           <thead>
             <tr>
-              <th className="py-2 px-4 border-b border-gray-600">Timestamp</th>
-              <th className="py-2 px-4 border-b border-gray-600">Type</th>
-              <th className="py-2 px-4 border-b border-gray-600">Agent</th>
-              <th className="py-2 px-4 border-b border-gray-600">Price</th>
-              <th className="py-2 px-4 border-b border-gray-600">Balance</th>
-              <th className="py-2 px-4 border-b border-gray-600">Result</th>
+              <th className="py-2 px-4 border-b">Timestamp</th>
+              <th className="py-2 px-4 border-b">Symbol</th> {/* New column */}
+              <th className="py-2 px-4 border-b">Type</th>
+              <th className="py-2 px-4 border-b">Price</th>
+              <th className="py-2 px-4 border-b">Balance</th>
+              <th className="py-2 px-4 border-b">Profit %</th>
             </tr>
           </thead>
           <tbody>
             {sortedData.length === 0 ? (
               <tr>
                 <td colSpan={6} className="text-center py-4">
-                  No trade data available
+                  No data
                 </td>
               </tr>
             ) : (
-              sortedData.map((trade, idx) => (
+              sortedData.map((d, idx) => (
                 <tr key={idx} className="hover:bg-gray-700">
-                  <td className="py-2 px-4 border-b border-gray-600">{trade.time}</td>
-                  <td className="py-2 px-4 border-b border-gray-600">{trade.sequenceLabel}</td>
-                  <td className="py-2 px-4 border-b border-gray-600">{trade.agent}</td>
-                  <td className="py-2 px-4 border-b border-gray-600">${trade.price.toFixed(2)}</td>
-                  <td className="py-2 px-4 border-b border-gray-600">${trade.value.toFixed(2)}</td>
-                  <td className="py-2 px-4 border-b border-gray-600">{trade.result}</td>
+                  <td className="py-2 px-4 border-b">{d.time}</td>
+                  <td className="py-2 px-4 border-b">{d.symbol}</td>
+                  <td className="py-2 px-4 border-b">{d.sequenceLabel}</td>
+                  <td className="py-2 px-4 border-b">${d.price}</td>
+                  <td className="py-2 px-4 border-b">${d.value.toFixed(2)}</td>
+                  <td className="py-2 px-4 border-b">
+                    {typeof d.profit === "number" ? `${d.profit.toFixed(2)}%` : "N/A"}
+                  </td>
                 </tr>
               ))
             )}
