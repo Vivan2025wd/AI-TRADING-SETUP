@@ -1,0 +1,12 @@
+[
+  {
+    "timestamp": "2025-07-08T05:58:32.965901",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "price": 17.83,
+    "confidence": 0.760031860400505,
+    "win_rate": 0.0,
+    "score": 0.58,
+    "source": "mother_ai_decision"
+  }
+]

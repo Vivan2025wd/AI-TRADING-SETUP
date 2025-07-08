@@ -1,0 +1,32 @@
+[
+  {
+    "timestamp": "2025-07-08T05:21:19.951877",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "price": 2544.99,
+    "confidence": 0.7977923012227154,
+    "win_rate": 0.0,
+    "score": 0.599,
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:40.155071",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "price": 3545.02,
+    "confidence": 0.797455026341672,
+    "win_rate": 0.0,
+    "score": 0.599,
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:35.654476",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "price": 2552.17,
+    "confidence": 0.7948611938579682,
+    "win_rate": 0.0,
+    "score": 0.597,
+    "source": "mother_ai_decision"
+  }
+]

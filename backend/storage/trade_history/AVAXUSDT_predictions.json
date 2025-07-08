@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2025-07-08T05:18:38.615737",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7891879425711175,
+    "win_rate": 0.5,
+    "score": 0.745,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:18:41.781534",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7768587380333267,
+    "win_rate": 0.0,
+    "score": 0.588,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:16.222577",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.777522713162417,
+    "win_rate": 0.0,
+    "score": 0.589,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:17.322491",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7453374559424378,
+    "win_rate": 0.0,
+    "score": 0.573,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:33.888220",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7466268824555579,
+    "win_rate": 0.0,
+    "score": 0.573,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:37.511169",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7186412669491147,
+    "win_rate": 0.0,
+    "score": 0.559,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:31.004919",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.760031860400505,
+    "win_rate": 0.0,
+    "score": 0.58,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:33.646917",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7188295849467241,
+    "win_rate": 0.0,
+    "score": 0.559,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:12.756086",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7569367355478241,
+    "win_rate": 0.0,
+    "score": 0.578,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:15.416051",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7394389449827812,
+    "win_rate": 0.0,
+    "score": 0.57,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:19.192973",
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 0.7734321725835163,
+    "win_rate": 0.0,
+    "score": 0.587,
+    "source": "agent_prediction"
+  }
+]

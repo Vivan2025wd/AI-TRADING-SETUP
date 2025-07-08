@@ -1,0 +1,12 @@
+[
+  {
+    "timestamp": "2025-07-08T05:21:36.556175",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "price": 3.346,
+    "confidence": 0.7874713289990611,
+    "win_rate": 0.0,
+    "score": 0.594,
+    "source": "mother_ai_decision"
+  }
+]

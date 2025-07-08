@@ -1,0 +1,22 @@
+[
+  {
+    "timestamp": "2025-07-08T06:59:15.423763",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "price": 497.4,
+    "confidence": 0.7907820552589448,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:18.283403",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "price": 497.4,
+    "confidence": 0.7880988849071354,
+    "win_rate": 0.0,
+    "score": 0.594,
+    "source": "mother_ai_decision"
+  }
+]

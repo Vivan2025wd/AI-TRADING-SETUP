@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2025-07-08T05:18:40.713569",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7278791096513976,
+    "win_rate": 0.5,
+    "score": 0.714,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:18:43.792923",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7362577966945583,
+    "win_rate": 0.0,
+    "score": 0.568,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:18.626868",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7127941453262568,
+    "win_rate": 0.0,
+    "score": 0.556,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:19.611264",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7320647043787368,
+    "win_rate": 0.0,
+    "score": 0.566,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:36.213501",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7451908400189967,
+    "win_rate": 0.0,
+    "score": 0.573,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:39.832504",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7964935604946506,
+    "win_rate": 0.0,
+    "score": 0.598,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:32.748244",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7056772795958217,
+    "win_rate": 0.0,
+    "score": 0.553,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:35.398117",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7489497930312462,
+    "win_rate": 0.0,
+    "score": 0.574,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:15.054099",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7083745747729877,
+    "win_rate": 0.0,
+    "score": 0.554,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:17.964426",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7402679294648065,
+    "win_rate": 0.0,
+    "score": 0.57,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:21.350868",
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 0.7680539309577263,
+    "win_rate": 0.0,
+    "score": 0.584,
+    "source": "agent_prediction"
+  }
+]

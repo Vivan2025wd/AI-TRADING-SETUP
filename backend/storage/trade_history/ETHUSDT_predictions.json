@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2025-07-08T05:18:40.090977",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7229601862430869,
+    "win_rate": 0.5,
+    "score": 0.711,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:18:43.255109",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7083858279873475,
+    "win_rate": 0.0,
+    "score": 0.554,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:17.992067",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7904186912189521,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:18.928475",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7977923012227154,
+    "win_rate": 0.0,
+    "score": 0.599,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:35.598913",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.767882527810285,
+    "win_rate": 0.0,
+    "score": 0.584,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:39.136494",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.797455026341672,
+    "win_rate": 0.0,
+    "score": 0.599,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:32.291465",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7019995615973954,
+    "win_rate": 0.0,
+    "score": 0.551,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:34.912823",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7948611938579682,
+    "win_rate": 0.0,
+    "score": 0.597,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:14.381249",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7622485482383712,
+    "win_rate": 0.0,
+    "score": 0.581,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:17.234346",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7390865834948207,
+    "win_rate": 0.0,
+    "score": 0.57,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:20.730722",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.765381240885541,
+    "win_rate": 0.0,
+    "score": 0.583,
+    "source": "agent_prediction"
+  }
+]

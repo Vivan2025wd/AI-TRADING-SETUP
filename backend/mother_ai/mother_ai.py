@@ -12,18 +12,29 @@ from backend.strategy_engine.strategy_parser import StrategyParser
 
 router = APIRouter()
 
+TRADE_HISTORY_DIR = "backend/storage/trade_history"
+PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
+os.makedirs(TRADE_HISTORY_DIR, exist_ok=True)
+os.makedirs(PERFORMANCE_LOG_DIR, exist_ok=True)
+
+
 class MotherAI:
-    def __init__(self, agents_dir="backend/agents", strategy_dir="backend/storage/strategies", agent_symbols=None):
+    def __init__(
+        self,
+        agents_dir="backend/agents",
+        strategy_dir="backend/storage/strategies",
+        agent_symbols=None,
+    ):
         self.agents_dir = agents_dir
         self.strategy_dir = strategy_dir
-        # Log to performance_logs folder
-        self.performance_tracker = PerformanceTracker(log_dir="backend/storage/performance_logs")
+        self.performance_tracker = PerformanceTracker(log_dir_type="performance_logs")
         self.agent_symbols = agent_symbols or []
 
     def load_agents(self):
         agents = []
         agent_files = [
-            f for f in os.listdir(self.agents_dir)
+            f
+            for f in os.listdir(self.agents_dir)
             if f.endswith(".py") and f not in ("__init__.py", "generic_agent.py")
         ]
 
@@ -32,8 +43,7 @@ class MotherAI:
             if not base_name.endswith("_agent"):
                 continue
 
-            symbol_prefix = base_name[:-6]
-            symbol = symbol_prefix.upper()
+            symbol = base_name[:-6].upper()  # full symbol including USDT
 
             if self.agent_symbols and symbol not in self.agent_symbols:
                 continue
@@ -83,7 +93,12 @@ class MotherAI:
         results = []
         for agent in agents:
             try:
-                symbol_ccxt = agent.symbol[:-4] + "/USDT"
+                # Ensure symbol has USDT suffix for fetch_ohlcv
+                symbol_ccxt = (
+                    agent.symbol if agent.symbol.endswith("USDT") else agent.symbol + "USDT"
+                )
+                symbol_ccxt = symbol_ccxt[:-4] + "/USDT"  # Convert ADAUSDT -> ADA/USDT for ccxt format
+
                 ohlcv_data = fetch_ohlcv(symbol_ccxt, interval="1h", limit=100)
                 if ohlcv_data.empty:
                     continue
@@ -91,8 +106,6 @@ class MotherAI:
                 prediction = agent.predict(ohlcv_data)
                 signal = prediction.get("action", "hold").lower()
                 confidence = prediction.get("confidence", 0.0)
-
-                # Add jitter ±5% to confidence
                 confidence += random.uniform(-0.05, 0.05)
                 confidence = max(0.0, min(confidence, 1.0))
 
@@ -100,7 +113,9 @@ class MotherAI:
                 print(f"⚠️ Error in predict for {agent.symbol}: {e}")
                 signal, confidence = "hold", 0.0
 
-            history = self.performance_tracker.get_agent_log(agent.symbol)
+            # Read agent's prediction history from trade_history (predictions file)
+            tracker = PerformanceTracker(log_dir_type="trade_history")
+            history = tracker.get_agent_log(agent.symbol)
 
             if not history:
                 win_rate = 0.5
@@ -109,32 +124,51 @@ class MotherAI:
                 health = StrategyHealth(history).summary()
                 win_rate = health.get("win_rate", 0.5)
                 drawdown = health.get("max_drawdown", 0.3)
-                health_penalty = 1.0 - drawdown  # penalize agents with high drawdowns
+                health_penalty = 1.0 - drawdown
 
             score = self.calculate_confidence_score(confidence, win_rate, health_penalty)
 
-            print(f"✅ Agent {agent.symbol}: confidence={confidence:.2f}, win_rate={win_rate:.2f}, drawdown_penalty={health_penalty:.2f}, score={score:.3f}")
+            # Log agent prediction to trade_history (full symbol, e.g. ADAUSDT_predictions.json)
+            self.log_agent_prediction(
+                agent.symbol,
+                {
+                    "timestamp": self.performance_tracker.current_time(),
+                    "symbol": agent.symbol,
+                    "signal": signal,
+                    "confidence": confidence,
+                    "win_rate": win_rate,
+                    "score": round(score, 3),
+                    "source": "agent_prediction",
+                },
+            )
 
-            results.append({
-                "symbol": agent.symbol,
-                "signal": signal,
-                "confidence": confidence,
-                "win_rate": win_rate,
-                "score": round(score, 3)
-            })
+            print(
+                f"✅ Agent {agent.symbol}: confidence={confidence:.2f}, win_rate={win_rate:.2f}, "
+                f"drawdown_penalty={health_penalty:.2f}, score={score:.3f}"
+            )
+
+            results.append(
+                {
+                    "symbol": agent.symbol,
+                    "signal": signal,
+                    "confidence": confidence,
+                    "win_rate": win_rate,
+                    "score": round(score, 3),
+                }
+            )
 
         return sorted(results, key=lambda x: x["score"], reverse=True)
 
     def calculate_confidence_score(self, confidence, win_rate, health_penalty, alpha=0.5, beta=0.3, gamma=0.2):
         return (alpha * confidence) + (beta * win_rate) + (gamma * health_penalty)
 
-    def decide_trades(self, top_n=1, min_score=0.5):  # lowered from 0.7 to 0.5
+    def decide_trades(self, top_n=1, min_score=0.5):
         agents = self.load_agents()
         evaluations = self.evaluate_agents(agents)
         top_trades = [e for e in evaluations if e["score"] >= min_score][:top_n]
         return top_trades
 
-    def make_portfolio_decision(self, min_score=0.5):  # lowered from 0.7 to 0.5
+    def make_portfolio_decision(self, min_score=0.5):
         top_trades = self.decide_trades(top_n=1, min_score=min_score)
         timestamp = self.performance_tracker.current_time()
 
@@ -142,12 +176,13 @@ class MotherAI:
             return {"decision": [], "timestamp": timestamp}
 
         trade = top_trades[0]
-        symbol_ccxt = trade["symbol"][:-4] + "/USDT"
+        symbol = trade["symbol"]
+        symbol_ccxt = symbol if symbol.endswith("USDT") else symbol + "USDT"
         df = fetch_ohlcv(symbol_ccxt, interval="1h", limit=1)
         last_price = df["close"].iloc[-1] if not df.empty else None
 
         decision_obj = {
-            "symbol": trade["symbol"],
+            "symbol": symbol,
             "signal": trade["signal"],
             "confidence": trade["confidence"],
             "win_rate": trade["win_rate"],
@@ -155,29 +190,44 @@ class MotherAI:
             "last_price": last_price,
         }
 
+        # Log entry for Mother AI decision in performance_logs with full symbol
         trade_log_entry = {
             "timestamp": timestamp,
-            "symbol": trade["symbol"],
+            "symbol": symbol,
             "signal": trade["signal"],
             "price": last_price,
             "confidence": trade["confidence"],
             "win_rate": trade["win_rate"],
-            "score": trade["score"]
+            "score": trade["score"],
+            "source": "mother_ai_decision",
         }
-        # Log trade to performance_logs/{symbol}_trades.json
-        self.performance_tracker.log_trade(trade["symbol"], trade_log_entry)
+
+        self.performance_tracker.log_trade(symbol, trade_log_entry)
 
         return {"decision": decision_obj, "timestamp": timestamp}
+
+    def log_agent_prediction(self, symbol, data):
+        """Logs agent predictions to trade_history/{symbol}_predictions.json using full symbol"""
+        path = os.path.join(TRADE_HISTORY_DIR, f"{symbol}_predictions.json")
+        existing = []
+        if os.path.exists(path):
+            with open(path, "r") as f:
+                try:
+                    existing = json.load(f)
+                except json.JSONDecodeError:
+                    existing = []
+        existing.append(data)
+        with open(path, "w") as f:
+            json.dump(existing, f, indent=2)
 
 
 # --- FastAPI Routes ---
 @router.get("/trades")
 async def get_trade_logs(limit: int = Query(100, ge=1)):
-    log_dir = "backend/storage/performance_logs"
-    tracker = PerformanceTracker(log_dir=log_dir)
+    tracker = PerformanceTracker(log_dir_type="performance_logs")
     trades = []
 
-    for filename in os.listdir(log_dir):
+    for filename in os.listdir(PERFORMANCE_LOG_DIR):
         if filename.endswith("_trades.json"):
             symbol = filename.replace("_trades.json", "")
             trades.extend(tracker.get_agent_log(symbol, limit=limit))
@@ -186,12 +236,12 @@ async def get_trade_logs(limit: int = Query(100, ge=1)):
 
     return {
         "data": trades[:limit],
-        "total": len(trades)
+        "total": len(trades),
     }
 
 
 @router.get("/decision")
-async def get_decision(min_score: float = Query(0.5, ge=0.0, le=1.0)):  # lowered from 0.7
+async def get_decision(min_score: float = Query(0.5, ge=0.0, le=1.0)):
     mother_ai = MotherAI()
     decision = mother_ai.make_portfolio_decision(min_score=min_score)
     if not decision or not decision.get("decision"):

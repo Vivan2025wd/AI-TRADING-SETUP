@@ -1,0 +1,12 @@
+[
+  {
+    "timestamp": "2025-07-08T06:59:21.654489",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "price": 0.5771,
+    "confidence": 0.7895082091367824,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "mother_ai_decision"
+  }
+]

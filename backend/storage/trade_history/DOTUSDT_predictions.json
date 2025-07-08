@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2025-07-08T05:18:39.745714",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7275210212418969,
+    "win_rate": 0.5,
+    "score": 0.714,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:18:42.975966",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7872229556850846,
+    "win_rate": 0.0,
+    "score": 0.594,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:17.675840",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.717880755031347,
+    "win_rate": 0.0,
+    "score": 0.559,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:18.617865",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7967849053634999,
+    "win_rate": 0.0,
+    "score": 0.598,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:35.287489",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7874713289990611,
+    "win_rate": 0.0,
+    "score": 0.594,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:38.820985",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7851887787552191,
+    "win_rate": 0.0,
+    "score": 0.593,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:32.049281",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7143181617524581,
+    "win_rate": 0.0,
+    "score": 0.557,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:34.684209",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7364646193422968,
+    "win_rate": 0.0,
+    "score": 0.568,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:14.044705",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7486646897739202,
+    "win_rate": 0.0,
+    "score": 0.574,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:16.649042",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7116074069626153,
+    "win_rate": 0.0,
+    "score": 0.556,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:20.411455",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7006397024742597,
+    "win_rate": 0.0,
+    "score": 0.55,
+    "source": "agent_prediction"
+  }
+]

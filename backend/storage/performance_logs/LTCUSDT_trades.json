@@ -1,0 +1,12 @@
+[
+  {
+    "timestamp": "2025-07-08T05:18:40.988518",
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "price": 85.82,
+    "confidence": 0.7965272623849976,
+    "win_rate": 0.5,
+    "score": 0.748,
+    "source": "mother_ai_decision"
+  }
+]

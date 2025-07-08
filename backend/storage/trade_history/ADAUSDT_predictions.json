@@ -1,0 +1,92 @@
+[
+  {
+    "timestamp": "2025-07-08T05:18:38.332789",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7380981882504941,
+    "win_rate": 0.5,
+    "score": 0.719,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:18:41.512949",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7789234903792978,
+    "win_rate": 0.0,
+    "score": 0.589,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:17.012709",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7448916003390813,
+    "win_rate": 0.0,
+    "score": 0.572,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:33.547057",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7050703785039985,
+    "win_rate": 0.0,
+    "score": 0.553,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:21:37.189218",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7900185614917327,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:30.789879",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7174582609548109,
+    "win_rate": 0.0,
+    "score": 0.559,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T05:58:33.425574",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7137828494928553,
+    "win_rate": 0.0,
+    "score": 0.557,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:12.471032",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.766098756586804,
+    "win_rate": 0.0,
+    "score": 0.583,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:15.077572",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7458118428648055,
+    "win_rate": 0.0,
+    "score": 0.573,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-08T06:59:18.894027",
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 0.7895082091367824,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "agent_prediction"
+  }
+]

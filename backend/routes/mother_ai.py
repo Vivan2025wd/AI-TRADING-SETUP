@@ -12,6 +12,8 @@ router = APIRouter(tags=["Mother AI"])
 # Global MotherAI instance (optional usage depending on your app)
 mother_ai_instance = MotherAI(agent_symbols=None)
 
+TRADE_HISTORY_DIR = "backend/storage/performance_logs"
+
 @router.get("/decision")
 def get_mother_ai_decision():
     try:
@@ -31,6 +33,7 @@ def get_mother_ai_decision():
     except Exception as e:
         print("❌ Mother AI Decision Error:", e)
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/execute")
 def execute_mother_decision():
@@ -58,11 +61,12 @@ def execute_mother_decision():
         print("❌ Execution failed:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/trades/{symbol}")
 def get_symbol_trades(symbol: str):
     try:
         symbol = symbol.upper()
-        log_file_path = f"backend/storage/performance_logs/{symbol}_trades.json"
+        log_file_path = f"{TRADE_HISTORY_DIR}/{symbol}_trades.json"
 
         if not os.path.exists(log_file_path):
             print(f"⚠️ No trade log found for {symbol}: {log_file_path}")
@@ -77,17 +81,21 @@ def get_symbol_trades(symbol: str):
         }
 
     except Exception as e:
-        print("❌ Failed to load performance log:", e)
+        print("❌ Failed to load trade log:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/trades")
 def get_all_trades():
     try:
-        base_dir = "backend/storage/performance_logs"
-        pattern = os.path.join(base_dir, "*_trades.json")
+        pattern = os.path.join(TRADE_HISTORY_DIR, "*_trades.json")
         all_files = glob.glob(pattern)
-
+        if not all_files:
+            print("⚠️ No trade logs found.")
+            return {
+                "symbol": "ALL",
+                "data": []
+            }
         all_trades = []
         for file_path in all_files:
             symbol = os.path.basename(file_path).replace("_trades.json", "").upper()
@@ -100,8 +108,8 @@ def get_all_trades():
 
                 all_trades.extend(trades)
 
-        # Optional: sort all trades by timestamp ascending
-        all_trades.sort(key=lambda x: x.get("timestamp") or "")
+        # Sort all trades by timestamp descending (most recent first)
+        all_trades.sort(key=lambda x: x.get("timestamp") or "", reverse=True)
 
         return {
             "symbol": "ALL",
@@ -109,5 +117,5 @@ def get_all_trades():
         }
 
     except Exception as e:
-        print("❌ Failed to load all performance logs:", e)
+        print("❌ Failed to load all trade logs:", e)
         raise HTTPException(status_code=500, detail=str(e))
