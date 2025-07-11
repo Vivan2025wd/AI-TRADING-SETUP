@@ -97,5 +97,104 @@
     "win_rate": 0.0,
     "score": 0.583,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:36.371812",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7633811434885389,
+    "win_rate": 0.0,
+    "score": 0.582,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:39.908901",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7766645220313048,
+    "win_rate": 0.0,
+    "score": 0.588,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:04.196026",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7692288438297376,
+    "win_rate": 0.0,
+    "score": 0.585,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:07.937693",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.7379261632987104,
+    "win_rate": 0.0,
+    "score": 0.569,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:44.417775",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7168953705972076,
+    "win_rate": 0.0,
+    "score": 0.558,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:46.994819",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7645829114924428,
+    "win_rate": 0.0,
+    "score": 0.582,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:06.325814",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7730868807865678,
+    "win_rate": 0.0,
+    "score": 0.587,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:08.947431",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7854276872085131,
+    "win_rate": 0.0,
+    "score": 0.593,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:46.573130",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7766678550039973,
+    "win_rate": 0.0,
+    "score": 0.588,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:48.695280",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7624348035220936,
+    "win_rate": 0.0,
+    "score": 0.581,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:52.405698",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.7295494289134882,
+    "win_rate": 0.0,
+    "score": 0.565,
+    "source": "agent_prediction"
   }
 ]

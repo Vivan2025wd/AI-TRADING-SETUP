@@ -97,5 +97,104 @@
     "win_rate": 0.0,
     "score": 0.559,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:35.745928",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7157939393080995,
+    "win_rate": 0.0,
+    "score": 0.558,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:39.226587",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7842575079389089,
+    "win_rate": 0.0,
+    "score": 0.592,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:03.532427",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.712892196218185,
+    "win_rate": 0.0,
+    "score": 0.556,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:07.336368",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7783328432751454,
+    "win_rate": 0.0,
+    "score": 0.589,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:43.835778",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.731354872440546,
+    "win_rate": 0.0,
+    "score": 0.566,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:46.554237",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7721955785191759,
+    "win_rate": 0.0,
+    "score": 0.586,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:05.885007",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7142948983490215,
+    "win_rate": 0.0,
+    "score": 0.557,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:08.458757",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7074087416058972,
+    "win_rate": 0.0,
+    "score": 0.554,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:46.147400",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7457361497253899,
+    "win_rate": 0.0,
+    "score": 0.573,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:48.086735",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7495762393745998,
+    "win_rate": 0.0,
+    "score": 0.575,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:51.699471",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "confidence": 0.7703545009912816,
+    "win_rate": 0.0,
+    "score": 0.585,
+    "source": "agent_prediction"
   }
 ]

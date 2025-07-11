@@ -1,0 +1,22 @@
+[
+  {
+    "timestamp": "2025-07-11T03:20:48.196710",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "price": 2.5779,
+    "confidence": 0.7885254838781554,
+    "win_rate": 0.0,
+    "score": 0.594,
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:53.397434",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "price": 2.5708,
+    "confidence": 0.7899213040616032,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "mother_ai_decision"
+  }
+]

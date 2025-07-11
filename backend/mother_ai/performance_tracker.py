@@ -1,10 +1,7 @@
-# backend/mother_ai/performance_tracker.py
-
 import os
 import json
-from datetime import datetime
+import glob
 from typing import Dict, List
-
 
 class PerformanceTracker:
     def __init__(self, log_dir_type="trade_history"):
@@ -18,6 +15,7 @@ class PerformanceTracker:
         else:
             raise ValueError("log_dir_type must be 'trade_history' or 'performance_logs'")
 
+        self.strategy_dir = os.path.join(base_dir, "strategies")
         os.makedirs(self.log_dir, exist_ok=True)
 
     def get_log_path(self, symbol: str) -> str:
@@ -41,6 +39,7 @@ class PerformanceTracker:
             os.remove(path)
 
     def current_time(self) -> str:
+        from datetime import datetime
         return datetime.utcnow().isoformat()
 
     def _load_logs(self, path: str) -> List[Dict]:
@@ -74,14 +73,12 @@ class PerformanceTracker:
             confidence_sum += confidence
 
             if "profit_percent" in log:
-                # This is a trade log
                 profit_sum += log.get("profit_percent", 0.0)
                 if log["profit_percent"] > 0:
                     wins += 1
                 else:
                     losses += 1
             elif "signal" in log:
-                # This is a prediction log, use score (if win/loss defined)
                 if log.get("result") == "win":
                     wins += 1
                 elif log.get("result") == "loss":
@@ -101,3 +98,51 @@ class PerformanceTracker:
             "avg_profit": avg_profit,
             "total": count
         }
+
+    def list_strategies(self, symbol: str) -> List[Dict]:
+        """
+        Lists all strategy JSONs for a symbol, loads metadata from each.
+        """
+        pattern = os.path.join(self.strategy_dir, f"{symbol}_strategy_*.json")
+        files = glob.glob(pattern)
+        strategies = []
+
+        for filepath in files:
+            try:
+                with open(filepath, "r") as f:
+                    data = json.load(f)
+                strategy_id = os.path.basename(filepath).replace(f"{symbol}_strategy_", "").replace(".json", "")
+                strategies.append({
+                    "strategy_id": strategy_id,
+                    "filename": os.path.basename(filepath),
+                    "metadata": data.get("metadata", {}),  # If your strategy JSON has metadata
+                    "raw_data": data,
+                })
+            except Exception as e:
+                print(f"⚠️ Failed to load strategy file {filepath}: {e}")
+        return strategies
+
+    def rate_strategies(self, symbol: str, limit: int = 100) -> List[Dict]:
+        """
+        For each strategy, rate it based on agent logs and return combined info:
+        Here we simply return health stats with the strategy metadata.
+        You can improve rating logic based on your needs.
+        """
+        strategies = self.list_strategies(symbol)
+        health = self.get_strategy_health(symbol, limit=limit)
+
+        rated = []
+        for s in strategies:
+            rated.append({
+                "strategy_id": s["strategy_id"],
+                "win_rate": health["win_rate"],
+                "avg_profit": health["avg_profit"],
+                "avg_confidence": health["avg_confidence"],
+                "total_predictions": health["total"],
+                "metadata": s.get("metadata", {}),
+            })
+
+        # Sort by win_rate or avg_profit descending
+        rated.sort(key=lambda x: (x["win_rate"], x["avg_profit"]), reverse=True)
+
+        return rated

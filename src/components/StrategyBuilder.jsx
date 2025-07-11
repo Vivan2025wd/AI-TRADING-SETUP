@@ -1,20 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Save, Trash2 } from "lucide-react";
 
-const indicators = ["RSI", "MACD", "SMA", "EMA"];
-const conditions = ["<", "<=", ">", ">=", "=="];
-const actions = ["BUY", "SELL", "HOLD"];
+const INDICATORS = ["rsi", "macd", "sma", "ema"];
+
+const ACTIONS = ["BUY", "SELL"];
+
+const CONDITIONS = {
+  rsi: {
+    BUY: ["buy_below", "buy_equals"],
+    SELL: ["sell_above", "sell_equals"],
+  },
+  ema: {
+    BUY: ["buy_crosses_above", "buy_equals"],
+    SELL: ["sell_crosses_below", "sell_equals"],
+  },
+  sma: {
+    BUY: ["buy_crosses_above", "buy_equals"],
+    SELL: ["sell_crosses_below", "sell_equals"],
+  },
+  macd: {
+    BUY: ["buy_below", "buy_equals"],
+    SELL: ["sell_above", "sell_equals"],
+  },
+};
 
 export default function StrategyBuilder() {
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState("");
   const [strategyName, setStrategyName] = useState("");
   const [rules, setRules] = useState([
-    { indicator: "RSI", condition: "<", value: "30", action: "BUY" },
+    {
+      indicator: "rsi",
+      period: 14,
+      condition: "buy_below",
+      value: 30,
+      action: "BUY",
+    },
   ]);
   const [loading, setLoading] = useState(false);
-  const [savedStrategies, setSavedStrategies] = useState([]);
-  const [error, setError] = useState(null); // <-- Error state
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -27,94 +51,84 @@ export default function StrategyBuilder() {
       } catch (err) {
         console.error(err);
         setError("Error loading agents. Using fallback list.");
-        const fallback = ["BTC", "ETH", "SOL"];
+        const fallback = ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
         setAgents(fallback);
         setSelectedAgent(fallback[0]);
       }
     };
 
-    const fetchStrategies = async () => {
-      try {
-        const res = await fetch("/api/strategy/list");
-        if (!res.ok) throw new Error("Failed to fetch strategies");
-        const data = await res.json();
-        setSavedStrategies(data.data || []);
-      } catch (err) {
-        console.error("Error fetching strategies:", err.message);
-        setError("Failed to load saved strategies.");
-        setSavedStrategies([]);
-      }
-    };
-
     fetchAgents();
-    fetchStrategies();
   }, []);
 
   const addRule = () => {
-    setRules([...rules, { indicator: "RSI", condition: "<", value: "30", action: "BUY" }]);
+    setRules([
+      ...rules,
+      {
+        indicator: "rsi",
+        period: 14,
+        condition: "buy_below",
+        value: 30,
+        action: "BUY",
+      },
+    ]);
   };
 
   const updateRule = (index, field, value) => {
-    const updated = [...rules];
-    updated[index][field] = value;
-    setRules(updated);
+    setRules((prev) => {
+      const newRules = [...prev];
+      newRules[index] = { ...newRules[index], [field]: value };
+      // Reset condition if indicator or action changed and condition is invalid now
+      if (field === "indicator" || field === "action") {
+        const conds = CONDITIONS[
+          newRules[index].indicator.toLowerCase()
+        ]?.[newRules[index].action];
+        if (!conds || !conds.includes(newRules[index].condition)) {
+          newRules[index].condition = conds ? conds[0] : "";
+        }
+      }
+      // Reset period to default if indicator changed and no period specified
+      if (field === "indicator" && !newRules[index].period) {
+        newRules[index].period = 14;
+      }
+      return newRules;
+    });
   };
 
   const removeRule = (index) => {
-    setRules(rules.filter((_, i) => i !== index));
+    setRules((prev) => prev.filter((_, i) => i !== index));
   };
 
   const convertRulesToIndicators = () => {
     const indicatorsObj = {};
-    rules.forEach((rule) => {
-      const key = rule.indicator.toLowerCase();
-      const val = parseFloat(rule.value);
-      const condition = rule.condition;
-      const action = rule.action;
-
+    rules.forEach(({ indicator, period, condition, value }) => {
+      const key = indicator.toLowerCase();
       if (!indicatorsObj[key]) indicatorsObj[key] = {};
+      indicatorsObj[key]["period"] = parseInt(period) || 14;
 
-      const add = (k) =>
-        (indicatorsObj[key][k] = indicatorsObj[key][k] || []).push(val);
-
-      if (key === "rsi") {
-        if (action === "BUY") {
-          if (["<", "<="].includes(condition)) add("buy_below");
-          else if (condition === "==") add("buy_equals");
-        } else if (action === "SELL") {
-          if ([">", ">="].includes(condition)) add("sell_above");
-          else if (condition === "==") add("sell_equals");
-        }
-      }
-
-      if (["ema", "sma"].includes(key)) {
-        if (action === "BUY") {
-          if ([">", ">="].includes(condition)) add("buy_crosses_above");
-          else if (condition === "==") add("buy_equals");
-        } else if (action === "SELL") {
-          if (["<", "<="].includes(condition)) add("sell_crosses_below");
-          else if (condition === "==") add("sell_equals");
-        }
-      }
-
-      if (key === "macd") {
-        if (action === "BUY") {
-          if (["<", "<="].includes(condition)) add("buy_below");
-          else if (condition === "==") add("buy_equals");
-        } else if (action === "SELL") {
-          if ([">", ">="].includes(condition)) add("sell_above");
-          else if (condition === "==") add("sell_equals");
-        }
+      if (typeof value === "string" && (value === "true" || value === "false")) {
+        indicatorsObj[key][condition] = value === "true";
+      } else if (typeof value === "number" || !isNaN(parseFloat(value))) {
+        indicatorsObj[key][condition] = parseFloat(value);
+      } else {
+        indicatorsObj[key][condition] = value;
       }
     });
-
     return indicatorsObj;
   };
 
   const convertToJSON = async () => {
-    if (!strategyName.trim()) return alert("Enter strategy name.");
-    if (!selectedAgent) return alert("Select an agent.");
-    if (rules.length === 0) return alert("Add at least one rule.");
+    if (!strategyName.trim()) {
+      alert("Please enter a strategy name.");
+      return;
+    }
+    if (!selectedAgent) {
+      alert("Please select an agent.");
+      return;
+    }
+    if (rules.length === 0) {
+      alert("Add at least one rule.");
+      return;
+    }
 
     const payload = {
       strategy_id: strategyName.trim(),
@@ -138,8 +152,15 @@ export default function StrategyBuilder() {
 
       alert(`✅ Saved strategy "${strategyName}"`);
       setStrategyName("");
-      setRules([{ indicator: "RSI", condition: "<", value: "30", action: "BUY" }]);
-      fetchSavedStrategies();
+      setRules([
+        {
+          indicator: "rsi",
+          period: 14,
+          condition: "buy_below",
+          value: 30,
+          action: "BUY",
+        },
+      ]);
     } catch (err) {
       setError("Error saving strategy: " + err.message);
     } finally {
@@ -147,45 +168,11 @@ export default function StrategyBuilder() {
     }
   };
 
-  const fetchSavedStrategies = async () => {
-    try {
-      const res = await fetch("/api/strategy/list");
-      if (!res.ok) throw new Error("Failed to fetch strategies");
-      const data = await res.json();
-      setSavedStrategies(data.data || []);
-    } catch (err) {
-      console.error("Error fetching strategies:", err.message);
-      setError("Error refreshing saved strategies.");
-      setSavedStrategies([]);
-    }
+  // Generate current JSON preview of strategy
+  const currentStrategyJSON = {
+    symbol: selectedAgent,
+    indicators: convertRulesToIndicators(),
   };
-
-  const deleteStrategy = async (strategyKey) => {
-    if (!window.confirm(`Are you sure you want to delete "${strategyKey}"?`)) return;
-
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/strategy/${strategyKey}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || "Failed to delete");
-      }
-
-      alert(`Deleted strategy "${strategyKey}"`);
-      fetchSavedStrategies();
-    } catch (err) {
-      setError("Error deleting strategy: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredStrategies = savedStrategies.filter(
-    (s) => s.strategy_id && s.symbol && agents.includes(s.symbol)
-  );
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-lg space-y-6 border border-gray-700 text-white">
@@ -228,80 +215,120 @@ export default function StrategyBuilder() {
       </div>
 
       {/* Rule Builder */}
-      {rules.map((rule, index) => (
-        <div
-          key={index}
-          className="flex flex-wrap items-center gap-4 p-4 bg-gray-800 rounded border border-gray-700"
-        >
-          <div>
-            <label className="block text-sm text-gray-300">Indicator</label>
-            <select
-              value={rule.indicator}
-              onChange={(e) => updateRule(index, "indicator", e.target.value)}
-              className="px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
-              disabled={loading}
-            >
-              {indicators.map((ind) => (
-                <option key={ind}>{ind}</option>
-              ))}
-            </select>
-          </div>
+      {rules.map((rule, index) => {
+        const condOptions =
+          CONDITIONS[rule.indicator.toLowerCase()]?.[rule.action] || [];
 
-          <div>
-            <label className="block text-sm text-gray-300">Condition</label>
-            <select
-              value={rule.condition}
-              onChange={(e) => updateRule(index, "condition", e.target.value)}
-              className="px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
-              disabled={loading}
-            >
-              {conditions.map((cond) => (
-                <option key={cond}>{cond}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-300">Value</label>
-            <input
-              type="number"
-              value={rule.value}
-              onChange={(e) => updateRule(index, "value", e.target.value)}
-              className="w-24 px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm text-gray-300">Action</label>
-            <select
-              value={rule.action}
-              onChange={(e) => updateRule(index, "action", e.target.value)}
-              className={`px-2 py-1 mt-1 border rounded ${
-                rule.action === "BUY"
-                  ? "bg-green-700 text-green-300"
-                  : rule.action === "SELL"
-                  ? "bg-red-700 text-red-300"
-                  : "bg-yellow-700 text-yellow-300"
-              }`}
-              disabled={loading}
-            >
-              {actions.map((a) => (
-                <option key={a}>{a}</option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            onClick={() => removeRule(index)}
-            className="ml-auto text-red-500 hover:text-red-700"
-            title="Remove rule"
-            disabled={loading}
+        return (
+          <div
+            key={index}
+            className="flex flex-wrap items-center gap-4 p-4 bg-gray-800 rounded border border-gray-700"
           >
-            <Trash2 className="w-5 h-5" />
-          </button>
-        </div>
-      ))}
+            {/* Indicator */}
+            <div>
+              <label className="block text-sm text-gray-300">Indicator</label>
+              <select
+                value={rule.indicator}
+                onChange={(e) => updateRule(index, "indicator", e.target.value)}
+                className="px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
+                disabled={loading}
+              >
+                {INDICATORS.map((ind) => (
+                  <option key={ind} value={ind}>
+                    {ind.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Period */}
+            <div>
+              <label className="block text-sm text-gray-300">Period</label>
+              <input
+                type="number"
+                min={1}
+                value={rule.period}
+                onChange={(e) => updateRule(index, "period", e.target.value)}
+                className="w-20 px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
+                disabled={loading}
+              />
+            </div>
+
+            {/* Action */}
+            <div>
+              <label className="block text-sm text-gray-300">Action</label>
+              <select
+                value={rule.action}
+                onChange={(e) => updateRule(index, "action", e.target.value)}
+                className={`px-2 py-1 mt-1 border rounded ${
+                  rule.action === "BUY"
+                    ? "bg-green-700 text-green-300"
+                    : "bg-red-700 text-red-300"
+                }`}
+                disabled={loading}
+              >
+                {ACTIONS.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Condition */}
+            <div>
+              <label className="block text-sm text-gray-300">Condition</label>
+              <select
+                value={rule.condition}
+                onChange={(e) => updateRule(index, "condition", e.target.value)}
+                className="px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
+                disabled={loading}
+              >
+                {condOptions.map((cond) => (
+                  <option key={cond} value={cond}>
+                    {cond.replace(/_/g, " ").toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Value */}
+            <div>
+              <label className="block text-sm text-gray-300">Value</label>
+              {rule.condition.includes("crosses") ? (
+                <select
+                  value={rule.value === true ? "true" : "false"}
+                  onChange={(e) =>
+                    updateRule(index, "value", e.target.value === "true")
+                  }
+                  className="px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
+                  disabled={loading}
+                >
+                  <option value="true">True</option>
+                  <option value="false">False</option>
+                </select>
+              ) : (
+                <input
+                  type="number"
+                  value={rule.value}
+                  onChange={(e) => updateRule(index, "value", e.target.value)}
+                  className="w-20 px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
+                  disabled={loading}
+                />
+              )}
+            </div>
+
+            <button
+              onClick={() => removeRule(index)}
+              className="ml-auto text-red-500 hover:text-red-700"
+              title="Remove rule"
+              disabled={loading}
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        );
+      })}
 
       {/* Actions */}
       <div className="flex gap-4">
@@ -323,35 +350,10 @@ export default function StrategyBuilder() {
         </button>
       </div>
 
-      {/* Saved Strategies */}
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold mb-4">Saved Strategies</h3>
-
-        {filteredStrategies.length === 0 && (
-          <p className="text-gray-400">No saved strategies found.</p>
-        )}
-
-        {filteredStrategies.map((strategy) => (
-          <div
-            key={`${strategy.symbol}-${strategy.strategy_id}`}
-            className="flex items-center justify-between bg-gray-800 p-4 rounded border border-gray-700 mb-2"
-          >
-            <div>
-              <p className="font-semibold">{strategy.strategy_id}</p>
-              <p className="text-gray-400 text-sm">Agent: {strategy.symbol}</p>
-            </div>
-            <button
-              onClick={() =>
-                deleteStrategy(`${strategy.symbol}_strategy_${strategy.strategy_id}`)
-              }
-              className="text-red-500 hover:text-red-700"
-              disabled={loading}
-              title="Delete strategy"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
-          </div>
-        ))}
+      {/* JSON Preview */}
+      <div className="mt-8 bg-gray-800 p-4 rounded border border-gray-700 whitespace-pre-wrap font-mono text-sm text-green-400 overflow-x-auto max-h-72">
+        <h3 className="text-lg font-semibold mb-2">Generated Strategy JSON</h3>
+        <pre>{JSON.stringify(currentStrategyJSON, null, 2)}</pre>
       </div>
     </div>
   );

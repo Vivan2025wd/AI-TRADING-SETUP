@@ -1,58 +1,94 @@
 import React, { useEffect, useState } from "react";
-import { ArrowUpRight, AlertCircle, Clock } from "lucide-react";
+import { ArrowUpRight, AlertCircle, Clock, RefreshCw, Loader2 } from "lucide-react";
+
+const CACHE_KEY = "mother_ai_decision_cache";
+const CACHE_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
 
 export default function MotherAIDecisionCard() {
   const [decisionData, setDecisionData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  async function fetchDecision() {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("http://localhost:8000/api/mother-ai/latest-decision"); // or your endpoint
+      if (!res.ok) throw new Error("Failed to fetch Mother AI decision");
+
+      const data = await res.json();
+
+      if (!data || !data.decision || Object.keys(data.decision).length === 0) {
+        setDecisionData({
+          status: "Inactive",
+          tradePick: "No signal",
+          lastUpdated: new Date().toLocaleString(),
+          rationale: "No qualified trades met the confidence threshold.",
+          confidence: 0,
+        });
+      } else {
+        const decision = data.decision;
+        setDecisionData({
+          status: "Active",
+          tradePick: `${decision.symbol} - ${decision.signal}`,
+          lastUpdated: new Date(data.timestamp).toLocaleString(),
+          rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
+          confidence: (decision.confidence * 100).toFixed(2),
+        });
+      }
+
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          timestamp: Date.now(),
+          decisionData: data,
+        })
+      );
+    } catch (err) {
+      console.error("Mother AI Fetch Error:", err);
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    async function fetchDecision() {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
       try {
-        setError(null);
-        const res = await fetch("http://localhost:8000/api/mother-ai/decision"); // or use /api if proxy set
+        const { timestamp, decisionData: cachedDecision } = JSON.parse(cached);
+        const age = Date.now() - timestamp;
 
-        if (!res.ok) throw new Error("Failed to fetch Mother AI decision");
-
-        const data = await res.json();
-
-        if (!data || !data.decision || Object.keys(data.decision).length === 0) {
-          // No valid decision data, set to inactive
-          setDecisionData({
-            status: "Inactive",
-            tradePick: "No signal",
-            lastUpdated: new Date().toLocaleString(),
-            rationale: "No qualified trades met the confidence threshold.",
-            confidence: 0,
-          });
-        } else {
-          const decision = data.decision;
-          setDecisionData({
-            status: "Active",
-            tradePick: `${decision.symbol} - ${decision.signal}`,
-            lastUpdated: new Date(data.timestamp).toLocaleString(),
-            rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
-            confidence: (decision.confidence * 100).toFixed(2),
-          });
+        if (age < CACHE_DURATION_MS) {
+          if (!cachedDecision || !cachedDecision.decision || Object.keys(cachedDecision.decision).length === 0) {
+            setDecisionData({
+              status: "Inactive",
+              tradePick: "No signal",
+              lastUpdated: new Date().toLocaleString(),
+              rationale: "No qualified trades met the confidence threshold.",
+              confidence: 0,
+            });
+          } else {
+            const decision = cachedDecision.decision;
+            setDecisionData({
+              status: "Active",
+              tradePick: `${decision.symbol} - ${decision.signal}`,
+              lastUpdated: new Date(cachedDecision.timestamp).toLocaleString(),
+              rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
+              confidence: (decision.confidence * 100).toFixed(2),
+            });
+          }
+          setLoading(false);
+          return;
         }
-      } catch (err) {
-        console.error("Mother AI Fetch Error:", err);
-        setError(err.message || "An unexpected error occurred.");
-      } finally {
-        setLoading(false);
+      } catch {
+        // corrupted cache fallback
       }
     }
 
     fetchDecision();
   }, []);
-
-  if (loading) {
-    return (
-      <div className="text-gray-300 text-center p-4">
-        Loading Mother AI decision...
-      </div>
-    );
-  }
 
   return (
     <div className="bg-gray-900 text-white shadow-md rounded-xl p-6 max-w-xl mx-auto space-y-6 border border-gray-700">
@@ -64,10 +100,20 @@ export default function MotherAIDecisionCard() {
           className={`px-3 py-1 text-sm font-semibold rounded-full ${
             decisionData?.status === "Active"
               ? "bg-green-700 text-green-100"
-              : "bg-gray-600 text-gray-200"
+              : decisionData?.status === "Inactive"
+              ? "bg-gray-600 text-gray-200"
+              : "bg-yellow-600 text-yellow-100"
           }`}
         >
-          {decisionData?.status || "Unknown"}
+          {loading ? (
+            <span className="flex items-center gap-1">
+              <Loader2 className="animate-spin w-4 h-4" /> Loading...
+            </span>
+          ) : error ? (
+            "Error"
+          ) : (
+            decisionData?.status || "Unknown"
+          )}
         </span>
       </div>
 
@@ -79,9 +125,7 @@ export default function MotherAIDecisionCard() {
       ) : (
         <>
           <div className="space-y-1">
-            <p className="text-lg font-semibold text-blue-400">
-              {decisionData?.tradePick}
-            </p>
+            <p className="text-lg font-semibold text-blue-400">{decisionData?.tradePick}</p>
             <p className="text-sm text-gray-400 flex items-center gap-1">
               <Clock className="w-4 h-4" /> Last Updated: {decisionData?.lastUpdated}
             </p>
@@ -98,13 +142,29 @@ export default function MotherAIDecisionCard() {
           <div className="pt-2">
             <p className="text-sm text-gray-300">
               <span className="font-semibold text-white">Confidence:</span>{" "}
-              <span className="text-green-400 font-semibold">
-                {decisionData?.confidence}%
-              </span>
+              <span className="text-green-400 font-semibold">{decisionData?.confidence}%</span>
             </p>
           </div>
+
+          {!loading && decisionData?.status === "Active" && (
+            <p className="text-sm text-gray-400 italic mt-2 text-center">
+              Waiting for next update...
+            </p>
+          )}
         </>
       )}
+
+      {/* Manual refresh button */}
+      <button
+        onClick={() => {
+          fetchDecision();
+        }}
+        className="mt-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center gap-2 mx-auto"
+        disabled={loading}
+      >
+        <RefreshCw className="w-4 h-4" />
+        Refresh Now
+      </button>
     </div>
   );
 }

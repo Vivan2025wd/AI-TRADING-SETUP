@@ -97,5 +97,104 @@
     "win_rate": 0.0,
     "score": 0.55,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:36.060448",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7128044486129188,
+    "win_rate": 0.0,
+    "score": 0.556,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:39.547458",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7441708189959284,
+    "win_rate": 0.0,
+    "score": 0.572,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:03.855249",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7680558694003015,
+    "win_rate": 0.0,
+    "score": 0.584,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:07.627800",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7902774308537155,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:44.193021",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7723952981393212,
+    "win_rate": 0.0,
+    "score": 0.586,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:46.773464",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7564192285038279,
+    "win_rate": 0.0,
+    "score": 0.578,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:06.105328",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7320340621413884,
+    "win_rate": 0.0,
+    "score": 0.566,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:08.675232",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7364844733981801,
+    "win_rate": 0.0,
+    "score": 0.568,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:46.360516",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7017739813632613,
+    "win_rate": 0.0,
+    "score": 0.551,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:48.395602",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7630393123600132,
+    "win_rate": 0.0,
+    "score": 0.582,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:52.069464",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.7677399739436203,
+    "win_rate": 0.0,
+    "score": 0.584,
+    "source": "agent_prediction"
   }
 ]

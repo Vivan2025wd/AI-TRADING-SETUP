@@ -97,5 +97,104 @@
     "win_rate": 0.0,
     "score": 0.587,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:34.750386",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.751919698842265,
+    "win_rate": 0.0,
+    "score": 0.576,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:38.269238",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7474358788550958,
+    "win_rate": 0.0,
+    "score": 0.574,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:01.837505",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7072926802523871,
+    "win_rate": 0.0,
+    "score": 0.554,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:06.319374",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7141032538415046,
+    "win_rate": 0.0,
+    "score": 0.557,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:42.875342",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7085342049174128,
+    "win_rate": 0.0,
+    "score": 0.554,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:45.883011",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7089190602108104,
+    "win_rate": 0.0,
+    "score": 0.554,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:05.244047",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7799265385410235,
+    "win_rate": 0.0,
+    "score": 0.59,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:07.792560",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7322304733192491,
+    "win_rate": 0.0,
+    "score": 0.566,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:45.372153",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.733227828325588,
+    "win_rate": 0.0,
+    "score": 0.567,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:47.117107",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7490090945122699,
+    "win_rate": 0.0,
+    "score": 0.575,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:50.796838",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.7275397751390997,
+    "win_rate": 0.0,
+    "score": 0.564,
+    "source": "agent_prediction"
   }
 ]

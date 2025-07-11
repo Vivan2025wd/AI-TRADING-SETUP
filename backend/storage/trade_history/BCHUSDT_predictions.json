@@ -97,5 +97,104 @@
     "win_rate": 0.0,
     "score": 0.579,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:35.093157",
+    "symbol": "BCHUSDT",
+    "signal": "hold",
+    "confidence": 0.7292818943637791,
+    "win_rate": 0.0,
+    "score": 0.565,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:38.586708",
+    "symbol": "BCHUSDT",
+    "signal": "hold",
+    "confidence": 0.7368029639757674,
+    "win_rate": 0.0,
+    "score": 0.568,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:02.837678",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7008274903022075,
+    "win_rate": 0.0,
+    "score": 0.55,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:06.674770",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7571177927053236,
+    "win_rate": 0.0,
+    "score": 0.579,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:43.235573",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7949721625745277,
+    "win_rate": 0.0,
+    "score": 0.597,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:46.100785",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7153718261884924,
+    "win_rate": 0.0,
+    "score": 0.558,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:05.456722",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7114947772560732,
+    "win_rate": 0.0,
+    "score": 0.556,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:08.006675",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7807019371797024,
+    "win_rate": 0.0,
+    "score": 0.59,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:45.738924",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7775271819209637,
+    "win_rate": 0.0,
+    "score": 0.589,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:47.429869",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7245803880605767,
+    "win_rate": 0.0,
+    "score": 0.562,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:51.095525",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.7611103167299579,
+    "win_rate": 0.0,
+    "score": 0.581,
+    "source": "agent_prediction"
   }
 ]

@@ -18,5 +18,15 @@
     "win_rate": 0.0,
     "score": 0.596,
     "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:40.950275",
+    "symbol": "DOGEUSDT",
+    "signal": "hold",
+    "price": 0.18157,
+    "confidence": 0.7842575079389089,
+    "win_rate": 0.0,
+    "score": 0.592,
+    "source": "mother_ai_decision"
   }
 ]

@@ -18,5 +18,15 @@
     "win_rate": 0.0,
     "score": 0.594,
     "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:45.207518",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "price": 521.0,
+    "confidence": 0.7949721625745277,
+    "win_rate": 0.0,
+    "score": 0.597,
+    "source": "mother_ai_decision"
   }
 ]

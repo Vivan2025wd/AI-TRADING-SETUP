@@ -3,12 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # --- Import route modules ---
 from backend.routes.agent import router as agent_router                   # Core agent routes + predictions
-from backend.routes.strategy import router as strategy_router             # Strategy CRUD (uses your fixed save/load/delete)
-from backend.routes.mother_ai import router as mother_ai_router           # Mother AI logic
+from backend.routes.strategy import router as strategy_router             # Strategy CRUD (save/load/delete)
+from backend.routes.mother_ai import router as mother_ai_router           # Mother AI logic (decision, execute, profits)
 from backend.routes.backtest import router as backtest_router             # Backtest strategies
-from backend.routes.binance import router as binance_router               # Binance data utils
-from backend.routes.agent_registry import router as agents_router         # Lists agents in /agents/*.py
-from backend.routes.strategy_file_loader import router as strategy_file_loader_router  # Loads .json strategies
+from backend.routes.binance import router as binance_router               # Binance OHLCV utils
+from backend.routes.agent_registry import router as agents_router         # Lists all agents
+from backend.routes.strategy_file_loader import router as strategy_file_loader_router  # Load saved .json strategies
 
 # --- Initialize FastAPI app ---
 app = FastAPI(
@@ -17,27 +17,30 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# --- CORS (frontend access config) ---
+# --- CORS config ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",  # Vite frontend
+        "http://localhost:5174",  # Optional second frontend
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- Health check route ---
+# --- Root health check ---
 @app.get("/")
 async def read_root():
     return {"message": "Backend is running!"}
 
-# --- Register API routers ---
-app.include_router(agent_router, prefix="/api/agent", tags=["Agent"])                  # agent prediction + symbol
-app.include_router(strategy_router, prefix="/api/strategy", tags=["Strategy"])         # save/load/delete strategies
-app.include_router(mother_ai_router, prefix="/api/mother-ai", tags=["Mother AI"])      # mother decision logic
-app.include_router(backtest_router, prefix="/api/backtest", tags=["Backtesting"])      # strategy test engine
-app.include_router(binance_router, prefix="/api/binance", tags=["Binance"])            # OHLCV fetch
-app.include_router(agents_router, prefix="/api/agents", tags=["Agent Registry"])       # shows real agents
-app.include_router(strategy_file_loader_router, prefix="/api/strategies", tags=["Strategy Files"])  # load .json strategies
+# --- Register routers ---
+app.include_router(agent_router, prefix="/api/agent", tags=["Agent"])                         # Symbol agents
+app.include_router(strategy_router, prefix="/api/strategy", tags=["Strategy"])                # JSON strategy management
+app.include_router(mother_ai_router, prefix="/api/mother-ai", tags=["Mother AI"])             # AI logic, decisions, profits
+app.include_router(backtest_router, prefix="/api/backtest", tags=["Backtesting"])             # Run strategy tests
+app.include_router(binance_router, prefix="/api/binance", tags=["Binance"])                   # OHLCV fetcher
+app.include_router(agents_router, prefix="/api/agents", tags=["Agent Registry"])              # Registry for active agents
+app.include_router(strategy_file_loader_router, prefix="/api/strategies", tags=["Strategy Files"])  # Load JSON strategies
 
-# --- Add more routes or events here if needed ---
+# --- Custom events or startup hooks can go here ---
