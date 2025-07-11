@@ -28,5 +28,15 @@
     "win_rate": 0.0,
     "score": 0.597,
     "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:37.301981",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "price": 2789.67,
+    "confidence": 0.7633811434885389,
+    "win_rate": 0.0,
+    "score": 0.582,
+    "source": "mother_ai_decision"
   }
 ]

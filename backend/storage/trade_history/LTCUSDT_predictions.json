@@ -97,5 +97,104 @@
     "win_rate": 0.0,
     "score": 0.574,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:36.678452",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7245567393838106,
+    "win_rate": 0.0,
+    "score": 0.562,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:40.277454",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7428942991591776,
+    "win_rate": 0.0,
+    "score": 0.571,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:04.523773",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7009196111838463,
+    "win_rate": 0.0,
+    "score": 0.55,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:09.304871",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.7407785377434242,
+    "win_rate": 0.0,
+    "score": 0.57,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:44.633871",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7495993045545244,
+    "win_rate": 0.0,
+    "score": 0.575,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:47.734707",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7104858681324431,
+    "win_rate": 0.0,
+    "score": 0.555,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:06.538206",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7319087366280577,
+    "win_rate": 0.0,
+    "score": 0.566,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:09.214619",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7203606444840598,
+    "win_rate": 0.0,
+    "score": 0.56,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:46.789587",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7953880507982994,
+    "win_rate": 0.0,
+    "score": 0.598,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:49.039438",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7049637309986401,
+    "win_rate": 0.0,
+    "score": 0.552,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:52.720983",
+    "symbol": "LTCUSDT",
+    "signal": "hold",
+    "confidence": 0.7485268015149864,
+    "win_rate": 0.0,
+    "score": 0.574,
+    "source": "agent_prediction"
   }
 ]

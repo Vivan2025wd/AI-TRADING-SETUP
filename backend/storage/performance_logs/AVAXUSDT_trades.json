@@ -8,5 +8,15 @@
     "win_rate": 0.0,
     "score": 0.58,
     "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:06.957018",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "price": 20.85,
+    "confidence": 0.7799265385410235,
+    "win_rate": 0.0,
+    "score": 0.59,
+    "source": "mother_ai_decision"
   }
 ]

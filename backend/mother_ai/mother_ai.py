@@ -3,12 +3,14 @@ import json
 import glob
 import random
 import importlib.util
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, FastAPI
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from backend.binance.fetch_live_ohlcv import fetch_ohlcv
 from backend.mother_ai.performance_tracker import PerformanceTracker
 from backend.strategy_engine.strategy_health import StrategyHealth
 from backend.strategy_engine.strategy_parser import StrategyParser
+from backend.mother_ai.profit_calculator import compute_trade_profits
 
 router = APIRouter()
 
@@ -19,12 +21,7 @@ os.makedirs(PERFORMANCE_LOG_DIR, exist_ok=True)
 
 
 class MotherAI:
-    def __init__(
-        self,
-        agents_dir="backend/agents",
-        strategy_dir="backend/storage/strategies",
-        agent_symbols=None,
-    ):
+    def __init__(self, agents_dir="backend/agents", strategy_dir="backend/storage/strategies", agent_symbols=None):
         self.agents_dir = agents_dir
         self.strategy_dir = strategy_dir
         self.performance_tracker = PerformanceTracker(log_dir_type="performance_logs")
@@ -32,18 +29,14 @@ class MotherAI:
 
     def load_agents(self):
         agents = []
-        agent_files = [
-            f
-            for f in os.listdir(self.agents_dir)
-            if f.endswith(".py") and f not in ("__init__.py", "generic_agent.py")
-        ]
+        agent_files = [f for f in os.listdir(self.agents_dir) if f.endswith(".py") and f not in ("__init__.py", "generic_agent.py")]
 
         for agent_file in agent_files:
             base_name = agent_file.replace(".py", "")
             if not base_name.endswith("_agent"):
                 continue
 
-            symbol = base_name[:-6].upper()  # full symbol including USDT
+            symbol = base_name[:-6].upper()
 
             if self.agent_symbols and symbol not in self.agent_symbols:
                 continue
@@ -93,11 +86,8 @@ class MotherAI:
         results = []
         for agent in agents:
             try:
-                # Ensure symbol has USDT suffix for fetch_ohlcv
-                symbol_ccxt = (
-                    agent.symbol if agent.symbol.endswith("USDT") else agent.symbol + "USDT"
-                )
-                symbol_ccxt = symbol_ccxt[:-4] + "/USDT"  # Convert ADAUSDT -> ADA/USDT for ccxt format
+                symbol_ccxt = agent.symbol if agent.symbol.endswith("USDT") else agent.symbol + "USDT"
+                symbol_ccxt = symbol_ccxt[:-4] + "/USDT"
 
                 ohlcv_data = fetch_ohlcv(symbol_ccxt, interval="1h", limit=100)
                 if ohlcv_data.empty:
@@ -113,7 +103,7 @@ class MotherAI:
                 print(f"⚠️ Error in predict for {agent.symbol}: {e}")
                 signal, confidence = "hold", 0.0
 
-            # Read agent's prediction history from trade_history (predictions file)
+            # Load past predictions to compute win_rate
             tracker = PerformanceTracker(log_dir_type="trade_history")
             history = tracker.get_agent_log(agent.symbol)
 
@@ -128,7 +118,6 @@ class MotherAI:
 
             score = self.calculate_confidence_score(confidence, win_rate, health_penalty)
 
-            # Log agent prediction to trade_history (full symbol, e.g. ADAUSDT_predictions.json)
             self.log_agent_prediction(
                 agent.symbol,
                 {
@@ -142,20 +131,15 @@ class MotherAI:
                 },
             )
 
-            print(
-                f"✅ Agent {agent.symbol}: confidence={confidence:.2f}, win_rate={win_rate:.2f}, "
-                f"drawdown_penalty={health_penalty:.2f}, score={score:.3f}"
-            )
+            print(f"✅ Agent {agent.symbol}: confidence={confidence:.2f}, win_rate={win_rate:.2f}, drawdown_penalty={health_penalty:.2f}, score={score:.3f}")
 
-            results.append(
-                {
-                    "symbol": agent.symbol,
-                    "signal": signal,
-                    "confidence": confidence,
-                    "win_rate": win_rate,
-                    "score": round(score, 3),
-                }
-            )
+            results.append({
+                "symbol": agent.symbol,
+                "signal": signal,
+                "confidence": confidence,
+                "win_rate": win_rate,
+                "score": round(score, 3),
+            })
 
         return sorted(results, key=lambda x: x["score"], reverse=True)
 
@@ -190,7 +174,6 @@ class MotherAI:
             "last_price": last_price,
         }
 
-        # Log entry for Mother AI decision in performance_logs with full symbol
         trade_log_entry = {
             "timestamp": timestamp,
             "symbol": symbol,
@@ -204,10 +187,13 @@ class MotherAI:
 
         self.performance_tracker.log_trade(symbol, trade_log_entry)
 
+        if trade["signal"].lower() == "sell":
+            print(f"📊 SELL decision made for {symbol}, updating profit summary...")
+            compute_trade_profits(symbol)
+
         return {"decision": decision_obj, "timestamp": timestamp}
 
     def log_agent_prediction(self, symbol, data):
-        """Logs agent predictions to trade_history/{symbol}_predictions.json using full symbol"""
         path = os.path.join(TRADE_HISTORY_DIR, f"{symbol}_predictions.json")
         existing = []
         if os.path.exists(path):
@@ -221,7 +207,41 @@ class MotherAI:
             json.dump(existing, f, indent=2)
 
 
-# --- FastAPI Routes ---
+# --- Scheduler and FastAPI app setup ---
+
+mother_ai_instance = MotherAI()
+latest_decision = None
+
+def scheduled_trade_decision():
+    global latest_decision
+    print("⏰ Running scheduled MotherAI decision...")
+    decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
+    latest_decision = decision
+    print(f"Decision made at {decision.get('timestamp')} for symbol: {decision['decision'].get('symbol') if decision.get('decision') else 'None'}")
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(scheduled_trade_decision, "interval", hours=2)
+scheduler.start()
+
+app = FastAPI(title="Mother AI Trading API")
+
+@app.on_event("startup")
+async def startup_event():
+    print("Starting scheduler for MotherAI trading decisions...")
+
+@app.get("/api/mother-ai/latest-decision")
+async def get_latest_decision():
+    if latest_decision is None:
+        return {"message": "No decision made yet. Waiting for scheduled run."}
+    return latest_decision
+
+@app.post("/api/mother-ai/trigger-decision")
+async def trigger_decision():
+    global latest_decision
+    latest_decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
+    return latest_decision
+
+# Existing routes exposed under the router
 @router.get("/trades")
 async def get_trade_logs(limit: int = Query(100, ge=1)):
     tracker = PerformanceTracker(log_dir_type="performance_logs")
@@ -239,7 +259,6 @@ async def get_trade_logs(limit: int = Query(100, ge=1)):
         "total": len(trades),
     }
 
-
 @router.get("/decision")
 async def get_decision(min_score: float = Query(0.5, ge=0.0, le=1.0)):
     mother_ai = MotherAI()
@@ -247,3 +266,6 @@ async def get_decision(min_score: float = Query(0.5, ge=0.0, le=1.0)):
     if not decision or not decision.get("decision"):
         raise HTTPException(status_code=404, detail="No decision found")
     return decision
+
+# Include the router for all Mother AI endpoints except /latest-decision and /trigger-decision
+app.include_router(router, prefix="/api/mother-ai", tags=["Mother AI"])

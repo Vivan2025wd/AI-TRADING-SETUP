@@ -14,7 +14,7 @@ const parseConditionAction = (key) => {
 export default function StrategyPerformance() {
   const [strategies, setStrategies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // <-- Added error state
+  const [error, setError] = useState(null);
 
   // Pagination state
   const [page, setPage] = useState(1);
@@ -22,62 +22,85 @@ export default function StrategyPerformance() {
   const limit = 10;
 
   useEffect(() => {
-    const fetchStrategies = async () => {
+    const fetchRatedStrategies = async () => {
       setLoading(true);
-      setError(null); // Reset error on each fetch
+      setError(null);
+
       try {
-        const res = await fetch(`/api/strategy/list?page=${page}&limit=${limit}`);
-        if (!res.ok) throw new Error("Failed to fetch strategies");
+        // Step 1: fetch all saved strategies with symbol & strategy_id
+        const resList = await fetch(`/api/strategy/list?page=${page}&limit=${limit}`);
+        if (!resList.ok) throw new Error("Failed to fetch strategy list");
+        const listData = await resList.json();
+        setTotalPages(listData.totalPages || 1);
 
-        const data = await res.json();
-        const strategiesRaw = Array.isArray(data.data) ? data.data : [];
+        // Step 2: For each symbol, fetch rated strategies using new endpoint
+        const strategiesRaw = listData.data || [];
 
-        setTotalPages(data.totalPages || 1);
+        // Group by symbol to minimize requests
+        const symbolSet = [...new Set(strategiesRaw.map((s) => s.symbol))];
 
-        // Enrich strategies with performance data and parsed rules
+        let allRatedStrategies = [];
+
+        for (const symbol of symbolSet) {
+          const resRated = await fetch(`/api/strategy/${symbol}/rate-strategies`);
+          if (!resRated.ok) {
+            console.warn(`No rated strategies found for ${symbol}`);
+            continue;
+          }
+          const ratedData = await resRated.json();
+
+          if (ratedData.strategies && ratedData.strategies.length) {
+            // Map and add symbol for uniformity
+            const mapped = ratedData.strategies.map((strat) => ({
+              ...strat,
+              symbol,
+            }));
+            allRatedStrategies = allRatedStrategies.concat(mapped);
+          }
+        }
+
+        // Filter for current page limit (we could do better server-side paging)
+        const pagedStrategies = allRatedStrategies.slice(0, limit);
+
+        // Parse rules for display (attempt to load strategy JSON from STRATEGY_DIR)
         const enriched = await Promise.all(
-          strategiesRaw.map(async (strat) => {
-            const { symbol = "UNKNOWN", strategy_id, strategy_json } = strat;
-
-            let winRate = 0.0;
+          pagedStrategies.map(async (strat) => {
+            // Fetch strategy JSON for rules display
+            let strategy_json = {};
             try {
-              const perfRes = await fetch(
-                `/api/strategy/${symbol}/${strategy_id}/performance`
+              const resStratJson = await fetch(
+                `/api/strategy/${strat.symbol}/${strat.strategy_id}`
               );
-              if (perfRes.ok) {
-                const perf = await perfRes.json();
-                winRate = perf?.win_rate ? perf.win_rate * 100 : 0;
-              } else {
-                console.warn(`No performance data for ${symbol}/${strategy_id}`);
+              if (resStratJson.ok) {
+                strategy_json = await resStratJson.json();
               }
-            } catch (err) {
-              console.warn(
-                `Error fetching performance for ${symbol}/${strategy_id}:`,
-                err
-              );
+            } catch {
+              // ignore error, rules empty
             }
 
-            const rules = strategy_json?.indicators
-              ? Object.entries(strategy_json.indicators).flatMap(
-                  ([indicator, config]) =>
-                    Object.entries(config).map(([cond, val]) => {
-                      const [condition, action] = parseConditionAction(cond);
-                      return {
-                        indicator: indicator.toUpperCase(),
-                        condition,
-                        value: val,
-                        action,
-                      };
-                    })
+            const rules = strategy_json.indicators
+              ? Object.entries(strategy_json.indicators).flatMap(([indicator, config]) =>
+                  Object.entries(config).map(([cond, val]) => {
+                    const [condition, action] = parseConditionAction(cond);
+                    return {
+                      indicator: indicator.toUpperCase(),
+                      condition,
+                      value: val,
+                      action,
+                    };
+                  })
                 )
               : [];
 
             return {
-              id: strategy_id,
-              agent: symbol,
-              winRate,
+              id: strat.strategy_id,
+              agent: strat.symbol,
+              winRate: strat.win_rate * 100 || 0,
+              avgProfit: strat.avg_profit || 0,
+              avgConfidence: strat.avg_confidence * 100 || 0,
+              totalPredictions: strat.total || 0,
               rules,
-              symbol,
+              symbol: strat.symbol,
             };
           })
         );
@@ -92,7 +115,7 @@ export default function StrategyPerformance() {
       }
     };
 
-    fetchStrategies();
+    fetchRatedStrategies();
   }, [page]);
 
   const deleteStrategy = async (symbol, id) => {
@@ -144,48 +167,56 @@ export default function StrategyPerformance() {
                   <th className="py-3 px-4 border border-gray-700 text-left">Agent</th>
                   <th className="py-3 px-4 border border-gray-700 text-left">Strategy Name</th>
                   <th className="py-3 px-4 border border-gray-700 text-left">Win Rate</th>
+                  <th className="py-3 px-4 border border-gray-700 text-left">Avg Profit %</th>
+                  <th className="py-3 px-4 border border-gray-700 text-left">Avg Confidence</th>
+                  <th className="py-3 px-4 border border-gray-700 text-left">Total Predictions</th>
                   <th className="py-3 px-4 border border-gray-700 text-left">Rules</th>
                   <th className="py-3 px-4 border border-gray-700 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {strategies.map(({ id, agent, winRate, rules, symbol }) => (
-                  <tr key={id} className="hover:bg-gray-800 transition-colors">
-                    <td className="py-3 px-4 border border-gray-700">{agent}</td>
-                    <td className="py-3 px-4 border border-gray-700 font-semibold">{id}</td>
-                    <td className="py-3 px-4 border border-gray-700">
-                      <span
-                        className={`font-semibold px-3 py-1 rounded-full inline-block ${
-                          winRate >= 70
-                            ? "bg-green-700 text-green-300"
-                            : winRate >= 50
-                            ? "bg-yellow-700 text-yellow-300"
-                            : "bg-red-700 text-red-300"
-                        }`}
-                        title={`Win Rate: ${winRate.toFixed(1)}%`}
-                      >
-                        {winRate.toFixed(1)}%
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 border border-gray-700 text-sm whitespace-pre-wrap">
-                      {rules
-                        .map(
-                          ({ indicator, condition, value, action }) =>
-                            `IF ${indicator} ${condition} ${value} THEN ${action}`
-                        )
-                        .join("\n")}
-                    </td>
-                    <td className="py-3 px-4 border border-gray-700 text-center">
-                      <button
-                        onClick={() => deleteStrategy(symbol, id)}
-                        className="text-red-500 hover:text-red-700 transition"
-                        title="Delete strategy"
-                      >
-                        <Trash2 className="w-5 h-5 mx-auto" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {strategies.map(
+                  ({ id, agent, winRate, avgProfit, avgConfidence, totalPredictions, rules, symbol }) => (
+                    <tr key={id} className="hover:bg-gray-800 transition-colors">
+                      <td className="py-3 px-4 border border-gray-700">{agent}</td>
+                      <td className="py-3 px-4 border border-gray-700 font-semibold">{id}</td>
+                      <td className="py-3 px-4 border border-gray-700">
+                        <span
+                          className={`font-semibold px-3 py-1 rounded-full inline-block ${
+                            winRate >= 70
+                              ? "bg-green-700 text-green-300"
+                              : winRate >= 50
+                              ? "bg-yellow-700 text-yellow-300"
+                              : "bg-red-700 text-red-300"
+                          }`}
+                          title={`Win Rate: ${winRate.toFixed(1)}%`}
+                        >
+                          {winRate.toFixed(1)}%
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 border border-gray-700">{avgProfit.toFixed(2)}</td>
+                      <td className="py-3 px-4 border border-gray-700">{avgConfidence.toFixed(1)}%</td>
+                      <td className="py-3 px-4 border border-gray-700">{totalPredictions}</td>
+                      <td className="py-3 px-4 border border-gray-700 text-sm whitespace-pre-wrap">
+                        {rules
+                          .map(
+                            ({ indicator, condition, value, action }) =>
+                              `IF ${indicator} ${condition} ${value} THEN ${action}`
+                          )
+                          .join("\n")}
+                      </td>
+                      <td className="py-3 px-4 border border-gray-700 text-center">
+                        <button
+                          onClick={() => deleteStrategy(symbol, id)}
+                          className="text-red-500 hover:text-red-700 transition"
+                          title="Delete strategy"
+                        >
+                          <Trash2 className="w-5 h-5 mx-auto" />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>

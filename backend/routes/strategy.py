@@ -5,6 +5,7 @@ from pathlib import Path
 
 from backend.strategy_engine.json_strategy_parser import parse_strategy_json
 from backend.strategy_engine.strategy_health import StrategyHealth
+from backend.mother_ai.performance_tracker import PerformanceTracker
 
 router = APIRouter(tags=["Strategies"])
 
@@ -125,3 +126,18 @@ def get_strategy_performance(symbol: str, strategy_id: str):
 
     stats = StrategyHealth(trades).summary()
     return stats
+
+@router.get("/{symbol}/rate-strategies")
+def rate_strategies_for_symbol(symbol: str):
+    symbol = symbol.upper()
+    tracker = PerformanceTracker(log_dir_type="trade_history")
+    try:
+        rated_strategies = tracker.rate_strategies(symbol)
+        if not rated_strategies:
+            raise HTTPException(status_code=404, detail="No strategies found or no data to rate.")
+        return {
+            "symbol": symbol,
+            "strategies": rated_strategies
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to rate strategies: {e}")

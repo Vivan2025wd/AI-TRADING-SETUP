@@ -97,5 +97,104 @@
     "win_rate": 0.0,
     "score": 0.563,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:37.300438",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 0.7135020111023344,
+    "win_rate": 0.0,
+    "score": 0.557,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:40.948864",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 0.7615890074876115,
+    "win_rate": 0.0,
+    "score": 0.581,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:05.207730",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 0.7690427739828856,
+    "win_rate": 0.0,
+    "score": 0.585,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:10.661098",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 0.7718247335484781,
+    "win_rate": 0.0,
+    "score": 0.586,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:45.205071",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.7503736814548991,
+    "win_rate": 0.0,
+    "score": 0.575,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:48.194540",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.7885254838781554,
+    "win_rate": 0.0,
+    "score": 0.594,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:06.955419",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.7613277143872963,
+    "win_rate": 0.0,
+    "score": 0.581,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:09.658242",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.7836897937108074,
+    "win_rate": 0.0,
+    "score": 0.592,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:47.205834",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.7806233587562312,
+    "win_rate": 0.0,
+    "score": 0.59,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:49.691969",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.7000608412761234,
+    "win_rate": 0.0,
+    "score": 0.55,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:53.389019",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.7899213040616032,
+    "win_rate": 0.0,
+    "score": 0.595,
+    "source": "agent_prediction"
   }
 ]

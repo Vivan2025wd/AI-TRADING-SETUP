@@ -88,5 +88,104 @@
     "win_rate": 0.0,
     "score": 0.595,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:34.422489",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7267781708802503,
+    "win_rate": 0.0,
+    "score": 0.563,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T07:52:37.957686",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7326869261944348,
+    "win_rate": 0.0,
+    "score": 0.566,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:01.224382",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.7999380709808263,
+    "win_rate": 0.0,
+    "score": 0.6,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-10T08:04:05.990580",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.7026888096328054,
+    "win_rate": 0.0,
+    "score": 0.551,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:42.649543",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.745412003246834,
+    "win_rate": 0.0,
+    "score": 0.573,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:20:45.653124",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7044710603404936,
+    "win_rate": 0.0,
+    "score": 0.552,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:05.034559",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7257294117005764,
+    "win_rate": 0.0,
+    "score": 0.563,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:31:07.434034",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7939346582879587,
+    "win_rate": 0.0,
+    "score": 0.597,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:45.117481",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7653297163566671,
+    "win_rate": 0.0,
+    "score": 0.583,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:46.789743",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7802496691864987,
+    "win_rate": 0.0,
+    "score": 0.59,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-11T03:32:50.492887",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.7283346206019384,
+    "win_rate": 0.0,
+    "score": 0.564,
+    "source": "agent_prediction"
   }
 ]

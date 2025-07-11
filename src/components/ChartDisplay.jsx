@@ -13,57 +13,75 @@ import {
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function MotherAIBalanceChart() {
+  const [symbols, setSymbols] = useState([]);
+  const [selectedSymbol, setSelectedSymbol] = useState("");
   const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [refreshToggle, setRefreshToggle] = useState(false);
 
+  // 1. Fetch available symbols
   useEffect(() => {
-    let isMounted = true;
+    async function fetchSymbols() {
+      try {
+        const res = await fetch("/api/mother-ai/trades");
+        if (!res.ok) throw new Error("Failed to load symbols");
 
-    async function fetchData() {
+        const data = await res.json();
+        const uniqueSymbols = Array.from(
+          new Set(data.data.map((t) => t.symbol).filter(Boolean))
+        );
+
+        setSymbols(uniqueSymbols);
+        if (uniqueSymbols.length > 0 && !selectedSymbol) {
+          setSelectedSymbol(uniqueSymbols[0]);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Error loading symbols");
+      }
+    }
+
+    fetchSymbols();
+  }, []);
+
+  // 2. Fetch profit summary and build capital growth history
+  useEffect(() => {
+    if (!selectedSymbol) return;
+
+    let isMounted = true;
+    async function fetchProfitSummary() {
       setLoading(true);
       setError(null);
+
       try {
-        // Fetch all trades combined from backend
-        const res = await fetch(`/api/mother-ai/trades`);
-        if (!res.ok) throw new Error(`Failed to load trade logs`);
+        const res = await fetch(`/api/mother-ai/profits/${selectedSymbol}`);
+        if (!res.ok) throw new Error(`No profit summary for ${selectedSymbol}`);
+
         const data = await res.json();
         if (!isMounted) return;
 
-        // Sort by timestamp ascending
-        const sorted = [...data.data].sort(
-          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        const trades = Array.isArray(data.trades) ? data.trades : [];
+        const sorted = [...trades].sort(
+          (a, b) => new Date(a.exit_time) - new Date(b.exit_time)
         );
 
-        let buyCount = 0;
-        let sellCount = 0;
-
-        const formatted = sorted.map((trade) => {
-          const type = (trade.signal || "").toUpperCase(); // 'signal' field used here
-          if (type === "BUY") buyCount++;
-          else if (type === "SELL") sellCount++;
-
+        let capital = 0;
+        const historyData = sorted.map((trade) => {
+          capital += trade.pnl;
           return {
-            time: new Date(trade.timestamp).toLocaleString(),
-            rawTime: new Date(trade.timestamp).getTime(),
-            type,
-            price: trade.price || 0,
-            value: trade.balance || 0,
-            profit: trade.profit_percent ?? null,
-            symbol: trade.symbol || "N/A",    // Include symbol from backend log
-            sequenceLabel:
-              type === "BUY"
-                ? `Buy #${buyCount}`
-                : type === "SELL"
-                ? `Sell #${sellCount}`
-                : "Balance",
+            timestamp: trade.exit_time,
+            balance: capital,
+            profit_percent: trade.entry_price
+              ? (capital / trade.entry_price) * 100
+              : 0,
           };
         });
 
-        setHistory(formatted);
+        setHistory(historyData);
       } catch (err) {
         if (!isMounted) return;
+        console.error(err);
         setError(err.message);
         setHistory([]);
       } finally {
@@ -71,19 +89,18 @@ export default function MotherAIBalanceChart() {
       }
     }
 
-    fetchData();
+    fetchProfitSummary();
 
     return () => {
       isMounted = false;
     };
-  }, [refreshToggle]);
+  }, [selectedSymbol, refreshToggle]);
 
-  const sortedData = [...history].sort((a, b) => a.rawTime - b.rawTime);
-  const labels = sortedData.map((d) => d.time);
-
+  // 3. Chart Setup
+  const labels = history.map((d) => new Date(d.timestamp).toLocaleString());
   const balanceDataset = {
-    label: "Balance",
-    data: sortedData.map((d) => d.value),
+    label: "Net Capital ($)",
+    data: history.map((d) => d.balance),
     borderColor: "rgb(34,197,94)",
     backgroundColor: "rgba(34,197,94,0.2)",
     tension: 0.4,
@@ -91,55 +108,9 @@ export default function MotherAIBalanceChart() {
     spanGaps: true,
   };
 
-  const buyPoints = sortedData
-    .map((d, i) =>
-      d.type === "BUY"
-        ? {
-            x: labels[i],
-            y: d.value,
-            sequenceLabel: d.sequenceLabel,
-            price: d.price,
-            profit: d.profit,
-          }
-        : null
-    )
-    .filter(Boolean);
-
-  const sellPoints = sortedData
-    .map((d, i) =>
-      d.type === "SELL"
-        ? {
-            x: labels[i],
-            y: d.value,
-            sequenceLabel: d.sequenceLabel,
-            price: d.price,
-            profit: d.profit,
-          }
-        : null
-    )
-    .filter(Boolean);
-
   const chartData = {
     labels,
-    datasets: [
-      balanceDataset,
-      {
-        label: "Buy",
-        data: buyPoints,
-        backgroundColor: "blue",
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        showLine: false,
-      },
-      {
-        label: "Sell",
-        data: sellPoints,
-        backgroundColor: "red",
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        showLine: false,
-      },
-    ],
+    datasets: [balanceDataset],
   };
 
   const options = {
@@ -151,13 +122,17 @@ export default function MotherAIBalanceChart() {
       tooltip: {
         callbacks: {
           label: (ctx) => {
-            const point = ctx.raw;
-            if (ctx.dataset.label === "Buy" || ctx.dataset.label === "Sell") {
-              return `${point.sequenceLabel}\nPrice: $${point.price}\nProfit: ${
-                point.profit ?? "?"
-              }%\nBalance: $${point.y}`;
-            }
-            return `Balance: $${ctx.parsed.y.toFixed(2)}`;
+            const d = history[ctx.dataIndex];
+            if (!d) return "";
+            return [
+              `Balance: $${(d.balance ?? 0).toFixed(2)}`,
+              `Profit %: ${
+                typeof d.profit_percent === "number"
+                  ? `${d.profit_percent.toFixed(2)}%`
+                  : "N/A"
+              }`,
+              `Time: ${new Date(d.timestamp).toLocaleString()}`,
+            ];
           },
         },
       },
@@ -168,9 +143,23 @@ export default function MotherAIBalanceChart() {
     },
   };
 
+  // 4. UI Render
   return (
     <div className="space-y-4">
-      <h2 className="text-white text-xl font-semibold">Performance for All Symbols</h2>
+      <h2 className="text-white text-xl font-semibold">
+        Net Capital Growth for{" "}
+        <select
+          className="bg-gray-700 text-white rounded px-2 py-1 ml-2"
+          value={selectedSymbol}
+          onChange={(e) => setSelectedSymbol(e.target.value)}
+        >
+          {symbols.map((sym) => (
+            <option key={sym} value={sym}>
+              {sym}
+            </option>
+          ))}
+        </select>
+      </h2>
 
       <div style={{ height: 300 }}>
         {loading && <p className="text-blue-400">Loading...</p>}
@@ -185,36 +174,33 @@ export default function MotherAIBalanceChart() {
         Refresh
       </button>
 
-      {/* Table */}
       <div className="overflow-x-auto mt-4">
         <table className="min-w-full text-white bg-gray-800 rounded">
           <thead>
             <tr>
               <th className="py-2 px-4 border-b">Timestamp</th>
-              <th className="py-2 px-4 border-b">Symbol</th> {/* New column */}
-              <th className="py-2 px-4 border-b">Type</th>
-              <th className="py-2 px-4 border-b">Price</th>
               <th className="py-2 px-4 border-b">Balance</th>
               <th className="py-2 px-4 border-b">Profit %</th>
             </tr>
           </thead>
           <tbody>
-            {sortedData.length === 0 ? (
+            {history.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-4">
+                <td colSpan={3} className="text-center py-4">
                   No data
                 </td>
               </tr>
             ) : (
-              sortedData.map((d, idx) => (
+              history.map((d, idx) => (
                 <tr key={idx} className="hover:bg-gray-700">
-                  <td className="py-2 px-4 border-b">{d.time}</td>
-                  <td className="py-2 px-4 border-b">{d.symbol}</td>
-                  <td className="py-2 px-4 border-b">{d.sequenceLabel}</td>
-                  <td className="py-2 px-4 border-b">${d.price}</td>
-                  <td className="py-2 px-4 border-b">${d.value.toFixed(2)}</td>
                   <td className="py-2 px-4 border-b">
-                    {typeof d.profit === "number" ? `${d.profit.toFixed(2)}%` : "N/A"}
+                    {new Date(d.timestamp).toLocaleString()}
+                  </td>
+                  <td className="py-2 px-4 border-b">${(d.balance ?? 0).toFixed(2)}</td>
+                  <td className="py-2 px-4 border-b">
+                    {typeof d.profit_percent === "number"
+                      ? `${d.profit_percent.toFixed(2)}%`
+                      : "N/A"}
                   </td>
                 </tr>
               ))
