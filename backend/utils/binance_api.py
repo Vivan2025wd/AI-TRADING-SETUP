@@ -14,6 +14,15 @@ user_binance_client: Optional[Client] = None
 DEFAULT_API_KEY = os.getenv("BINANCE_API_KEY", "")
 DEFAULT_API_SECRET = os.getenv("BINANCE_API_SECRET", "")
 
+# Trading Mode
+# Load from .env, default to "False" if not set or invalid
+REAL_TRADING_MODE_STR = os.getenv("REAL_TRADING_MODE", "False")
+REAL_TRADING_MODE = REAL_TRADING_MODE_STR.lower() == "true"
+
+def is_real_trading_mode() -> bool:
+    """Returns True if real trading mode is enabled, False otherwise."""
+    return REAL_TRADING_MODE
+
 def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = None) -> dict:
     """
     Initializes the Binance client using provided or default API keys.
@@ -30,10 +39,23 @@ def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = 
 
     try:
         client = Client(api_key=key, api_secret=secret)
+        # To use Binance Testnet, provide API keys generated from the Testnet website.
+        # The client will automatically point to testnet endpoints.
+        # If using a specific domain like Binance.US, client might need tld='us'.
+        # For general spot testnet, keys are sufficient.
+
         client.get_account()  # Test credentials
 
         user_binance_client = client
         log.info("[Binance] API connection successful.")
+        if is_real_trading_mode():
+            log.warning("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            log.warning("!!! REAL TRADING MODE IS ACTIVE. LIVE ORDERS WILL BE PLACED !!!")
+            log.warning("!!! Ensure you are using TESTNET keys if testing.            !!!")
+            log.warning("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        else:
+            log.info("[Binance] Connection is in MOCK TRADING MODE.")
+
         return {"success": True, "message": "Binance API connected successfully."}
 
     except Exception as e:

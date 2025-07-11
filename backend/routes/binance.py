@@ -39,10 +39,35 @@ def get_ohlcv(
     limit: int = Query(100, description="Number of candles to fetch"),
 ):
     df = fetch_ohlcv(symbol, interval=interval, limit=limit)
-    if df.empty:
-        raise HTTPException(status_code=404, detail=f"No OHLCV data found for symbol {symbol}")
+    if df.empty: # df can be None if ccxt fails before creating a DataFrame
+        raise HTTPException(status_code=404, detail=f"No OHLCV data found for symbol {symbol} or error in fetching.")
     data = df.reset_index().to_dict(orient="records")
     return {"symbol": symbol, "interval": interval, "limit": limit, "ohlcv": data}
+
+@router.get("/account/balance")
+def get_account_balance():
+    """
+    Fetches the user's spot account balance for all assets with a non-zero balance.
+    Requires API keys to be connected.
+    """
+    if user_binance_client is None:
+        raise HTTPException(status_code=503, detail="Binance client not connected. Please connect API keys first.")
+
+    try:
+        account_info = user_binance_client.get_account()
+        balances = account_info.get("balances", [])
+
+        # Filter for assets with non-zero balance (free or locked)
+        non_zero_balances = [
+            b for b in balances
+            if float(b.get("free", 0)) > 0 or float(b.get("locked", 0)) > 0
+        ]
+        return {"balances": non_zero_balances}
+    except Exception as e:
+        # Log the exception for debugging
+        # from backend.utils.logger import log # or logger if already imported
+        # log.error(f"Error fetching account balance: {e}")
+        raise HTTPException(status_code=500, detail=f"Error fetching account balance: {str(e)}")
 
 @router.get("/test")
 def test_route():
