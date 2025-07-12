@@ -1,16 +1,17 @@
 import os
 import json
 import glob
-import random
 import importlib.util
 from fastapi import APIRouter, HTTPException, Query, FastAPI
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from backend.binance.fetch_live_ohlcv import fetch_ohlcv
+from backend.binance.binance_trader import place_market_order  # ✅ Trade executor
 from backend.mother_ai.performance_tracker import PerformanceTracker
 from backend.strategy_engine.strategy_health import StrategyHealth
 from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.mother_ai.profit_calculator import compute_trade_profits
+from backend.mother_ai.meta_evaluator import MetaEvaluator
 
 router = APIRouter()
 
@@ -26,6 +27,7 @@ class MotherAI:
         self.strategy_dir = strategy_dir
         self.performance_tracker = PerformanceTracker(log_dir_type="performance_logs")
         self.agent_symbols = agent_symbols or []
+        self.meta_evaluator = MetaEvaluator()
 
     def load_agents(self):
         agents = []
@@ -96,14 +98,11 @@ class MotherAI:
                 prediction = agent.predict(ohlcv_data)
                 signal = prediction.get("action", "hold").lower()
                 confidence = prediction.get("confidence", 0.0)
-                confidence += random.uniform(-0.05, 0.05)
-                confidence = max(0.0, min(confidence, 1.0))
 
             except Exception as e:
                 print(f"⚠️ Error in predict for {agent.symbol}: {e}")
                 signal, confidence = "hold", 0.0
 
-            # Load past predictions to compute win_rate
             tracker = PerformanceTracker(log_dir_type="trade_history")
             history = tracker.get_agent_log(agent.symbol)
 
@@ -116,7 +115,14 @@ class MotherAI:
                 drawdown = health.get("max_drawdown", 0.3)
                 health_penalty = 1.0 - drawdown
 
-            score = self.calculate_confidence_score(confidence, win_rate, health_penalty)
+            meta_features = {
+                "confidence": confidence,
+                "win_rate": win_rate,
+                "drawdown_penalty": health_penalty,
+                "is_buy": 1 if signal == "buy" else 0,
+                "is_sell": 1 if signal == "sell" else 0,
+            }
+            score = self.meta_evaluator.predict_refined_score(meta_features)
 
             self.log_agent_prediction(
                 agent.symbol,
@@ -143,14 +149,31 @@ class MotherAI:
 
         return sorted(results, key=lambda x: x["score"], reverse=True)
 
-    def calculate_confidence_score(self, confidence, win_rate, health_penalty, alpha=0.5, beta=0.3, gamma=0.2):
-        return (alpha * confidence) + (beta * win_rate) + (gamma * health_penalty)
-
     def decide_trades(self, top_n=1, min_score=0.5):
         agents = self.load_agents()
         evaluations = self.evaluate_agents(agents)
         top_trades = [e for e in evaluations if e["score"] >= min_score][:top_n]
         return top_trades
+
+    def execute_trade(self, symbol: str, signal: str, price: float, confidence: float):
+        if signal.lower() not in ("buy", "sell") or not price:
+            print(f"⚠️ Skipping trade execution for {symbol} with signal '{signal}' and price '{price}'")
+            return
+
+        print(f"🚀 Executing {signal.upper()} trade for {symbol} at ${price:.2f} (confidence={confidence:.2f})")
+
+        try:
+            binance_symbol = symbol.replace("USDT", "/USDT")
+            usdt_amount = 20
+            quantity = usdt_amount / price
+
+            order = place_market_order(binance_symbol, signal, quantity)
+            if order:
+                print(f"✅ Order executed: {order['id']}")
+            else:
+                print("❌ Order failed")
+        except Exception as e:
+            print(f"❌ Trade execution error for {symbol}: {e}")
 
     def make_portfolio_decision(self, min_score=0.5):
         top_trades = self.decide_trades(top_n=1, min_score=min_score)
@@ -187,9 +210,12 @@ class MotherAI:
 
         self.performance_tracker.log_trade(symbol, trade_log_entry)
 
-        if trade["signal"].lower() == "sell":
-            print(f"📊 SELL decision made for {symbol}, updating profit summary...")
-            compute_trade_profits(symbol)
+        if trade["signal"].lower() in ("buy", "sell") and last_price is not None:
+            self.execute_trade(symbol, trade["signal"], last_price, trade["confidence"])
+
+            if trade["signal"].lower() == "sell":
+                print(f"📊 SELL decision made for {symbol}, updating profit summary...")
+                compute_trade_profits(symbol)
 
         return {"decision": decision_obj, "timestamp": timestamp}
 
@@ -207,7 +233,7 @@ class MotherAI:
             json.dump(existing, f, indent=2)
 
 
-# --- Scheduler and FastAPI app setup ---
+# --- FastAPI + Scheduler setup ---
 
 mother_ai_instance = MotherAI()
 latest_decision = None
@@ -217,7 +243,7 @@ def scheduled_trade_decision():
     print("⏰ Running scheduled MotherAI decision...")
     decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
     latest_decision = decision
-    print(f"Decision made at {decision.get('timestamp')} for symbol: {decision['decision'].get('symbol') if decision.get('decision') else 'None'}")
+    print(f"✅ Decision at {decision.get('timestamp')} → {decision['decision'].get('symbol')}")
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(scheduled_trade_decision, "interval", hours=2)
@@ -227,7 +253,7 @@ app = FastAPI(title="Mother AI Trading API")
 
 @app.on_event("startup")
 async def startup_event():
-    print("Starting scheduler for MotherAI trading decisions...")
+    print("🔄 Starting MotherAI trade scheduler...")
 
 @app.get("/api/mother-ai/latest-decision")
 async def get_latest_decision():
@@ -241,7 +267,6 @@ async def trigger_decision():
     latest_decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
     return latest_decision
 
-# Existing routes exposed under the router
 @router.get("/trades")
 async def get_trade_logs(limit: int = Query(100, ge=1)):
     tracker = PerformanceTracker(log_dir_type="performance_logs")
@@ -253,11 +278,7 @@ async def get_trade_logs(limit: int = Query(100, ge=1)):
             trades.extend(tracker.get_agent_log(symbol, limit=limit))
 
     trades = sorted(trades, key=lambda x: x.get("timestamp", ""), reverse=True)
-
-    return {
-        "data": trades[:limit],
-        "total": len(trades),
-    }
+    return {"data": trades[:limit], "total": len(trades)}
 
 @router.get("/decision")
 async def get_decision(min_score: float = Query(0.5, ge=0.0, le=1.0)):
@@ -267,5 +288,4 @@ async def get_decision(min_score: float = Query(0.5, ge=0.0, le=1.0)):
         raise HTTPException(status_code=404, detail="No decision found")
     return decision
 
-# Include the router for all Mother AI endpoints except /latest-decision and /trigger-decision
 app.include_router(router, prefix="/api/mother-ai", tags=["Mother AI"])

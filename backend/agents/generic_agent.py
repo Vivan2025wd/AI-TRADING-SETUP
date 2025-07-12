@@ -1,69 +1,90 @@
 import pandas as pd
-from datetime import datetime
+import numpy as np
+import joblib
+import os
+from sklearn.ensemble import RandomForestClassifier
 from backend.strategy_engine.strategy_parser import StrategyParser
+from backend.ml_engine.feature_extractor import extract_features  # You must implement this
+from typing import Optional
 
 class GenericAgent:
-    def __init__(self, symbol: str, strategy_logic: StrategyParser):
-        """
-        Initialize the agent with a symbol and its parsed strategy logic.
-
-        Args:
-            symbol (str): Trading pair symbol (e.g., 'BTCUSDT').
-            strategy_logic (StrategyParser): An instance of StrategyParser containing the strategy logic.
-        """
+    def __init__(self, symbol: str, strategy_logic: StrategyParser, model_path: Optional[str] = None):
         self.symbol = symbol
         self.strategy_logic = strategy_logic
+        self.model_path = model_path or f"backend/agents/models/{symbol.lower()}_model.pkl"
+        self.model = self._load_model()
+
+    def _load_model(self):
+        if os.path.exists(self.model_path):
+            print(f"✅ Loading ML model from: {self.model_path}")
+            return joblib.load(self.model_path)
+        else:
+            print(f"⚠️ No ML model found at {self.model_path}. Using rule-based logic only.")
+            return None
+
+    def train_model(self, labeled_data: pd.DataFrame):
+        """
+        Train and save a RandomForest model using labeled data.
+        'labeled_data' must contain feature columns and a target column 'action' with ['buy', 'sell', 'hold'] labels.
+        """
+        if "action" not in labeled_data.columns:
+            raise ValueError("Training data must have an 'action' column")
+
+        features = labeled_data.drop(columns=["action"])
+        labels = labeled_data["action"]
+
+        model = RandomForestClassifier(n_estimators=100, max_depth=6, random_state=42)
+        model.fit(features, labels)
+
+        os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+        joblib.dump(model, self.model_path)
+        self.model = model
+        print(f"✅ Trained and saved ML model to {self.model_path}")
+
+    def _predict_with_model(self, features: pd.DataFrame) -> tuple[str, float]:
+        if self.model is None or features.empty:
+            return "hold", 0.0
+
+        try:
+            latest_features = features.iloc[[-1]]  # last row only
+            proba = self.model.predict_proba(latest_features)[0]
+            print(f"🔍 Predicted class probabilities: {proba}")  # Debug: show probabilities
+            pred_class = self.model.classes_[np.argmax(proba)]
+            confidence = max(proba)
+            return pred_class, confidence
+        except Exception as e:
+            print(f"❌ Model prediction failed: {e}")
+            return "hold", 0.0
 
     def evaluate(self, ohlcv_data: pd.DataFrame) -> dict:
-        """
-        Evaluate the current OHLCV data using the strategy logic.
-
-        Args:
-            ohlcv_data (pd.DataFrame): DataFrame containing OHLCV data with a datetime index.
-
-        Returns:
-            dict: A dictionary containing symbol, action, confidence, and timestamp.
-                Action is one of 'buy', 'sell', or 'hold'.
-        """
-        print(f"🧠 Evaluating agent for {self.symbol}...")
-
         if ohlcv_data.empty:
-            print(f"⚠️ OHLCV data for {self.symbol} is empty!")
-            raise ValueError(f"OHLCV data for {self.symbol} is empty")
+            raise ValueError(f"⚠️ OHLCV data for {self.symbol} is empty")
 
-        # Make sure the DataFrame is sorted by datetime ascending
         ohlcv_data = ohlcv_data.sort_index()
-        print(f"✅ Received {len(ohlcv_data)} rows of OHLCV data for {self.symbol}")
 
-        # Evaluate strategy
-        action = self.strategy_logic.evaluate(ohlcv_data)
-        if action not in {"buy", "sell", "hold"}:
-            print(f"❗ Invalid action '{action}' returned. Defaulting to 'hold'")
-            action = "hold"  # fallback to 'hold' on invalid action
+        try:
+            features = extract_features(ohlcv_data)
+        except Exception as e:
+            print(f"❌ Feature extraction failed: {e}")
+            features = pd.DataFrame()
 
-        # Confidence is a placeholder; customize if your StrategyParser can return confidence
-        confidence = 0.75
+        action_ml, confidence = self._predict_with_model(features)
 
-        # Use the timestamp of the latest candle in ISO format
+        # Fallback to rule-based if ML is uncertain or holds
+        if action_ml == "hold" or confidence < 0.6:
+            action = self.strategy_logic.evaluate(ohlcv_data)
+            # confidence remains as predicted by ML (could be zero)
+        else:
+            action = action_ml
+
         timestamp = pd.to_datetime(ohlcv_data.index[-1]).isoformat()
-
-        print(f"📈 Agent for {self.symbol} suggests to '{action.upper()}' at {timestamp} with confidence {confidence}")
 
         return {
             "symbol": self.symbol,
             "action": action,
-            "confidence": confidence,
+            "confidence": round(confidence, 4),
             "timestamp": timestamp
         }
 
     def predict(self, ohlcv_data: pd.DataFrame) -> dict:
-        """
-        Alias for evaluate; useful for clarity when the agent predicts the next move.
-
-        Args:
-            ohlcv_data (pd.DataFrame): OHLCV data.
-
-        Returns:
-            dict: Same as evaluate.
-        """
         return self.evaluate(ohlcv_data)
