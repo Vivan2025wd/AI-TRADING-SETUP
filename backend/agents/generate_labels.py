@@ -24,38 +24,50 @@ def load_trades(symbol: str) -> pd.DataFrame:
     trades = trades.sort_values("timestamp")
     return trades
 
-def generate_labels(symbol: str):
-    print(f"Generating labels for {symbol}...")
+def generate_labels(symbol: str, window: int = 3):
+    print(f"\n🔧 Generating labels for {symbol}...")
 
     ohlcv = load_ohlcv(symbol)
     trades = load_trades(symbol)
 
-    # Prepare label series, default to "hold"
+    # Default all to "hold"
     labels = pd.Series("hold", index=ohlcv.index)
 
-    # For each trade signal, assign label to closest OHLCV timestamp <= trade time
     for _, trade in trades.iterrows():
-        trade_time = trade["timestamp"]
+        trade_time = trade.get("timestamp")
         signal = trade.get("signal", "hold").lower()
-        # Find the last OHLCV timestamp <= trade_time
-        possible_times = ohlcv.index[ohlcv.index <= trade_time]
-        if not possible_times.empty:
-            closest_time = possible_times[-1]
-            labels.loc[closest_time] = signal
 
-    # Save labels to CSV
+        if pd.isnull(trade_time) or signal not in ["buy", "sell", "hold"]:
+            continue
+
+        # Find index closest to trade_time
+        idx = ohlcv.index.get_indexer([trade_time], method='nearest')[0]
+
+        # Mark a window around that index
+        start = max(0, idx - window)
+        end = min(len(ohlcv) - 1, idx + window)
+
+        labels.iloc[start:end + 1] = signal
+
+    # Save labels
     label_df = pd.DataFrame({"action": labels})
     out_path = os.path.join(LABELS_DIR, f"{symbol}_labels.csv")
     label_df.to_csv(out_path)
-    print(f"Saved labels to {out_path}")
+    print(f"✅ Saved labels to {out_path}")
+
+    # Print class distribution for debugging
+    distribution = label_df["action"].value_counts(normalize=True).round(3) * 100
+    print(f"📊 Label distribution for {symbol}:")
+    for label, pct in distribution.items():
+        print(f"   - {label}: {pct:.1f}%")
 
 def main():
-    symbols = ["DOGEUSDT","SOLUSDT","XRPUSDT","DOTUSDT", "LTCUSDT", "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"]
+    symbols = ["DOGEUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT", "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"]
     for symbol in symbols:
         try:
             generate_labels(symbol)
         except Exception as e:
-            print(f"Failed to generate labels for {symbol}: {e}")
+            print(f"❌ Failed to generate labels for {symbol}: {e}")
 
 if __name__ == "__main__":
     main()
