@@ -19,22 +19,40 @@ export default function MotherAIDecisionCard() {
 
       const data = await res.json();
 
-      if (!data || !data.decision || Object.keys(data.decision).length === 0) {
+      // Handle backend statuses explicitly
+      if (data.status === "waiting") {
+        setDecisionData({
+          status: "Waiting",
+          tradePick: "No signal yet",
+          lastUpdated: null,
+          rationale: data.message || "Mother AI is still evaluating. Please wait...",
+          confidence: 0,
+        });
+      } else if (data.status === "no_signal") {
         setDecisionData({
           status: "Inactive",
           tradePick: "No signal",
-          lastUpdated: new Date().toLocaleString(),
-          rationale: "No qualified trades met the confidence threshold.",
+          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
+          rationale: data.message || "No qualified trades met the confidence threshold.",
           confidence: 0,
         });
-      } else {
+      } else if (data.status === "success" && data.decision) {
         const decision = data.decision;
         setDecisionData({
           status: "Active",
-          tradePick: `${decision.symbol} - ${decision.signal}`,
-          lastUpdated: new Date(data.timestamp).toLocaleString(),
+          tradePick: `${decision.symbol} - ${decision.signal.toUpperCase()}`,
+          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
           rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
           confidence: (decision.confidence * 100).toFixed(2),
+        });
+      } else {
+        // fallback for unknown or empty data
+        setDecisionData({
+          status: "Unknown",
+          tradePick: "No signal",
+          lastUpdated: null,
+          rationale: "Unexpected response from Mother AI backend.",
+          confidence: 0,
         });
       }
 
@@ -61,24 +79,42 @@ export default function MotherAIDecisionCard() {
         const age = Date.now() - timestamp;
 
         if (age < CACHE_DURATION_MS) {
-          if (!cachedDecision || !cachedDecision.decision || Object.keys(cachedDecision.decision).length === 0) {
+          // Handle cached data based on new backend status
+          if (cachedDecision.status === "waiting") {
+            setDecisionData({
+              status: "Waiting",
+              tradePick: "No signal yet",
+              lastUpdated: null,
+              rationale: cachedDecision.message || "Mother AI is still evaluating. Please wait...",
+              confidence: 0,
+            });
+          } else if (cachedDecision.status === "no_signal") {
             setDecisionData({
               status: "Inactive",
               tradePick: "No signal",
-              lastUpdated: new Date().toLocaleString(),
-              rationale: "No qualified trades met the confidence threshold.",
+              lastUpdated: cachedDecision.timestamp ? new Date(cachedDecision.timestamp).toLocaleString() : new Date().toLocaleString(),
+              rationale: cachedDecision.message || "No qualified trades met the confidence threshold.",
               confidence: 0,
             });
-          } else {
+          } else if (cachedDecision.status === "success" && cachedDecision.decision) {
             const decision = cachedDecision.decision;
             setDecisionData({
               status: "Active",
-              tradePick: `${decision.symbol} - ${decision.signal}`,
-              lastUpdated: new Date(cachedDecision.timestamp).toLocaleString(),
+              tradePick: `${decision.symbol} - ${decision.signal.toUpperCase()}`,
+              lastUpdated: cachedDecision.timestamp ? new Date(cachedDecision.timestamp).toLocaleString() : new Date().toLocaleString(),
               rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
               confidence: (decision.confidence * 100).toFixed(2),
             });
+          } else {
+            setDecisionData({
+              status: "Unknown",
+              tradePick: "No signal",
+              lastUpdated: null,
+              rationale: "Unexpected cached data from Mother AI backend.",
+              confidence: 0,
+            });
           }
+
           setLoading(false);
           return;
         }
@@ -102,7 +138,9 @@ export default function MotherAIDecisionCard() {
               ? "bg-green-700 text-green-100"
               : decisionData?.status === "Inactive"
               ? "bg-gray-600 text-gray-200"
-              : "bg-yellow-600 text-yellow-100"
+              : decisionData?.status === "Waiting"
+              ? "bg-yellow-600 text-yellow-100"
+              : "bg-red-700 text-red-200"
           }`}
         >
           {loading ? (
@@ -127,7 +165,7 @@ export default function MotherAIDecisionCard() {
           <div className="space-y-1">
             <p className="text-lg font-semibold text-blue-400">{decisionData?.tradePick}</p>
             <p className="text-sm text-gray-400 flex items-center gap-1">
-              <Clock className="w-4 h-4" /> Last Updated: {decisionData?.lastUpdated}
+              <Clock className="w-4 h-4" /> Last Updated: {decisionData?.lastUpdated || "N/A"}
             </p>
           </div>
 
@@ -147,9 +185,7 @@ export default function MotherAIDecisionCard() {
           </div>
 
           {!loading && decisionData?.status === "Active" && (
-            <p className="text-sm text-gray-400 italic mt-2 text-center">
-              Waiting for next update...
-            </p>
+            <p className="text-sm text-gray-400 italic mt-2 text-center">Waiting for next update...</p>
           )}
         </>
       )}

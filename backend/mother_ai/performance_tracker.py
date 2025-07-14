@@ -28,6 +28,16 @@ class PerformanceTracker:
         with open(path, "w") as f:
             json.dump(logs, f, indent=2)
 
+    def log_prediction(self, symbol: str, prediction_data: Dict):
+        """
+        Logs an agent prediction to {symbol}_predictions.json in the trade_history directory.
+        """
+        path = self.get_log_path(symbol)
+        logs = self._load_logs(path)
+        logs.append(prediction_data)
+        with open(path, "w") as f:
+            json.dump(logs, f, indent=2)
+
     def get_agent_log(self, symbol: str, limit: int = 100) -> List[Dict]:
         path = self.get_log_path(symbol)
         logs = self._load_logs(path)
@@ -81,7 +91,6 @@ class PerformanceTracker:
                 else:
                     losses += 1
             else:
-                # fallback: check result field if present
                 result = log.get("result", "").lower()
                 if result == "win":
                     wins += 1
@@ -104,9 +113,6 @@ class PerformanceTracker:
         }
 
     def list_strategies(self, symbol: str) -> List[Dict]:
-        """
-        Lists all strategy JSON files for a symbol, loading metadata.
-        """
         pattern = os.path.join(self.strategy_dir, f"{symbol}_strategy_*.json")
         files = glob.glob(pattern)
         strategies = []
@@ -128,9 +134,6 @@ class PerformanceTracker:
         return strategies
 
     def rate_strategies(self, symbol: str, limit: int = 100) -> List[Dict]:
-        """
-        Rate strategies by combining health stats and metadata.
-        """
         strategies = self.list_strategies(symbol)
         health = self.get_strategy_health(symbol, limit=limit)
 

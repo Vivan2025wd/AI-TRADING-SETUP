@@ -196,5 +196,47 @@
     "win_rate": 0.0,
     "score": 0.574,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:32.034238",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:34.731112",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:53.039705",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:09.099862",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:32.578687",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:35.459188",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
   }
 ]

@@ -196,5 +196,47 @@
     "win_rate": 0.0,
     "score": 0.551,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:29.190246",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:33.741633",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:37.606601",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:07.554302",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:31.505752",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:34.164277",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
   }
 ]

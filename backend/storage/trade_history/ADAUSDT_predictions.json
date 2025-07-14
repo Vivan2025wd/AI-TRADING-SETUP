@@ -187,5 +187,47 @@
     "win_rate": 0.0,
     "score": 0.564,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:26.719995",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:32.944544",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:36.619193",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:06.748153",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:30.725160",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:33.376923",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
   }
 ]

@@ -196,5 +196,47 @@
     "win_rate": 0.0,
     "score": 0.565,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:31.524955",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:34.480672",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:52.758933",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:08.390751",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:32.263645",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:35.133464",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
   }
 ]

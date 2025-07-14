@@ -196,5 +196,47 @@
     "win_rate": 0.0,
     "score": 0.564,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:27.479355",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:33.216314",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:37.097329",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:07.030062",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:31.006002",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:33.632804",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
   }
 ]

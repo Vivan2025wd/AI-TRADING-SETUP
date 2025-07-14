@@ -196,5 +196,47 @@
     "win_rate": 0.0,
     "score": 0.581,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:28.703442",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9391,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:33.499783",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9391,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:37.356933",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9391,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:07.290635",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9416,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:31.240531",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9416,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:33.913169",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9416,
+    "source": "agent_predictions_batch"
   }
 ]

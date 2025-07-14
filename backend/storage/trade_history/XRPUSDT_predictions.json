@@ -196,5 +196,47 @@
     "win_rate": 0.0,
     "score": 0.595,
     "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:32.680491",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:36.091589",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:53:53.664548",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:09.734769",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:33.115449",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-14T08:54:35.966369",
+    "symbol": "XRPUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
   }
 ]

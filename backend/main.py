@@ -36,6 +36,7 @@ app.add_middleware(
 async def read_root():
     return {"message": "Backend is running!"}
 
+
 # --- Register routers ---
 app.include_router(agent_router, prefix="/api/agent", tags=["Agent"])                         # Symbol agents
 app.include_router(strategy_router, prefix="/api/strategy", tags=["Strategy"])                # JSON strategy management

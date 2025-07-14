@@ -7,108 +7,101 @@ from backend.mother_ai.profit_calculator import compute_trade_profits
 import os
 import json
 import glob
-from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime
 
 router = APIRouter(tags=["Mother AI"])
 
-# Global MotherAI instance
+# Global instances and constants
 mother_ai_instance = MotherAI(agent_symbols=None)
-
-TRADE_HISTORY_DIR = "backend/storage/performance_logs"
-
-# To store the latest decision
+TRADE_HISTORY_DIR = "backend/storage/trade_history"
 latest_decision = None
 
-# Scheduler job to run every 2 hours
-def scheduled_trade_decision():
-    global latest_decision
-    print("⏰ Running scheduled MotherAI decision...")
-    decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
-    latest_decision = decision
-    print(f"Decision made at {decision.get('timestamp')} for symbol: "
-          f"{decision['decision'].get('symbol') if decision.get('decision') else 'None'}")
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(scheduled_trade_decision, "interval", hours=2)
-scheduler.start()
+def log(msg: str):
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}")
 
 
 @router.get("/latest-decision")
 def get_latest_decision():
+    log("📥 GET /latest-decision called")
     if latest_decision is None:
-        return {"message": "No decision made yet. Waiting for scheduled run."}
+        log("⚠️ No decision made yet.")
+        return {
+            "status": "waiting",
+            "message": "No decision made yet.",
+            "decision": {}
+        }
+    log(f"✅ Returning latest decision: {latest_decision}")
     return latest_decision
 
 
 @router.post("/trigger-decision")
 def trigger_decision():
     global latest_decision
+    log("🚨 POST /trigger-decision called")
     latest_decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
+    log(f"✅ Decision triggered: {latest_decision}")
     return latest_decision
-
-
-@router.get("/decision")
-def get_mother_ai_decision():
-    try:
-        print("🧠 Mother AI: Starting portfolio decision...")
-        result = mother_ai_instance.make_portfolio_decision()
-
-        decision = result.get("decision", {})
-        symbol = decision.get("symbol")
-        signal = decision.get("signal", "").lower()
-
-        # ✅ Trigger profit summary update after SELL signal
-        if signal == "sell" and symbol:
-            print(f"📊 SELL decision for {symbol}, updating profit summary...")
-            compute_trade_profits(symbol)
-
-        if not decision:
-            print("⚠️ No valid decision found.")
-            return {
-                "decision": [],
-                "timestamp": mother_ai_instance.performance_tracker.current_time()
-            }
-
-        print("✅ Decision found!")
-        return result
-
-    except Exception as e:
-        print("❌ Mother AI Decision Error:", e)
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/execute")
 def execute_mother_decision():
     try:
-        print("🧠 Executing Mother AI trades...")
+        log("🧠 POST /execute called: Executing Mother AI trades...")
         result = mother_ai_instance.make_portfolio_decision()
         decision = result.get("decision", {})
 
         if not decision:
+            log("⚠️ No valid decision to execute")
             return JSONResponse(
                 status_code=200,
-                content={
-                    "message": "No valid decision to execute.",
-                    "executed_trades": []
-                }
+                content={"message": "No valid decision to execute.", "executed_trades": []}
             )
 
         executed = execute_mother_ai_decision(result)
 
-        # ✅ Trigger profit summary update after SELL signal
         symbol = decision.get("symbol")
         signal = decision.get("signal", "").lower()
         if signal == "sell" and symbol:
-            print(f"📊 SELL decision for {symbol}, updating profit summary...")
+            log(f"📊 SELL decision for {symbol}, updating profit summary...")
             compute_trade_profits(symbol)
 
+        log(f"✅ Executed {len(executed)} trades.")
         return {
             "message": f"{len(executed)} trades executed.",
             "executed_trades": executed
         }
 
     except Exception as e:
-        print("❌ Execution failed:", e)
+        log(f"❌ Execution failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/decision")
+def get_mother_ai_decision():
+    log("🧠 GET /decision called")
+    try:
+        result = mother_ai_instance.make_portfolio_decision()
+        decision = result.get("decision", {})
+
+        if not decision:
+            log("⚠️ No valid decision found.")
+            return {
+                "decision": [],
+                "timestamp": mother_ai_instance.performance_tracker.current_time()
+            }
+
+        symbol = decision.get("symbol")
+        signal = decision.get("signal", "").lower()
+        if signal == "sell" and symbol:
+            log(f"📊 SELL decision for {symbol}, updating profit summary...")
+            compute_trade_profits(symbol)
+
+        log(f"✅ Returning decision: {decision}")
+        return result
+
+    except Exception as e:
+        log(f"❌ Error during decision: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -116,68 +109,68 @@ def execute_mother_decision():
 def get_symbol_trades(symbol: str):
     try:
         symbol = symbol.upper()
+        log(f"📥 GET /trades/{symbol} called")
         log_file_path = f"{TRADE_HISTORY_DIR}/{symbol}_trades.json"
 
         if not os.path.exists(log_file_path):
-            print(f"⚠️ No trade log found for {symbol}: {log_file_path}")
-            raise HTTPException(status_code=404, detail=f"No trade log found for {symbol}")
+            log(f"❌ No trade log for {symbol}")
+            raise HTTPException(status_code=404, detail=f"No trade log for {symbol}")
 
         with open(log_file_path, "r") as f:
             data = json.load(f)
 
+        log(f"✅ Loaded {len(data)} trades for {symbol}")
         return {
             "symbol": symbol,
             "data": data
         }
 
     except Exception as e:
-        print("❌ Failed to load trade log:", e)
+        log(f"❌ Failed to load trade log for {symbol}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/trades")
 def get_all_trades():
+    log("📥 GET /trades called to fetch all symbols")
     try:
         pattern = os.path.join(TRADE_HISTORY_DIR, "*_trades.json")
         all_files = glob.glob(pattern)
         if not all_files:
-            print("⚠️ No trade logs found.")
-            return {
-                "symbol": "ALL",
-                "data": []
-            }
+            log("⚠️ No trade files found.")
+            return {"symbol": "ALL", "data": []}
 
         all_trades = []
         for file_path in all_files:
             symbol = os.path.basename(file_path).replace("_trades.json", "").upper()
             with open(file_path, "r") as f:
                 trades = json.load(f)
-
                 for trade in trades:
-                    trade["symbol"] = symbol  # Add for frontend usage
-
+                    trade["symbol"] = symbol
                 all_trades.extend(trades)
 
         all_trades.sort(key=lambda x: x.get("timestamp") or "", reverse=True)
+        log(f"✅ Total trades loaded: {len(all_trades)}")
 
-        return {
-            "symbol": "ALL",
-            "data": all_trades
-        }
+        return {"symbol": "ALL", "data": all_trades}
 
     except Exception as e:
-        print("❌ Failed to load all trade logs:", e)
+        log(f"❌ Failed to load all trades: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/profits/{symbol}")
 def get_profit_summary(symbol: str):
+    symbol = symbol.upper()
+    log(f"📈 GET /profits/{symbol} called")
     try:
-        symbol = symbol.upper()
         summary = compute_trade_profits(symbol)
         if summary is None:
-            raise HTTPException(status_code=404, detail=f"No trades found for {symbol}")
+            log(f"⚠️ No trades found for {symbol}")
+            raise HTTPException(status_code=404, detail=f"No trades for {symbol}")
+        log(f"✅ Profit summary for {symbol}: {summary}")
         return summary
+
     except Exception as e:
-        print("❌ Profit summary generation failed:", e)
+        log(f"❌ Profit summary error for {symbol}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
