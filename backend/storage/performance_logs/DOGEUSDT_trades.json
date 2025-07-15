@@ -12,7 +12,7 @@
   {
     "timestamp": "2025-07-08T05:21:19.014312",
     "symbol": "DOGEUSDT",
-    "signal": "sell",
+    "signal": "buy",
     "price": 0.16761,
     "confidence": 0.7921452503343092,
     "win_rate": 0.0,
@@ -22,7 +22,7 @@
   {
     "timestamp": "2025-07-10T07:52:40.950275",
     "symbol": "DOGEUSDT",
-    "signal": "hold",
+    "signal": "sell",
     "price": 0.18157,
     "confidence": 0.7842575079389089,
     "win_rate": 0.0,

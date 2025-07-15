@@ -22,7 +22,7 @@
   {
     "timestamp": "2025-07-11T03:31:09.659784",
     "symbol": "ADAUSDT",
-    "signal": "hold",
+    "signal": "buy",
     "price": 0.6868,
     "confidence": 0.7939346582879587,
     "win_rate": 0.0,
@@ -32,7 +32,7 @@
   {
     "timestamp": "2025-07-11T03:32:49.693582",
     "symbol": "ADAUSDT",
-    "signal": "hold",
+    "signal": "sell",
     "price": 0.6862,
     "confidence": 0.7802496691864987,
     "win_rate": 0.0,
