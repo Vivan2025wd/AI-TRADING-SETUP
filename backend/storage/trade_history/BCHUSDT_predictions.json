@@ -448,5 +448,534 @@
     "signal": "hold",
     "confidence": 0.3,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T03:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9141549086061076,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T03:33:12.214673",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9142,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T03:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9141549086061076,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T03:33:15.672053",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9142,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T03:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9141549086061076,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T03:33:19.874587",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9142,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9039664022606128,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.904,
+    "win_rate": 0.0,
+    "score": 0.904,
+    "timestamp": "2025-07-16T05:03:36.702283",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9039664022606128,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.904,
+    "win_rate": 0.0,
+    "score": 0.904,
+    "timestamp": "2025-07-16T05:03:43.224308",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9073493545719222,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T05:08:13.389358",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9073,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9073493545719222,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T05:08:16.530911",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9073,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448115869485266,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.945,
+    "timestamp": "2025-07-16T05:21:00.660898",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448115869485266,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T05:21:08.383188",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448115869485266,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T05:21:12.405132",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T05:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9448,
+    "win_rate": 0.0,
+    "score": 0.0,
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:20.826576",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:24.781983",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:31.379901",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.616685372983362,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.6167,
+    "win_rate": 0.0,
+    "score": 0.617,
+    "timestamp": "2025-07-16T06:00:49.135000",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T06:01:44.589299",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-16T06:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-16T06:01:48.989940",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
   }
 ]

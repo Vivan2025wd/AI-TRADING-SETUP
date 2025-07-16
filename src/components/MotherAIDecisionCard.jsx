@@ -14,53 +14,47 @@ export default function MotherAIDecisionCard() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:8000/api/mother-ai/latest-decision"); // or your endpoint
+      const res = await fetch("http://localhost:8000/api/mother-ai/decision");
       if (!res.ok) throw new Error("Failed to fetch Mother AI decision");
 
       const data = await res.json();
 
-      // Handle backend statuses explicitly
-      if (data.status === "waiting") {
-        setDecisionData({
-          status: "Waiting",
-          tradePick: "No signal yet",
+      let final = {};
+
+      if (!data || typeof data !== "object") {
+        final = {
+          status: "Unknown",
+          tradePick: "No signal",
           lastUpdated: null,
-          rationale: data.message || "Mother AI is still evaluating. Please wait...",
+          rationale: "Invalid or empty response from Mother AI backend.",
           confidence: 0,
-        });
-      } else if (data.status === "no_signal") {
-        setDecisionData({
+        };
+      } else if (!data.decision || Object.keys(data.decision).length === 0) {
+        final = {
           status: "Inactive",
           tradePick: "No signal",
           lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
           rationale: data.message || "No qualified trades met the confidence threshold.",
           confidence: 0,
-        });
-      } else if (data.status === "success" && data.decision) {
-        const decision = data.decision;
-        setDecisionData({
-          status: "Active",
-          tradePick: `${decision.symbol} - ${decision.signal.toUpperCase()}`,
-          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
-          rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
-          confidence: (decision.confidence * 100).toFixed(2),
-        });
+        };
       } else {
-        // fallback for unknown or empty data
-        setDecisionData({
-          status: "Unknown",
-          tradePick: "No signal",
-          lastUpdated: null,
-          rationale: "Unexpected response from Mother AI backend.",
-          confidence: 0,
-        });
+        const d = data.decision;
+        final = {
+          status: "Active",
+          tradePick: `${d.symbol} - ${d.signal?.toUpperCase() || "N/A"}`,
+          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
+          rationale: `Confidence: ${(d.confidence * 100).toFixed(2)}%, Win Rate: ${(d.win_rate * 100).toFixed(2)}%, Score: ${d.score}`,
+          confidence: (d.confidence * 100).toFixed(2),
+        };
       }
+
+      setDecisionData(final);
 
       localStorage.setItem(
         CACHE_KEY,
         JSON.stringify({
           timestamp: Date.now(),
-          decisionData: data,
+          decisionData: final,
         })
       );
     } catch (err) {
@@ -79,47 +73,12 @@ export default function MotherAIDecisionCard() {
         const age = Date.now() - timestamp;
 
         if (age < CACHE_DURATION_MS) {
-          // Handle cached data based on new backend status
-          if (cachedDecision.status === "waiting") {
-            setDecisionData({
-              status: "Waiting",
-              tradePick: "No signal yet",
-              lastUpdated: null,
-              rationale: cachedDecision.message || "Mother AI is still evaluating. Please wait...",
-              confidence: 0,
-            });
-          } else if (cachedDecision.status === "no_signal") {
-            setDecisionData({
-              status: "Inactive",
-              tradePick: "No signal",
-              lastUpdated: cachedDecision.timestamp ? new Date(cachedDecision.timestamp).toLocaleString() : new Date().toLocaleString(),
-              rationale: cachedDecision.message || "No qualified trades met the confidence threshold.",
-              confidence: 0,
-            });
-          } else if (cachedDecision.status === "success" && cachedDecision.decision) {
-            const decision = cachedDecision.decision;
-            setDecisionData({
-              status: "Active",
-              tradePick: `${decision.symbol} - ${decision.signal.toUpperCase()}`,
-              lastUpdated: cachedDecision.timestamp ? new Date(cachedDecision.timestamp).toLocaleString() : new Date().toLocaleString(),
-              rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
-              confidence: (decision.confidence * 100).toFixed(2),
-            });
-          } else {
-            setDecisionData({
-              status: "Unknown",
-              tradePick: "No signal",
-              lastUpdated: null,
-              rationale: "Unexpected cached data from Mother AI backend.",
-              confidence: 0,
-            });
-          }
-
+          setDecisionData(cachedDecision);
           setLoading(false);
           return;
         }
       } catch {
-        // corrupted cache fallback
+        // Ignore broken cache
       }
     }
 
@@ -190,11 +149,8 @@ export default function MotherAIDecisionCard() {
         </>
       )}
 
-      {/* Manual refresh button */}
       <button
-        onClick={() => {
-          fetchDecision();
-        }}
+        onClick={fetchDecision}
         className="mt-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center gap-2 mx-auto"
         disabled={loading}
       >

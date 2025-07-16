@@ -173,6 +173,3 @@ class MotherAI:
                 continue
         return all_preds
 
-    def make_decision_from_predictions(self, min_confidence=0.3, top_n=1):
-        filtered = [p for p in self.load_all_predictions() if p.get("confidence", 0) >= min_confidence]
-        return sorted(filtered, key=lambda x: x["confidence"], reverse=True)[:top_n]

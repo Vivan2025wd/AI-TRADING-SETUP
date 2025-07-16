@@ -54,6 +54,7 @@ def get_latest_decision():
 def trigger_decision():
     global latest_decision
     latest_decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
+    print(f"[DEBUG] Latest decision: {latest_decision}")
     return latest_decision
 
 
@@ -150,3 +151,4 @@ def get_profit_summary(symbol: str):
         raise HTTPException(status_code=404, detail=f"No trades for {symbol}")
 
     return summary
+
