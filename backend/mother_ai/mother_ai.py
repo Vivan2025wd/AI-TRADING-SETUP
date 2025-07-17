@@ -1,5 +1,3 @@
-# mother_ai.py
-
 import os
 import json
 import glob
@@ -125,10 +123,25 @@ class MotherAI:
     def is_in_cooldown(self, symbol):
         return symbol in self.cooldown_tracker and (time.time() - self.cooldown_tracker[symbol]) < TRADE_COOLDOWN_SECONDS
 
-    def decide_trades(self, top_n=1, min_score=0.5):
+    def decide_trades(self, top_n=1, min_score=0.5, min_confidence=0.7):
         agents = self.load_agents()
         evaluations = self.evaluate_agents(agents)
-        return [e for e in evaluations if e["score"] >= min_score and not self.is_in_cooldown(e["symbol"])][:top_n]
+
+        filtered = []
+        for e in evaluations:
+            # Skip if score below min_score or cooldown active
+            if e["score"] < min_score or self.is_in_cooldown(e["symbol"]):
+                continue
+
+            # Enforce confidence threshold for buy/sell signals
+            if e["signal"] in ("buy", "sell") and e["confidence"] < min_confidence:
+                # Treat as hold by skipping this agent
+                continue
+
+            filtered.append(e)
+
+        # Return top N by score, no holds included
+        return filtered[:top_n]
 
     def execute_trade(self, symbol, signal, price, confidence):
         if signal not in ("buy", "sell") or not price:
@@ -172,4 +185,3 @@ class MotherAI:
             except:
                 continue
         return all_preds
-

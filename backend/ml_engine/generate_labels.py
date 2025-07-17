@@ -30,15 +30,15 @@ def generate_labels(symbol: str, window: int = 3):
     ohlcv = load_ohlcv(symbol)
     trades = load_trades(symbol)
 
-    # Default all to "hold"
-    labels = pd.Series("hold", index=ohlcv.index)
+    # Initialize all to None — we’ll drop these later
+    labels = pd.Series(None, index=ohlcv.index)
 
     for _, trade in trades.iterrows():
         trade_time = trade.get("timestamp")
-        signal = trade.get("signal", "hold").lower()
+        signal = trade.get("signal", "").lower()
 
-        if pd.isnull(trade_time) or signal not in ["buy", "sell", "hold"]:
-            continue
+        if pd.isnull(trade_time) or signal not in ["buy", "sell"]:
+            continue  # skip 'hold' and invalid
 
         # Find index closest to trade_time
         idx = ohlcv.index.get_indexer([trade_time], method='nearest')[0]
@@ -48,6 +48,9 @@ def generate_labels(symbol: str, window: int = 3):
         end = min(len(ohlcv) - 1, idx + window)
 
         labels.iloc[start:end + 1] = signal
+
+    # Drop unlabeled rows (None or NaN)
+    labels = labels.dropna()
 
     # Save labels
     label_df = pd.DataFrame({"action": labels})
@@ -62,7 +65,10 @@ def generate_labels(symbol: str, window: int = 3):
         print(f"   - {label}: {pct:.1f}%")
 
 def main():
-    symbols = ["DOGEUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT", "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"]
+    symbols = [
+        "DOGEUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT",
+        "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"
+    ]
     for symbol in symbols:
         try:
             generate_labels(symbol)
