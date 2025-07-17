@@ -1342,5 +1342,233 @@
     "signal": "hold",
     "confidence": 0.3,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:35:09.894037",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:35:13.283523",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:35:18.673298",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.3,
+    "win_rate": 0.0,
+    "score": 0.3,
+    "timestamp": "2025-07-17T06:35:34.074334",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8716532348982922,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:43:09.915316",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8717,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8716532348982922,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:43:12.967111",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8717,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8716532348982922,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:43:16.356546",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8717,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8716532348982922,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:44:09.351508",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8717,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8716532348982922,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:44:12.333595",
+    "symbol": "ETHUSDT",
+    "signal": "hold",
+    "confidence": 0.8717,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.5,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:50:27.167876",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.5,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.5,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:50:30.911138",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.5,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.5,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.5,
+    "win_rate": 0.0,
+    "score": 0.5,
+    "timestamp": "2025-07-17T06:51:24.940955",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:14:34.698249",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:14:38.906354",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:16:23.000376",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:16:26.841817",
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.81,
+    "source": "agent_predictions_batch"
   }
 ]

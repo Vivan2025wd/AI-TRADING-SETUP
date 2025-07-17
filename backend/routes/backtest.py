@@ -1,11 +1,10 @@
 import json
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from backend.backtester.runner import run_backtest
 from pathlib import Path
+from backend.backtester.runner import run_backtest
 
-# Do NOT include prefix here if already prefixed in main.py
-router = APIRouter(tags=["Backtesting"])  # ✅ Remove prefix if already set in main.py
+router = APIRouter(tags=["Backtesting"])
 
 # ------------------------------
 # POST /api/backtest/ — Run Backtest
@@ -30,31 +29,44 @@ def execute_backtest(payload: BacktestPayload):
         raise HTTPException(status_code=500, detail=str(e))
 
 # -----------------------------------------------
-# GET /api/backtest/results — Paginated Trade Logs
+# GET /api/backtest/results — Mother AI trade profits
 # -----------------------------------------------
 @router.get("/results")
 def get_recent_backtest_results(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1)
 ):
-    logs_dir = Path("backend/storage/performance_logs")
+    logs_dir = Path("backend/storage/trade_profits")
 
     if not logs_dir.exists():
-        raise HTTPException(status_code=404, detail="Performance log directory not found.")
+        raise HTTPException(status_code=404, detail="Trade profits directory not found.")
 
     all_trades = []
 
-    for log_file in logs_dir.glob("*_trades.json"):
+    for summary_file in logs_dir.glob("*_summary.json"):
         try:
-            with open(log_file, "r") as f:
-                trades = json.load(f)
-                symbol = log_file.stem.replace("_trades", "")
-                for trade in trades:
-                    trade["symbol"] = symbol
-                    all_trades.append(trade)
-        except Exception as e:
-            print(f"Error reading {log_file}: {e}")
+            with open(summary_file, "r") as f:
+                summary = json.load(f)
+                symbol = summary.get("symbol", summary_file.stem.replace("_summary", ""))
+                trades = summary.get("trades", [])
 
+                balance = 100.0  # Starting virtual balance
+                for trade in trades:
+                    pnl = trade.get("pnl", 0)
+                    balance += balance * pnl
+
+                    all_trades.append({
+                        "type": "TRADE",
+                        "timestamp": trade.get("exit_time"),
+                        "price": trade.get("exit_price"),
+                        "profit_percent": pnl * 100,
+                        "balance": balance,
+                        "symbol": symbol
+                    })
+        except Exception as e:
+            print(f"Error reading {summary_file}: {e}")
+
+    # Sort by timestamp descending
     sorted_trades = sorted(all_trades, key=lambda x: x.get("timestamp", ""), reverse=True)
 
     total = len(sorted_trades)

@@ -1387,5 +1387,233 @@
     "signal": "buy",
     "confidence": 0.99,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:35:09.272258",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:35:12.549040",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:35:18.096812",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "timestamp": "2025-07-17T06:35:33.491701",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:43:09.178586",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:43:12.384910",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:43:15.768699",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:44:08.775761",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:44:11.762099",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:50:26.457268",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T06:50:30.161461",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T06:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "win_rate": 0.0,
+    "score": 0.94,
+    "timestamp": "2025-07-17T06:51:24.246630",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:14:33.693478",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:14:38.193250",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:16:22.280806",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T07:16:26.077345",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
   }
 ]

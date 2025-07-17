@@ -38,5 +38,15 @@
     "win_rate": 0.0,
     "score": 0.59,
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7708,
+    "price": 0.7708,
+    "timestamp": "2025-07-17T06:35:34.923523",
+    "source": "mother_ai_decision"
   }
 ]

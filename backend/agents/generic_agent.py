@@ -3,11 +3,11 @@ import numpy as np
 import joblib
 import os
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.utils.class_weight import compute_class_weight
 from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.ml_engine.feature_extractor import extract_features
-from backend.mother_ai.performance_tracker import PerformanceTracker  # Add tracker
+from backend.mother_ai.performance_tracker import PerformanceTracker
 from typing import Optional
+
 
 class GenericAgent:
     def __init__(self, symbol: str, strategy_logic: StrategyParser, model_path: Optional[str] = None):
@@ -15,8 +15,6 @@ class GenericAgent:
         self.strategy_logic = strategy_logic
         self.model_path = model_path or f"backend/agents/models/{symbol.lower()}_model.pkl"
         self.model = self._load_model()
-
-        # Initialize PerformanceTracker for saving predictions
         self.tracker = PerformanceTracker(log_dir_type="trade_history")
 
     def _load_model(self):
@@ -31,6 +29,9 @@ class GenericAgent:
         if "action" not in labeled_data.columns:
             raise ValueError("Training data must have an 'action' column")
 
+        # Remove 'hold' from training data if present
+        labeled_data = labeled_data[labeled_data["action"].isin(["buy", "sell"])]
+
         features = labeled_data.drop(columns=["action"])
         labels = labeled_data["action"]
 
@@ -38,7 +39,7 @@ class GenericAgent:
             n_estimators=100,
             max_depth=6,
             random_state=42,
-            class_weight="balanced"  # Handle label imbalance
+            class_weight="balanced"
         )
 
         model.fit(features, labels)
@@ -50,10 +51,12 @@ class GenericAgent:
 
     def _predict_with_model(self, features: pd.DataFrame) -> tuple[str, float]:
         if self.model is None or features.empty:
-            return "hold", 0.0
+            # No default to "hold" anymore, randomly choose between "buy" and "sell"
+            random_action = np.random.choice(["buy", "sell"])
+            return random_action, 0.5
 
         try:
-            latest_features = features.iloc[[-1]]  # Predict on last row
+            latest_features = features.iloc[[-1]]
             proba = self.model.predict_proba(latest_features)[0]
             pred_class = self.model.classes_[np.argmax(proba)]
             confidence = float(np.max(proba))
@@ -61,7 +64,7 @@ class GenericAgent:
             return pred_class, confidence
         except Exception as e:
             print(f"❌ Model prediction failed: {e}")
-            return "hold", 0.0
+            return np.random.choice(["buy", "sell"]), 0.5
 
     def evaluate(self, ohlcv_data: pd.DataFrame) -> dict:
         if ohlcv_data.empty:
@@ -77,16 +80,9 @@ class GenericAgent:
 
         action_ml, confidence_ml = self._predict_with_model(features)
 
-        confidence_threshold = 0.6  # You can tune this
-
-        if action_ml == "hold" or confidence_ml < confidence_threshold:
-            action_rb = self.strategy_logic.evaluate(ohlcv_data)
-            action = action_rb
-            confidence = 0.3  # Distinct low confidence for fallback
-            print(f"⚙️ Rule-based fallback: {action_rb} (ML: {action_ml}, conf: {confidence_ml:.2f})")
-        else:
-            action = action_ml
-            confidence = confidence_ml
+        # Always use ML prediction (no rule-based fallback anymore)
+        action = action_ml
+        confidence = confidence_ml
 
         timestamp = pd.to_datetime(ohlcv_data.index[-1]).isoformat()
 
@@ -97,7 +93,7 @@ class GenericAgent:
             "timestamp": timestamp
         }
 
-        # ✅ Log the prediction to trade_history
+        # ✅ Log to trade_history
         self.tracker.log_trade(self.symbol, {
             "timestamp": timestamp,
             "symbol": self.symbol,

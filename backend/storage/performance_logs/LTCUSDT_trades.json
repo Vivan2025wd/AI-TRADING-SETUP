@@ -18,5 +18,15 @@
     "win_rate": 0.0,
     "score": 0.598,
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 98.54,
+    "price": 98.54,
+    "timestamp": "2025-07-17T06:51:26.238485",
+    "source": "mother_ai_decision"
   }
 ]
