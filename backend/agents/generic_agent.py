@@ -16,6 +16,7 @@ class GenericAgent:
         self.model_path = model_path or f"backend/agents/models/{symbol.lower()}_model.pkl"
         self.model = self._load_model()
         self.tracker = PerformanceTracker(log_dir_type="trade_history")
+        self.position_state = None  # 'long' if in position, None if flat
 
     def _load_model(self):
         if os.path.exists(self.model_path):
@@ -29,9 +30,7 @@ class GenericAgent:
         if "action" not in labeled_data.columns:
             raise ValueError("Training data must have an 'action' column")
 
-        # Remove 'hold' from training data if present
         labeled_data = labeled_data[labeled_data["action"].isin(["buy", "sell"])]
-
         features = labeled_data.drop(columns=["action"])
         labels = labeled_data["action"]
 
@@ -41,7 +40,6 @@ class GenericAgent:
             random_state=42,
             class_weight="balanced"
         )
-
         model.fit(features, labels)
 
         os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
@@ -51,7 +49,6 @@ class GenericAgent:
 
     def _predict_with_model(self, features: pd.DataFrame) -> tuple[str, float]:
         if self.model is None or features.empty:
-            # No default to "hold" anymore, randomly choose between "buy" and "sell"
             random_action = np.random.choice(["buy", "sell"])
             return random_action, 0.5
 
@@ -80,10 +77,25 @@ class GenericAgent:
 
         action_ml, confidence_ml = self._predict_with_model(features)
 
-        # Always use ML prediction (no rule-based fallback anymore)
+        # Buy-Hold-Sell logic
+        if self.position_state == "long":
+            if action_ml == "buy":
+                action_ml = "hold"
+            elif action_ml == "sell":
+                self.position_state = None
+        elif self.position_state is None:
+            if action_ml == "sell":
+                action_ml = "searching"
+            elif action_ml == "buy":
+                self.position_state = "long"
+            else:
+                if confidence_ml > 0.6:
+                    action_ml = "buy_soon"
+                else:
+                    action_ml = "searching"
+
         action = action_ml
         confidence = confidence_ml
-
         timestamp = pd.to_datetime(ohlcv_data.index[-1]).isoformat()
 
         prediction = {
@@ -93,7 +105,6 @@ class GenericAgent:
             "timestamp": timestamp
         }
 
-        # ✅ Log to trade_history
         self.tracker.log_trade(self.symbol, {
             "timestamp": timestamp,
             "symbol": self.symbol,

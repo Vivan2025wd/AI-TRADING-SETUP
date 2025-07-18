@@ -29,6 +29,7 @@ class MotherAI:
         self.agent_symbols = agent_symbols or []
         self.meta_evaluator = MetaEvaluator()
         self.cooldown_tracker = {}
+        self.position_tracker = {}  # NEW: Keeps track of position state (None, 'long')
 
     def load_agents(self):
         agents = []
@@ -103,13 +104,14 @@ class MotherAI:
             "is_sell": int(prediction["signal"] == "sell")
         })
 
-    def _log_prediction(self, symbol, prediction, health, score):
+    def _log_prediction(self, symbol, prediction, health, score, price=None):
         data = {
             **prediction,
             "win_rate": health.get("win_rate", 0.5),
             "score": round(score, 3),
+            "price": price,  # ✅ Add price to the log
             "timestamp": self.performance_tracker.current_time(),
-            "source": "agent_prediction"
+            "source": "mother_ai_decision"  # ✅ Updated to reflect Mother AI decision
         }
         path = os.path.join(TRADE_HISTORY_DIR, f"{symbol}_predictions.json")
         try:
@@ -120,6 +122,7 @@ class MotherAI:
         with open(path, "w") as f:
             json.dump(existing, f, indent=2)
 
+
     def is_in_cooldown(self, symbol):
         return symbol in self.cooldown_tracker and (time.time() - self.cooldown_tracker[symbol]) < TRADE_COOLDOWN_SECONDS
 
@@ -129,18 +132,19 @@ class MotherAI:
 
         filtered = []
         for e in evaluations:
-            # Skip if score below min_score or cooldown active
             if e["score"] < min_score or self.is_in_cooldown(e["symbol"]):
                 continue
 
-            # Enforce confidence threshold for buy/sell signals
-            if e["signal"] in ("buy", "sell") and e["confidence"] < min_confidence:
-                # Treat as hold by skipping this agent
-                continue
+            # Buy-Hold-Sell Cycle Logic
+            current_position = self.position_tracker.get(e["symbol"], None)
 
-            filtered.append(e)
+            if e["signal"] == "buy":
+                if current_position is None and e["confidence"] >= min_confidence:
+                    filtered.append(e)
+            elif e["signal"] == "sell":
+                if current_position == "long" and e["confidence"] >= min_confidence:
+                    filtered.append(e)
 
-        # Return top N by score, no holds included
         return filtered[:top_n]
 
     def execute_trade(self, symbol, signal, price, confidence):
@@ -151,6 +155,10 @@ class MotherAI:
             order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
             if order:
                 self.cooldown_tracker[symbol] = time.time()
+                if signal == "buy":
+                    self.position_tracker[symbol] = "long"
+                elif signal == "sell":
+                    self.position_tracker[symbol] = None
         except Exception as e:
             print(f"❌ Trade error: {e}")
 
@@ -165,7 +173,7 @@ class MotherAI:
         price = df["close"].iloc[-1] if not df.empty else None
 
         result = {**decision, "last_price": price}
-        self.performance_tracker.log_trade(decision["symbol"], {**result, "price": price, "timestamp": timestamp, "source": "mother_ai_decision"})
+        self._log_prediction(decision["symbol"], decision, {"win_rate": decision.get("win_rate", 0.0)}, decision["score"], price)
 
         if decision["signal"] in ("buy", "sell") and price:
             self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])

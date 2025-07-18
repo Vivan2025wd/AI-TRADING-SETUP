@@ -1570,5 +1570,502 @@
     "signal": "buy",
     "confidence": 0.98,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T11:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T11:42:10.790620",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T11:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T11:42:14.621940",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-17T11:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-17T11:42:18.982234",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T01:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T01:48:39.827790",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T01:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T01:48:42.348209",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T02:17:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T02:17:15.155512",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T02:17:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T02:17:19.589543",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T02:17:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T02:17:27.640038",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "timestamp": "2025-07-18T02:17:37.265326",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-18T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "timestamp": "2025-07-18T02:17:45.951813",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-18T02:18:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T02:18:35.814855",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T02:18:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T02:18:41.194341",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T02:18:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T02:18:47.040667",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "timestamp": "2025-07-18T03:32:18.219539",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-18T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "timestamp": "2025-07-18T03:32:30.753932",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-18T03:37:00",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:37:39.918107",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:37:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:37:43.966800",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:37:00",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:37:48.671254",
+    "symbol": "DOTUSDT",
+    "signal": "hold",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:45:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:45:47.597752",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:45:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:45:51.755623",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:45:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:45:56.457618",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "win_rate": 0.0,
+    "score": 0.96,
+    "timestamp": "2025-07-18T03:46:07.667266",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-18T03:52:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:52:11.514655",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:52:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:52:15.558899",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:52:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T03:52:24.197113",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "win_rate": 0.0,
+    "score": 0.96,
+    "timestamp": "2025-07-18T03:52:40.676365",
+    "source": "agent_prediction"
+  },
+  {
+    "timestamp": "2025-07-18T04:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "price": null,
+    "timestamp": "2025-07-18T04:08:58.123032",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-18T04:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "price": null,
+    "timestamp": "2025-07-18T04:09:06.608323",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-18T04:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "win_rate": 0.0,
+    "score": 0.95,
+    "price": null,
+    "timestamp": "2025-07-18T04:10:21.572754",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-18T04:19:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T04:19:41.900577",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T04:19:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T04:19:46.673636",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T04:43:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T04:43:45.463943",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T04:43:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T04:43:49.562656",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T04:43:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T04:43:55.168535",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "source": "agent_predictions_batch"
   }
 ]

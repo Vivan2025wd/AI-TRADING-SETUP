@@ -10,7 +10,7 @@ SYMBOLS = [
     "SOLUSDT",
     "DOGEUSDT",
     "DOTUSDT",
-    "LTCUSDT",
+    "LTCUSDT", 
     "BCHUSDT",
     "AVAXUSDT",
 ]

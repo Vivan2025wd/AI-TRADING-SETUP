@@ -18,5 +18,45 @@
     "price": 118386.48,
     "timestamp": "2025-07-16T14:16:01.984347",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 120074.77,
+    "price": 120074.77,
+    "timestamp": "2025-07-18T03:32:19.810312",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 120074.78,
+    "price": 120074.78,
+    "timestamp": "2025-07-18T03:32:32.309564",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 120410.51,
+    "price": 120410.51,
+    "timestamp": "2025-07-18T03:46:09.300169",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 120259.97,
+    "price": 120259.97,
+    "timestamp": "2025-07-18T03:52:42.191637",
+    "source": "mother_ai_decision"
   }
 ]
