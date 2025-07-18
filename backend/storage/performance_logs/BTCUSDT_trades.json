@@ -51,7 +51,7 @@
   },
   {
     "symbol": "BTCUSDT",
-    "signal": "buy",
+    "signal": "sell",
     "confidence": 1.0,
     "score": 1.0,
     "last_price": 120259.97,

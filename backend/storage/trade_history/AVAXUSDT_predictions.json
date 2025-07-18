@@ -2112,5 +2112,381 @@
     "signal": "buy",
     "confidence": 0.97,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T04:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "win_rate": 0.0,
+    "score": 0.91,
+    "price": null,
+    "timestamp": "2025-07-18T04:49:55.037420",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-18T04:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "win_rate": 0.0,
+    "score": 0.91,
+    "price": null,
+    "timestamp": "2025-07-18T04:51:07.453445",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-18T04:53:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T04:53:39.340820",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T04:53:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T04:53:43.404174",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "win_rate": 0.0,
+    "score": 0.91,
+    "price": null,
+    "executed": false,
+    "timestamp": "2025-07-18T05:24:40.486934",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-18T05:37:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "ml_signal": "buy",
+    "rule_signal": "buy",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T05:37:12.911591",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T05:37:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "ml_signal": "buy",
+    "rule_signal": "buy",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T05:37:17.010492",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T05:37:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "ml_signal": "buy",
+    "rule_signal": "buy",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T05:37:24.494472",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "win_rate": 0.0,
+    "score": 0.91,
+    "price": null,
+    "executed": false,
+    "timestamp": "2025-07-18T05:37:52.521570",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-18T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.93,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.93,
+    "win_rate": 0.0,
+    "score": 0.93,
+    "price": null,
+    "timestamp": "2025-07-18T05:56:29.463219",
+    "source": "mother_ai_decision",
+    "position_state": "idle",
+    "unrealized_pnl": 0.0,
+    "position_duration_hours": 0.0
+  },
+  {
+    "timestamp": "2025-07-18T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.93,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.93,
+    "win_rate": 0.0,
+    "score": 0.93,
+    "price": null,
+    "timestamp": "2025-07-18T05:57:04.331091",
+    "source": "mother_ai_decision",
+    "position_state": "idle",
+    "unrealized_pnl": 0.0,
+    "position_duration_hours": 0.0
+  },
+  {
+    "timestamp": "2025-07-18T05:58:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T05:58:47.164810",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T05:58:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T05:58:51.378363",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.91,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T06:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-18T06:00:28.553668",
+    "source": "mother_ai_decision",
+    "position_state": "idle",
+    "unrealized_pnl": 0.0,
+    "position_duration_hours": 0.0
+  },
+  {
+    "timestamp": "2025-07-18T06:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-18T06:01:02.382584",
+    "source": "mother_ai_decision",
+    "position_state": "idle",
+    "unrealized_pnl": 0.0,
+    "position_duration_hours": 0.0
+  },
+  {
+    "timestamp": "2025-07-18T06:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-18T06:07:15.977664",
+    "source": "mother_ai_decision",
+    "position_state": "idle",
+    "unrealized_pnl": 0.0,
+    "position_duration_hours": 0.0
+  },
+  {
+    "timestamp": "2025-07-18T06:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-18T06:14:07.271190",
+    "source": "mother_ai_decision",
+    "position_state": "idle",
+    "unrealized_pnl": 0.0,
+    "position_duration_hours": 0.0
+  },
+  {
+    "timestamp": "2025-07-18T06:14:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T06:14:23.761729",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T06:14:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T06:14:28.101737",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T06:15:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T06:15:43.801449",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-18T06:15:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "ml_signal": "buy",
+    "rule_signal": "hold",
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-18T06:15:47.950190",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
   }
 ]
