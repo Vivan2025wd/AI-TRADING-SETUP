@@ -2443,5 +2443,101 @@
     "signal": "searching",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "win_rate": 0.0,
+    "score": 0.85,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:21.286445",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "win_rate": 0.0,
+    "score": 0.85,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:21.351410",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "win_rate": 0.0,
+    "score": 0.85,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:21.561777",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.85,
+    "win_rate": 0.0,
+    "score": 0.85,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:21.810924",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:44.642131",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:48.687836",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
   }
 ]

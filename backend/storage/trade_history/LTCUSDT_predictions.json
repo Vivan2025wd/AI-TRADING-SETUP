@@ -2443,5 +2443,118 @@
     "signal": "buy",
     "confidence": 0.768,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.475960",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.546507",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.683639",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.734863",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.825697",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:43.801000",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:47.899628",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
   }
 ]

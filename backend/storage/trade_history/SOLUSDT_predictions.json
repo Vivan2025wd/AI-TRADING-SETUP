@@ -2443,5 +2443,111 @@
     "signal": "buy",
     "confidence": 0.776,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.892115",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.920994",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:21.077047",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:21.240486",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:21.340742",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.92,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:44.208174",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.92,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.92,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:48.274956",
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.92,
+    "source": "agent_predictions_batch"
   }
 ]

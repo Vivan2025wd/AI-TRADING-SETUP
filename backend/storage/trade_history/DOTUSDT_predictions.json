@@ -2443,5 +2443,101 @@
     "signal": "buy",
     "confidence": 0.8,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:19.646149",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:19.905440",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:19.927995",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "win_rate": 0.0,
+    "score": 0.98,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:20.062536",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:42.785614",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:47.051701",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
   }
 ]

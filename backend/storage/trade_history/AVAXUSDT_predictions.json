@@ -2488,5 +2488,101 @@
     "signal": "buy",
     "confidence": 0.94,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:17.966633",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:18.039650",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:18.196089",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "source": "GenericAgent"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "win_rate": 0.0,
+    "score": 0.97,
+    "price": null,
+    "timestamp": "2025-07-19T05:52:18.253150",
+    "source": "mother_ai_decision"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:41.201756",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent"
+  },
+  {
+    "timestamp": "2025-07-19T05:52:45.480971",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
   }
 ]
