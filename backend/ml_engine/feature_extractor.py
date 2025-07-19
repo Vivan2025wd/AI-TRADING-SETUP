@@ -26,3 +26,18 @@ def add_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
     df.fillna(0, inplace=True)
     return df
+def extract_features(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df['return'] = df['close'].pct_change()
+    df['sma_10'] = df['close'].rolling(10).mean()
+    df['ema_20'] = df['close'].ewm(span=20).mean()
+    # RSI calculation (same as in add_technical_indicators)
+    delta = pd.to_numeric(df['close'].diff(), errors='coerce')
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+    avg_gain = gain.rolling(window=14).mean()
+    avg_loss = loss.rolling(window=14).mean()
+    rs = avg_gain / (avg_loss + 1e-9)
+    df['rsi'] = 100 - (100 / (1 + rs))
+    df = df.dropna()
+    return df[['return', 'sma_10', 'ema_20', 'rsi']]

@@ -14,35 +14,47 @@ export default function MotherAIDecisionCard() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:8000/api/mother-ai/latest-decision"); // or your endpoint
+      const res = await fetch("http://localhost:8000/api/mother-ai/decision");
       if (!res.ok) throw new Error("Failed to fetch Mother AI decision");
 
       const data = await res.json();
 
-      if (!data || !data.decision || Object.keys(data.decision).length === 0) {
-        setDecisionData({
+      let final = {};
+
+      if (!data || typeof data !== "object") {
+        final = {
+          status: "Unknown",
+          tradePick: "No signal",
+          lastUpdated: null,
+          rationale: "Invalid or empty response from Mother AI backend.",
+          confidence: 0,
+        };
+      } else if (!data.decision || Object.keys(data.decision).length === 0) {
+        final = {
           status: "Inactive",
           tradePick: "No signal",
-          lastUpdated: new Date().toLocaleString(),
-          rationale: "No qualified trades met the confidence threshold.",
+          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
+          rationale: data.message || "No qualified trades met the confidence threshold.",
           confidence: 0,
-        });
+        };
       } else {
-        const decision = data.decision;
-        setDecisionData({
+        const d = data.decision;
+        final = {
           status: "Active",
-          tradePick: `${decision.symbol} - ${decision.signal}`,
-          lastUpdated: new Date(data.timestamp).toLocaleString(),
-          rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
-          confidence: (decision.confidence * 100).toFixed(2),
-        });
+          tradePick: `${d.symbol} - ${d.signal?.toUpperCase() || "N/A"}`,
+          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
+          rationale: `Confidence: ${(d.confidence * 100).toFixed(2)}%, Win Rate: ${(d.win_rate * 100).toFixed(2)}%, Score: ${d.score}`,
+          confidence: (d.confidence * 100).toFixed(2),
+        };
       }
+
+      setDecisionData(final);
 
       localStorage.setItem(
         CACHE_KEY,
         JSON.stringify({
           timestamp: Date.now(),
-          decisionData: data,
+          decisionData: final,
         })
       );
     } catch (err) {
@@ -61,29 +73,12 @@ export default function MotherAIDecisionCard() {
         const age = Date.now() - timestamp;
 
         if (age < CACHE_DURATION_MS) {
-          if (!cachedDecision || !cachedDecision.decision || Object.keys(cachedDecision.decision).length === 0) {
-            setDecisionData({
-              status: "Inactive",
-              tradePick: "No signal",
-              lastUpdated: new Date().toLocaleString(),
-              rationale: "No qualified trades met the confidence threshold.",
-              confidence: 0,
-            });
-          } else {
-            const decision = cachedDecision.decision;
-            setDecisionData({
-              status: "Active",
-              tradePick: `${decision.symbol} - ${decision.signal}`,
-              lastUpdated: new Date(cachedDecision.timestamp).toLocaleString(),
-              rationale: `Confidence: ${(decision.confidence * 100).toFixed(2)}%, Win Rate: ${(decision.win_rate * 100).toFixed(2)}%, Score: ${decision.score}`,
-              confidence: (decision.confidence * 100).toFixed(2),
-            });
-          }
+          setDecisionData(cachedDecision);
           setLoading(false);
           return;
         }
       } catch {
-        // corrupted cache fallback
+        // Ignore broken cache
       }
     }
 
@@ -102,7 +97,9 @@ export default function MotherAIDecisionCard() {
               ? "bg-green-700 text-green-100"
               : decisionData?.status === "Inactive"
               ? "bg-gray-600 text-gray-200"
-              : "bg-yellow-600 text-yellow-100"
+              : decisionData?.status === "Waiting"
+              ? "bg-yellow-600 text-yellow-100"
+              : "bg-red-700 text-red-200"
           }`}
         >
           {loading ? (
@@ -127,7 +124,7 @@ export default function MotherAIDecisionCard() {
           <div className="space-y-1">
             <p className="text-lg font-semibold text-blue-400">{decisionData?.tradePick}</p>
             <p className="text-sm text-gray-400 flex items-center gap-1">
-              <Clock className="w-4 h-4" /> Last Updated: {decisionData?.lastUpdated}
+              <Clock className="w-4 h-4" /> Last Updated: {decisionData?.lastUpdated || "N/A"}
             </p>
           </div>
 
@@ -147,18 +144,13 @@ export default function MotherAIDecisionCard() {
           </div>
 
           {!loading && decisionData?.status === "Active" && (
-            <p className="text-sm text-gray-400 italic mt-2 text-center">
-              Waiting for next update...
-            </p>
+            <p className="text-sm text-gray-400 italic mt-2 text-center">Waiting for next update...</p>
           )}
         </>
       )}
 
-      {/* Manual refresh button */}
       <button
-        onClick={() => {
-          fetchDecision();
-        }}
+        onClick={fetchDecision}
         className="mt-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center gap-2 mx-auto"
         disabled={loading}
       >

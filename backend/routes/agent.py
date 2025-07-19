@@ -4,6 +4,7 @@ from backend.agents.generic_agent import GenericAgent
 from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.binance.fetch_live_ohlcv import fetch_ohlcv
 from backend.strategy_engine.json_strategy_parser import load_strategy_for_symbol
+from backend.mother_ai.performance_tracker import PerformanceTracker  # ✅ Add tracker
 
 import os
 import inspect
@@ -15,9 +16,6 @@ AGENTS_DIR = Path(__file__).resolve().parent.parent / "agents"
 
 
 def get_real_agents() -> List[str]:
-    """
-    Detects all real (non-generic) agent classes and extracts their symbol class attribute.
-    """
     agent_symbols = []
     for file in AGENTS_DIR.glob("*.py"):
         if file.stem in {"__init__", "generic_agent"}:
@@ -39,7 +37,6 @@ def get_real_agents() -> List[str]:
             continue
 
         for name, cls in inspect.getmembers(module, inspect.isclass):
-            print(f"🔍 Found class: {name}")
             if issubclass(cls, GenericAgent) and cls is not GenericAgent:
                 symbol = getattr(cls, "symbol", None)
                 print(f"✅ Registered agent class: {name}, symbol: {symbol}")
@@ -60,7 +57,6 @@ def get_agent_prediction(symbol: str):
     try:
         symbol = symbol.upper()
 
-        # ✅ Updated fallback logic
         try:
             strategy_dict = load_strategy_for_symbol(symbol + "USDT")
         except FileNotFoundError:
@@ -79,6 +75,16 @@ def get_agent_prediction(symbol: str):
 
         agent = GenericAgent(symbol=symbol, strategy_logic=strategy_runner)
         prediction_result = agent.predict(ohlcv_data)
+
+        # ✅ Log prediction
+        tracker = PerformanceTracker(log_dir_type="trade_history")
+        tracker.log_prediction(symbol, {
+            "timestamp": tracker.current_time(),
+            "symbol": symbol,
+            "signal": prediction_result["action"],
+            "confidence": prediction_result["confidence"],
+            "source": "agent_route"
+        })
 
         return {
             "symbol": symbol,
@@ -101,9 +107,10 @@ def get_all_agent_predictions(page: int = Query(1, ge=1), limit: int = Query(5, 
     end = start + limit
     agents_slice = all_agents[start:end]
 
+    tracker = PerformanceTracker(log_dir_type="trade_history")  # ✅ One tracker for all
+
     for symbol in agents_slice:
         try:
-            # ✅ Updated fallback logic
             try:
                 strategy_dict = load_strategy_for_symbol(symbol + "USDT")
             except FileNotFoundError:
@@ -135,6 +142,15 @@ def get_all_agent_predictions(page: int = Query(1, ge=1), limit: int = Query(5, 
             action = prediction_result["action"]
             confidence = prediction_result["confidence"]
             entry_price = ohlcv_data["close"].iloc[-1]
+
+            # ✅ Log this prediction
+            tracker.log_prediction(symbol, {
+                "timestamp": tracker.current_time(),
+                "symbol": symbol,
+                "signal": action,
+                "confidence": confidence,
+                "source": "agent_predictions_batch"
+            })
 
             predictions.append({
                 "agentName": f"{symbol} Agent",
@@ -169,6 +185,8 @@ def get_all_agent_predictions(page: int = Query(1, ge=1), limit: int = Query(5, 
         "totalPages": (total_agents + limit - 1) // limit,
         "data": predictions
     }
+
+
 @router.get("/debug/agents")
 def debug_loaded_agents():
     import os

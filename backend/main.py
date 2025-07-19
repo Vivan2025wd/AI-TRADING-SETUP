@@ -9,6 +9,8 @@ from backend.routes.backtest import router as backtest_router             # Back
 from backend.routes.binance import router as binance_router               # Binance OHLCV utils
 from backend.routes.agent_registry import router as agents_router         # Lists all agents
 from backend.routes.strategy_file_loader import router as strategy_file_loader_router  # Load saved .json strategies
+from dotenv import load_dotenv
+load_dotenv()
 
 # --- Initialize FastAPI app ---
 app = FastAPI(
@@ -33,6 +35,7 @@ app.add_middleware(
 @app.get("/")
 async def read_root():
     return {"message": "Backend is running!"}
+
 
 # --- Register routers ---
 app.include_router(agent_router, prefix="/api/agent", tags=["Agent"])                         # Symbol agents
