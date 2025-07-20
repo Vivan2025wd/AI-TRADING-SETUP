@@ -23,7 +23,6 @@ def validate_strategy(strategy: Dict[str, Any]) -> None:
 def save_strategy_to_file(symbol: str, strategy_id: str, strategy: Dict[str, Any]) -> None:
     """
     Save the strategy dict to a JSON file.
-    Also saves a `_strategy_default.json` file if strategy_id is 'default'.
     """
     validate_strategy(strategy)
     filename = f"{symbol}_strategy_{strategy_id}.json"
@@ -73,21 +72,12 @@ def parse_strategy_json(json_str: str) -> Dict[str, Any]:
 
 def load_strategy_for_symbol(symbol: str) -> Dict[str, Any]:
     """
-    Loads the default strategy for a given symbol.
-    If default is missing, loads the first available strategy file.
+    Loads the first available strategy file for a given symbol.
     Raises FileNotFoundError if none are found.
     """
     symbol = symbol.upper()
-    default_path = STRATEGY_DIR / f"{symbol}_strategy_default.json"
-
-    if default_path.exists():
-        with open(default_path, "r", encoding="utf-8") as f:
-            strategy = json.load(f)
-            validate_strategy(strategy)
-            return strategy
-
-    # Fallback: any other strategy file
     candidates = list(STRATEGY_DIR.glob(f"{symbol}_strategy_*.json"))
+
     for candidate in candidates:
         try:
             with open(candidate, "r", encoding="utf-8") as f:
