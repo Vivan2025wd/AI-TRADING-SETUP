@@ -1,0 +1,12 @@
+[
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "score": 0.96,
+    "last_price": 4.573,
+    "price": 4.573,
+    "timestamp": "2025-07-20T16:13:30.530495",
+    "source": "mother_ai_decision"
+  }
+]

@@ -96,5 +96,152 @@
     "signal": "buy",
     "confidence": 0.53,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T14:41:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:41:48.929682",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T14:41:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:41:54.699068",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T14:42:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:42:22.132326",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T14:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:49:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:49:23.040545",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T14:49:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:49:29.632632",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T14:49:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T14:49:40.421885",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T16:06:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T16:06:29.297509",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T16:06:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-20T16:06:34.573961",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T16:12:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-20T16:12:58.450038",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-20T16:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.95,
+    "source": "GenericAgent/ml"
   }
 ]

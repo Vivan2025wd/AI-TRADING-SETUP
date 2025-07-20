@@ -75,10 +75,22 @@ class StrategyParser:
         """
         return StrategyParser(strategy_json)
 
-    def evaluate(self, df: pd.DataFrame) -> str:
+    def evaluate(self, df: pd.DataFrame) -> dict:
         """
-        Evaluates the latest row and returns one of: 'buy', 'sell', 'hold'.
+        Evaluates the latest row and returns a dict:
+        {
+            "action": "buy" | "sell" | "hold",
+            "confidence": float (currently defaulted to 1.0)
+        }
         """
         df = self.apply_indicators(df)
         signals = self.evaluate_conditions(df)
-        return signals[-1] if signals else "hold"
+        action = signals[-1] if signals else "hold"
+
+    # Optional: in future, use more complex logic to assign real confidence values
+        confidence = 1.0 if action in ["buy", "sell"] else 0.0
+
+        return {
+            "action": action,
+            "confidence": confidence
+        }
