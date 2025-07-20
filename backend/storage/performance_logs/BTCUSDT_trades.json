@@ -1,0 +1,12 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118634.0,
+    "price": 118634.0,
+    "timestamp": "2025-07-20T14:42:41.759732",
+    "source": "mother_ai_decision"
+  }
+]

@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.ml_engine.feature_extractor import extract_features
 from backend.mother_ai.performance_tracker import PerformanceTracker
-from typing import Optional
+from typing import Optional, Dict
 
 
 class GenericAgent:
@@ -50,8 +50,7 @@ class GenericAgent:
 
     def _predict_with_model(self, features: pd.DataFrame) -> tuple[str, float]:
         if self.model is None or features.empty:
-            random_action = np.random.choice(["buy", "sell"])
-            return random_action, 0.5
+            return np.random.choice(["buy", "sell"]), 0.5
 
         try:
             latest_features = features.iloc[[-1]]
@@ -65,10 +64,6 @@ class GenericAgent:
             return np.random.choice(["buy", "sell"]), 0.5
 
     def _load_last_trade_signal(self) -> Optional[str]:
-        """
-        Load the last trade signal from performance logs for the current symbol.
-        Returns "buy", "sell", or None if no previous trades.
-        """
         path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
         if not os.path.exists(path):
             return None
@@ -76,14 +71,12 @@ class GenericAgent:
             with open(path, "r") as f:
                 trades = json.load(f)
                 if trades:
-                    last_signal = trades[-1].get("signal", None)
-                    return last_signal
+                    return trades[-1].get("signal", None)
         except Exception as e:
             print(f"⚠️ Failed to load last trade signal: {e}")
-            return None
         return None
 
-    def evaluate(self, ohlcv_data: pd.DataFrame) -> dict:
+    def evaluate(self, ohlcv_data: pd.DataFrame) -> Dict:
         if ohlcv_data.empty:
             raise ValueError(f"⚠️ OHLCV data for {self.symbol} is empty")
 
@@ -91,55 +84,85 @@ class GenericAgent:
 
         try:
             features = extract_features(ohlcv_data)
+            action_ml, confidence_ml = self._predict_with_model(features)
         except Exception as e:
-            print(f"❌ Feature extraction failed: {e}")
+            print(f"❌ Feature extraction or ML failed: {e}")
             features = pd.DataFrame()
+            action_ml, confidence_ml = "searching", 0.0
 
-        action_ml, confidence_ml = self._predict_with_model(features)
+        try:
+            rule_result = self.strategy_logic.evaluate(ohlcv_data)
 
-        # Prevent consecutive 'buy' signals based on last trade log
+            if isinstance(rule_result, str):
+                rule_result = json.loads(rule_result)
+
+            action_rule = rule_result.get("action", "searching")
+            confidence_rule = rule_result.get("confidence", 0.0)
+            print(f"🧠 Rule-based result: {rule_result}")
+        except Exception as e: 
+            print(f"❌ Strategy evaluation failed: {e}")
+            action_rule, confidence_rule = "searching", 0.0
+
+        # Decision Fusion
+        if confidence_rule >= 0.9:
+            final_action = action_rule
+            final_confidence = confidence_rule
+            source = "rule_based"
+        else:
+            final_action = action_ml
+            final_confidence = confidence_ml
+            source = "ml"
+
+        # Enforce Position Rules
         last_signal = self._load_last_trade_signal()
-        if last_signal == "buy" and action_ml == "buy":
-            print(f"⛔ Preventing consecutive buy for {self.symbol} based on last trade log")
-            action_ml = "hold"
+        if last_signal == "buy" and final_action == "buy":
+            print(f"⛔ Preventing consecutive buy for {self.symbol}")
+            final_action = "hold"
 
-        # Buy-Hold-Sell logic based on position_state
         if self.position_state == "long":
-            if action_ml == "buy":
-                action_ml = "hold"
-            elif action_ml == "sell":
+            if final_action == "buy":
+                final_action = "hold"
+            elif final_action == "sell":
                 self.position_state = None
         elif self.position_state is None:
-            if action_ml == "sell":
-                action_ml = "searching"
-            elif action_ml == "buy":
+            if final_action == "sell":
+                final_action = "searching"
+            elif final_action == "buy":
                 self.position_state = "long"
             else:
-                if confidence_ml > 0.6:
-                    action_ml = "buy_soon"
+                if final_confidence > 0.6:
+                    final_action = "buy_soon"
                 else:
-                    action_ml = "searching"
+                    final_action = "searching"
 
-        action = action_ml
-        confidence = confidence_ml
         timestamp = pd.to_datetime(ohlcv_data.index[-1]).isoformat()
 
-        prediction = {
+        result = {
             "symbol": self.symbol,
-            "action": action,
-            "confidence": round(confidence, 4),
-            "timestamp": timestamp
+            "action": final_action,
+            "confidence": round(final_confidence, 4), 
+            "timestamp": timestamp,
+            "source": source,
+            "ml": {
+                "action": action_ml,
+                "confidence": round(confidence_ml, 4)
+            },
+            "rule_based": {
+                "action": action_rule,
+                "confidence": round(confidence_rule, 4)
+            }
         }
 
         self.tracker.log_trade(self.symbol, {
             "timestamp": timestamp,
             "symbol": self.symbol,
-            "signal": action,
-            "confidence": confidence,
-            "source": "GenericAgent"
+            "signal": final_action,
+            "confidence": final_confidence,
+            "source": f"GenericAgent/{source}"
         })
 
-        return prediction
+        return result
 
-    def predict(self, ohlcv_data: pd.DataFrame) -> dict:
+
+    def predict(self, ohlcv_data: pd.DataFrame) -> Dict:
         return self.evaluate(ohlcv_data)
