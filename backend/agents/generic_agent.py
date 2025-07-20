@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+import json
 from sklearn.ensemble import RandomForestClassifier
 from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.ml_engine.feature_extractor import extract_features
@@ -63,6 +64,25 @@ class GenericAgent:
             print(f"❌ Model prediction failed: {e}")
             return np.random.choice(["buy", "sell"]), 0.5
 
+    def _load_last_trade_signal(self) -> Optional[str]:
+        """
+        Load the last trade signal from performance logs for the current symbol.
+        Returns "buy", "sell", or None if no previous trades.
+        """
+        path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path, "r") as f:
+                trades = json.load(f)
+                if trades:
+                    last_signal = trades[-1].get("signal", None)
+                    return last_signal
+        except Exception as e:
+            print(f"⚠️ Failed to load last trade signal: {e}")
+            return None
+        return None
+
     def evaluate(self, ohlcv_data: pd.DataFrame) -> dict:
         if ohlcv_data.empty:
             raise ValueError(f"⚠️ OHLCV data for {self.symbol} is empty")
@@ -77,7 +97,13 @@ class GenericAgent:
 
         action_ml, confidence_ml = self._predict_with_model(features)
 
-        # Buy-Hold-Sell logic
+        # Prevent consecutive 'buy' signals based on last trade log
+        last_signal = self._load_last_trade_signal()
+        if last_signal == "buy" and action_ml == "buy":
+            print(f"⛔ Preventing consecutive buy for {self.symbol} based on last trade log")
+            action_ml = "hold"
+
+        # Buy-Hold-Sell logic based on position_state
         if self.position_state == "long":
             if action_ml == "buy":
                 action_ml = "hold"

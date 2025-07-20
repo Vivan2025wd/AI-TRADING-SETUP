@@ -29,7 +29,7 @@ class MotherAI:
         self.agent_symbols = agent_symbols or []
         self.meta_evaluator = MetaEvaluator()
         self.cooldown_tracker = {}
-        self.position_tracker = {}  # NEW: Keeps track of position state (None, 'long')
+        self.position_tracker = {}
 
     def load_agents(self):
         agents = []
@@ -75,7 +75,6 @@ class MotherAI:
             prediction = self._safe_predict(agent, ohlcv)
             health = StrategyHealth(trade_tracker.get_agent_log(agent.symbol)).summary()
             score = self._calculate_score(prediction, health)
-            self._log_prediction(agent.symbol, prediction, health, score)
             results.append({**prediction, "score": round(score, 3)})
         return sorted(results, key=lambda x: x["score"], reverse=True)
 
@@ -104,24 +103,44 @@ class MotherAI:
             "is_sell": int(prediction["signal"] == "sell")
         })
 
-    def _log_prediction(self, symbol, prediction, health, score, price=None):
-        data = {
-            **prediction,
-            "win_rate": health.get("win_rate", 0.5),
-            "score": round(score, 3),
-            "price": price,  # ✅ Add price to the log
-            "timestamp": self.performance_tracker.current_time(),
-            "source": "mother_ai_decision"  # ✅ Updated to reflect Mother AI decision
+    def _log_trade_execution(self, symbol, signal, price, confidence, score, timestamp):
+        path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")
+        entry = {
+            "symbol": symbol,
+            "signal": signal,
+            "confidence": round(confidence, 4),
+            "score": round(score, 4),
+            "last_price": round(price, 4),
+            "price": round(price, 4),
+            "timestamp": timestamp,
+            "source": "mother_ai_decision"
         }
-        path = os.path.join(TRADE_HISTORY_DIR, f"{symbol}_predictions.json")
-        try:
-            existing = json.load(open(path)) if os.path.exists(path) else []
-        except:
-            existing = []
-        existing.append(data)
-        with open(path, "w") as f:
-            json.dump(existing, f, indent=2)
 
+        try:
+            history = json.load(open(path)) if os.path.exists(path) else []
+        except Exception:
+            history = []
+
+        history.append(entry)
+
+        with open(path, "w") as f:
+            json.dump(history, f, indent=2)
+
+    def _is_previous_trade_open_buy(self, symbol: str) -> bool:
+        path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")
+        if not os.path.exists(path):
+            return False
+        try:
+            with open(path, "r") as f:
+                history = json.load(f)
+                for entry in reversed(history):
+                    if entry["signal"] == "buy":
+                        return True
+                    if entry["signal"] == "sell":
+                        return False
+        except Exception:
+            return False
+        return False
 
     def is_in_cooldown(self, symbol):
         return symbol in self.cooldown_tracker and (time.time() - self.cooldown_tracker[symbol]) < TRADE_COOLDOWN_SECONDS
@@ -135,12 +154,13 @@ class MotherAI:
             if e["score"] < min_score or self.is_in_cooldown(e["symbol"]):
                 continue
 
-            # Buy-Hold-Sell Cycle Logic
             current_position = self.position_tracker.get(e["symbol"], None)
 
             if e["signal"] == "buy":
                 if current_position is None and e["confidence"] >= min_confidence:
-                    filtered.append(e)
+                    # Check if last buy was not closed by sell
+                    if not self._is_previous_trade_open_buy(e["symbol"]):
+                        filtered.append(e)
             elif e["signal"] == "sell":
                 if current_position == "long" and e["confidence"] >= min_confidence:
                     filtered.append(e)
@@ -173,23 +193,21 @@ class MotherAI:
         price = df["close"].iloc[-1] if not df.empty else None
 
         result = {**decision, "last_price": price}
-        self._log_prediction(decision["symbol"], decision, {"win_rate": decision.get("win_rate", 0.0)}, decision["score"], price)
 
         if decision["signal"] in ("buy", "sell") and price:
             self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])
+            self._log_trade_execution(
+                symbol=decision["symbol"],
+                signal=decision["signal"],
+                price=price,
+                confidence=decision["confidence"],
+                score=decision["score"],
+                timestamp=timestamp
+            )
             if decision["signal"] == "sell":
                 compute_trade_profits(decision["symbol"])
 
         return {"decision": result, "timestamp": timestamp}
 
     def load_all_predictions(self) -> List[Dict]:
-        all_preds = []
-        for file in glob.glob(os.path.join(TRADE_HISTORY_DIR, "*_predictions.json")):
-            try:
-                with open(file) as f:
-                    data = json.load(f)
-                    if isinstance(data, list):
-                        all_preds.extend(data)
-            except:
-                continue
-        return all_preds
+        return []
