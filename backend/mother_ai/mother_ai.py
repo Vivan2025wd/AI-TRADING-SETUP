@@ -17,6 +17,11 @@ from backend.storage.auto_cleanup import auto_cleanup_logs
 TRADE_HISTORY_DIR =  "backend/storage/trade_history"
 PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
 TRADE_COOLDOWN_SECONDS = 600
+MAX_HOLD_SECONDS = 6 * 3600  # 6 hours
+RISK_PER_TRADE = 0.01  # 1% of capital
+DEFAULT_BALANCE_USD = 1000  # for mock position sizing
+TP_RATIO = 1.5  # Take Profit: 1.5x Risk
+SL_PERCENT = 0.03  # 3% Stop Loss
 
 os.makedirs(TRADE_HISTORY_DIR, exist_ok=True)
 os.makedirs(PERFORMANCE_LOG_DIR, exist_ok=True)
@@ -172,13 +177,26 @@ class MotherAI:
         if signal not in ("buy", "sell") or not price:
             return
         try:
-            qty = 20 / price
-            order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
-            if order:
-                self.cooldown_tracker[symbol] = time.time()
-                if signal == "buy":
-                    self.position_tracker[symbol] = "long"
-                elif signal == "sell":
+            if signal == "buy":
+                sl = price * (1 - SL_PERCENT)
+                tp = price + ((price - sl) * TP_RATIO)
+                risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
+                qty = risk_amount / (price - sl)
+                order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
+                if order:
+                    self.cooldown_tracker[symbol] = time.time()
+                    self.position_tracker[symbol] = {
+                        "side": "long",
+                        "entry_price": price,
+                        "entry_time": time.time(),
+                        "stop_loss": sl,
+                        "take_profit": tp,
+                        "qty": qty
+                    }
+            elif signal == "sell":
+                order = place_market_order(symbol.replace("USDT", "/USDT"), signal, 0)  # qty ignored for sells
+                if order:
+                    self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = None
         except Exception as e:
             print(f"❌ Trade error: {e}")
@@ -186,15 +204,34 @@ class MotherAI:
     def make_portfolio_decision(self, min_score=0.5):
         auto_cleanup_logs()
 
-        top = self.decide_trades(min_score=min_score)
         timestamp = self.performance_tracker.current_time()
+
+        # Step 1: Check open positions for SL/TP/Timeout exit
+        for symbol, pos in list(self.position_tracker.items()):
+            if isinstance(pos, dict) and pos.get("side") == "long":
+                df = fetch_ohlcv(symbol, "1h", 1)
+                price = df["close"].iloc[-1] if not df.empty else None
+                if price:
+                    exit_reason = self.check_exit_conditions(symbol, price)
+                    if exit_reason:
+                        self._log_trade_execution(
+                            symbol=symbol,
+                            signal="sell",
+                            price=price,
+                            confidence=1.0,
+                            score=1.0,
+                            timestamp=timestamp
+                        )
+                        compute_trade_profits(symbol)
+
+        # Step 2: Evaluate new trades
+        top = self.decide_trades(min_score=min_score)
         if not top:
             return {"decision": [], "timestamp": timestamp}
 
         decision = top[0]
         df = fetch_ohlcv(decision["symbol"], "1h", 1)
         price = df["close"].iloc[-1] if not df.empty else None
-
         result = {**decision, "last_price": price}
 
         if decision["signal"] in ("buy", "sell") and price:
@@ -213,4 +250,20 @@ class MotherAI:
         return {"decision": result, "timestamp": timestamp}
 
     def load_all_predictions(self) -> List[Dict]:
-        return []
+            return []
+
+    def check_exit_conditions(self, symbol, current_price):
+        pos = self.position_tracker.get(symbol)
+        if not pos or pos.get("side") != "long":
+            return None  # No open position
+
+        sl_hit = current_price <= pos["stop_loss"]
+        tp_hit = current_price >= pos["take_profit"]
+        time_expired = (time.time() - pos["entry_time"]) > MAX_HOLD_SECONDS
+
+        if sl_hit or tp_hit or time_expired:
+            reason = "stop_loss" if sl_hit else "take_profit" if tp_hit else "max_hold"
+            print(f"💡 Exiting {symbol} due to {reason.upper()}")
+            self.execute_trade(symbol, "sell", current_price, confidence=1.0)
+            return reason
+        return None
