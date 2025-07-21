@@ -10,16 +10,15 @@ BASE_DIR = os.path.dirname(__file__)
 STORAGE_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'storage'))
 
 MOCK_BALANCE_FILE = os.path.join(STORAGE_DIR, 'mock_balance.json')
-TRADE_HISTORY_DIR = os.path.join(STORAGE_DIR, 'trade_history')
+# Removed TRADE_HISTORY_DIR since we no longer use trade_history logs
 PERFORMANCE_LOG_DIR = os.path.join(STORAGE_DIR, 'performance_logs')
-TRADE_PROFITS_DIR = os.path.join(STORAGE_DIR, 'trade_profits')  # ✅ new folder
+TRADE_PROFITS_DIR = os.path.join(STORAGE_DIR, 'trade_profits')  # new folder
 LAST_EXECUTION_FILE = os.path.join(STORAGE_DIR, 'last_execution_time.json')
-MOCK_PROFIT_FILE = os.path.join(TRADE_PROFITS_DIR, 'mock_profit.json')  # ✅ moved here
+MOCK_PROFIT_FILE = os.path.join(TRADE_PROFITS_DIR, 'mock_profit.json')  # moved here
 
 # --- Ensure directories exist ---
-os.makedirs(TRADE_HISTORY_DIR, exist_ok=True)
 os.makedirs(PERFORMANCE_LOG_DIR, exist_ok=True)
-os.makedirs(TRADE_PROFITS_DIR, exist_ok=True)  # ✅ make sure it exists
+os.makedirs(TRADE_PROFITS_DIR, exist_ok=True)  # ensure it exists
 
 # --- Defaults ---
 DEFAULT_BALANCE = {
@@ -91,8 +90,7 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
     usd_balance = balance.get("USD", 0)
 
     symbol = symbol.upper()
-    perf_path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")
-    hist_path = os.path.join(TRADE_HISTORY_DIR, f"{symbol}_log.json")
+    perf_path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")  # unified log path
 
     if action.lower() == "buy":
         amount = round((usd_balance * 0.1) / price, 6)
@@ -132,7 +130,7 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
             balance["USD"] += revenue
             del balance["holdings"][symbol]
 
-            # ✅ Update profit tracker
+            # Update profit tracker
             profit_tracker["total_profit_usd"] += round(profit_usd, 2)
             profit_tracker["total_trades"] += 1
             save_profit_tracker(profit_tracker)
@@ -161,14 +159,7 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
     save_mock_balance(balance)
     append_json_log(perf_path, result)
 
-    snapshot = {
-        "timestamp": timestamp,
-        "symbol": symbol,
-        "signal": action,
-        "price": price,
-        "confidence": confidence
-    }
-    append_json_log(hist_path, snapshot)
+    # Removed the separate trade_history log append (hist_path and snapshot)
 
     return result
 

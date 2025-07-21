@@ -18,5 +18,15 @@
     "win_rate": 0.0,
     "score": 0.595,
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 3.4917,
+    "price": 3.4917,
+    "timestamp": "2025-07-21T05:27:51.277388",
+    "source": "mother_ai_decision"
   }
 ]

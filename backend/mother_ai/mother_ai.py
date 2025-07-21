@@ -12,8 +12,9 @@ from backend.strategy_engine.strategy_health import StrategyHealth
 from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.mother_ai.meta_evaluator import MetaEvaluator
 from backend.mother_ai.profit_calculator import compute_trade_profits
+from backend.storage.auto_cleanup import auto_cleanup_logs
 
-TRADE_HISTORY_DIR = "backend/storage/trade_history"
+TRADE_HISTORY_DIR =  "backend/storage/trade_history"
 PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
 TRADE_COOLDOWN_SECONDS = 600
 
@@ -183,6 +184,8 @@ class MotherAI:
             print(f"❌ Trade error: {e}")
 
     def make_portfolio_decision(self, min_score=0.5):
+        auto_cleanup_logs()
+
         top = self.decide_trades(min_score=min_score)
         timestamp = self.performance_tracker.current_time()
         if not top:

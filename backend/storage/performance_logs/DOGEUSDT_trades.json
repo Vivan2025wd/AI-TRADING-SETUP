@@ -1,0 +1,12 @@
+[
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.2693,
+    "price": 0.2693,
+    "timestamp": "2025-07-21T02:55:24.205017",
+    "source": "mother_ai_decision"
+  }
+]
