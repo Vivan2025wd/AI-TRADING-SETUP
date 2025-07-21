@@ -1,13 +1,15 @@
 from backend.agents.generic_agent import GenericAgent
 from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.strategy_engine.json_strategy_parser import load_strategy_for_symbol
+from typing import Optional
 
 class ADAUSDTAgent(GenericAgent):
-    symbol = "ADAUSDT"
-    def __init__(self, symbol=None, strategy_logic=None):
-        if symbol is None:
-            symbol = "ADAUSDT"
+    symbol: str = "ADAUSDT"
+
+    def __init__(self, symbol: Optional[str] = None, strategy_logic: Optional[StrategyParser] = None):
+        resolved_symbol = symbol or self.symbol
         if strategy_logic is None:
-            strategy_dict = load_strategy_for_symbol(symbol)
+            strategy_dict = load_strategy_for_symbol(resolved_symbol)
             strategy_logic = StrategyParser(strategy_dict)
-        super().__init__(symbol=symbol, strategy_logic=strategy_logic)
+
+        super().__init__(symbol=resolved_symbol, strategy_logic=strategy_logic)
