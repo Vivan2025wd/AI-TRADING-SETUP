@@ -8,5 +8,15 @@
     "price": 198.26,
     "timestamp": "2025-07-22T14:02:31.615644",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 203.5,
+    "price": 203.5,
+    "timestamp": "2025-07-22T17:05:16.124686",
+    "source": "mother_ai_decision"
   }
 ]

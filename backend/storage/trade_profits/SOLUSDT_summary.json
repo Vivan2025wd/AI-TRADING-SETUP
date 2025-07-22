@@ -1,9 +1,17 @@
 {
   "symbol": "SOLUSDT",
-  "total_profit": 0.0,
-  "total_trades": 0,
-  "wins": 0,
+  "total_profit": 5.24,
+  "total_trades": 1,
+  "wins": 1,
   "losses": 0,
-  "win_rate": 0.0,
-  "trades": []
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-22T14:02:31.615644",
+      "entry_price": 198.26,
+      "exit_time": "2025-07-22T17:05:16.124686",
+      "exit_price": 203.5,
+      "pnl": 5.24
+    }
+  ]
 }

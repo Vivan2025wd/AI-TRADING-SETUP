@@ -8,5 +8,25 @@
     "price": 113.75,
     "timestamp": "2025-07-22T14:26:07.213422",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 116.51,
+    "price": 116.51,
+    "timestamp": "2025-07-22T17:05:39.362739",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 116.54,
+    "price": 116.54,
+    "timestamp": "2025-07-22T17:05:53.445292",
+    "source": "mother_ai_decision"
   }
 ]

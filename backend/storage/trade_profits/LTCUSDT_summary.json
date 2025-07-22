@@ -1,0 +1,17 @@
+{
+  "symbol": "LTCUSDT",
+  "total_profit": 2.76,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-22T14:26:07.213422",
+      "entry_price": 113.75,
+      "exit_time": "2025-07-22T17:05:39.362739",
+      "exit_price": 116.51,
+      "pnl": 2.76
+    }
+  ]
+}

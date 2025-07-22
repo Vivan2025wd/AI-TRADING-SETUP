@@ -68,5 +68,15 @@
     "price": 0.881,
     "timestamp": "2025-07-22T15:40:08.152703",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8846,
+    "price": 0.8846,
+    "timestamp": "2025-07-22T17:05:39.362739",
+    "source": "mother_ai_decision"
   }
 ]

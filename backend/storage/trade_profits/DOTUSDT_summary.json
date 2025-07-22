@@ -1,0 +1,17 @@
+{
+  "symbol": "DOTUSDT",
+  "total_profit": 0.049,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-22T14:25:42.308144",
+      "entry_price": 4.376,
+      "exit_time": "2025-07-22T17:00:58.307430",
+      "exit_price": 4.425,
+      "pnl": 0.049
+    }
+  ]
+}

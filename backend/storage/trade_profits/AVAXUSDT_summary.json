@@ -1,0 +1,24 @@
+{
+  "symbol": "AVAXUSDT",
+  "total_profit": 0.0,
+  "total_trades": 2,
+  "wins": 1,
+  "losses": 1,
+  "win_rate": 50.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-22T14:16:24.766721",
+      "entry_price": 25.05,
+      "exit_time": "2025-07-22T17:05:39.362739",
+      "exit_price": 25.07,
+      "pnl": 0.02
+    },
+    {
+      "entry_time": "2025-07-22T17:05:39.362739",
+      "entry_price": 25.07,
+      "exit_time": "2025-07-22T17:06:09.434669",
+      "exit_price": 25.05,
+      "pnl": -0.02
+    }
+  ]
+}

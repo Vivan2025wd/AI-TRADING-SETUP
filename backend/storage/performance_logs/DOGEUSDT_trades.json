@@ -8,5 +8,35 @@
     "price": 0.2629,
     "timestamp": "2025-07-22T14:21:45.910710",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.268,
+    "price": 0.268,
+    "timestamp": "2025-07-22T17:05:39.362739",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.2678,
+    "price": 0.2678,
+    "timestamp": "2025-07-22T17:06:09.434669",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.2671,
+    "price": 0.2671,
+    "timestamp": "2025-07-22T17:07:58.237076",
+    "source": "mother_ai_decision"
   }
 ]

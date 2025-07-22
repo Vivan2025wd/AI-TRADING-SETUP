@@ -8,5 +8,15 @@
     "price": 4.376,
     "timestamp": "2025-07-22T14:25:42.308144",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 4.425,
+    "price": 4.425,
+    "timestamp": "2025-07-22T17:00:58.307430",
+    "source": "mother_ai_decision"
   }
 ]

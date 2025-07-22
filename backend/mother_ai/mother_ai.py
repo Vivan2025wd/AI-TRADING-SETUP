@@ -295,7 +295,11 @@ class MotherAI:
                 if price:
                     # ✅ Show debug info
                     held_for = int(time.time() - pos.get("entry_time", 0))
-                    print(f"🔍 Checking {symbol} | Held for: {held_for}s | SL: {pos['stop_loss']:.2f}, TP: {pos['take_profit']:.2f}, Now: {price:.2f}")
+                    print(
+    f"🔍 Checking {symbol} | Held for: {held_for}s | "
+    f"SL: {pos.get('stop_loss', 0):.2f}, TP: {pos.get('take_profit', 0):.2f}, Now: {price:.2f}"
+)
+
                     
                     exit_reason = self.check_exit_conditions(symbol, price)
                     if exit_reason:
