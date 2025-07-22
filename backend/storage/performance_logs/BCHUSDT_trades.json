@@ -1,0 +1,12 @@
+[
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 516.4,
+    "price": 516.4,
+    "timestamp": "2025-07-22T14:26:13.765401",
+    "source": "mother_ai_decision"
+  }
+]

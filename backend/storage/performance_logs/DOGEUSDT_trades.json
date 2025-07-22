@@ -4,9 +4,9 @@
     "signal": "buy",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 0.2693,
-    "price": 0.2693,
-    "timestamp": "2025-07-21T02:55:24.205017",
+    "last_price": 0.2629,
+    "price": 0.2629,
+    "timestamp": "2025-07-22T14:21:45.910710",
     "source": "mother_ai_decision"
   }
 ]

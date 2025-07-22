@@ -2,11 +2,11 @@
   {
     "symbol": "ADAUSDT",
     "signal": "buy",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 0.8317,
-    "price": 0.8317,
-    "timestamp": "2025-07-20T05:34:42.131527",
+    "confidence": 0.99,
+    "score": 0.99,
+    "last_price": 0.8584,
+    "price": 0.8584,
+    "timestamp": "2025-07-22T14:03:57.247171",
     "source": "mother_ai_decision"
   }
 ]

@@ -1,750 +1,267 @@
 [
   {
-    "timestamp": "2025-07-20T05:33:00",
+    "timestamp": "2025-07-22T14:02:00",
     "symbol": "BTCUSDT",
     "signal": "buy",
     "confidence": 0.86,
-    "source": "GenericAgent"
+    "source": "GenericAgent/ml"
   },
   {
-    "timestamp": "2025-07-20T05:33:43.497814",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 0.86,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T05:33:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 0.86,
-    "source": "GenericAgent"
-  },
-  {
-    "timestamp": "2025-07-20T05:33:47.506671",
+    "timestamp": "2025-07-22T14:02:21.428665",
     "symbol": "BTCUSDT",
     "signal": "buy",
     "confidence": 0.86,
     "source": "agent_predictions_batch"
   },
   {
-    "timestamp": "2025-07-20T05:34:00",
+    "timestamp": "2025-07-22T14:02:00",
     "symbol": "BTCUSDT",
     "signal": "buy",
     "confidence": 0.86,
-    "source": "GenericAgent"
+    "source": "GenericAgent/ml"
   },
   {
-    "timestamp": "2025-07-20T05:34:17.639246",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 0.86,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T05:34:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 0.86,
-    "source": "GenericAgent"
-  },
-  {
-    "timestamp": "2025-07-20T05:34:21.725130",
+    "timestamp": "2025-07-22T14:02:25.467275",
     "symbol": "BTCUSDT",
     "signal": "buy",
     "confidence": 0.86,
     "source": "agent_predictions_batch"
   },
   {
-    "timestamp": "2025-07-20T05:00:00",
+    "timestamp": "2025-07-22T14:00:00",
     "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 0.79,
-    "source": "GenericAgent"
+    "signal": "searching",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
   },
   {
-    "timestamp": "2025-07-20T05:00:00",
+    "timestamp": "2025-07-22T14:03:00",
     "symbol": "BTCUSDT",
     "signal": "buy",
-    "confidence": 0.79,
-    "source": "GenericAgent"
+    "confidence": 0.86,
+    "source": "GenericAgent/ml"
   },
   {
-    "timestamp": "2025-07-20T05:58:00",
+    "timestamp": "2025-07-22T14:03:34.296694",
     "symbol": "BTCUSDT",
     "signal": "buy",
-    "confidence": 0.75,
-    "source": "GenericAgent"
-  },
-  {
-    "timestamp": "2025-07-20T05:58:35.500657",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 0.75,
+    "confidence": 0.86,
     "source": "agent_predictions_batch"
   },
   {
-    "timestamp": "2025-07-20T05:58:00",
+    "timestamp": "2025-07-22T14:03:00",
     "symbol": "BTCUSDT",
     "signal": "buy",
-    "confidence": 0.75,
-    "source": "GenericAgent"
+    "confidence": 0.89,
+    "source": "GenericAgent/ml"
   },
   {
-    "timestamp": "2025-07-20T05:58:39.376755",
+    "timestamp": "2025-07-22T14:03:38.210070",
     "symbol": "BTCUSDT",
     "signal": "buy",
-    "confidence": 0.75,
+    "confidence": 0.89,
     "source": "agent_predictions_batch"
   },
   {
-    "timestamp": "2025-07-20T14:41:00",
+    "timestamp": "2025-07-22T14:00:00",
     "symbol": "BTCUSDT",
     "signal": "buy",
     "confidence": 1.0,
     "source": "GenericAgent/ml"
   },
   {
-    "timestamp": "2025-07-20T14:41:54.783215",
+    "timestamp": "2025-07-22T14:00:00",
     "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T14:41:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
+    "signal": "hold",
     "confidence": 1.0,
     "source": "GenericAgent/ml"
   },
   {
-    "timestamp": "2025-07-20T14:42:00.162393",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T14:42:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T14:42:22.549765",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T14:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T14:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T14:49:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T14:49:24.141649",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T14:49:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T14:49:30.049213",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T14:49:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T14:49:41.539321",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T16:06:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T16:06:29.763163",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T16:06:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T16:06:35.007439",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T16:12:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-20T16:12:58.881470",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T16:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 0.98,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-20T16:21:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-20T16:21:26.435237",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-20T16:21:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-20T16:21:30.650634",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T02:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T02:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T02:56:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T02:56:09.441532",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T02:56:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T02:56:13.607497",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T03:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-21T03:00:50.173664",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T03:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-21T03:00:54.264419",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T03:35:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-21T03:35:52.070300",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T03:35:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/ml"
-  },
-  {
-    "timestamp": "2025-07-21T03:35:56.329197",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T04:17:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T04:17:11.732163",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T04:17:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T04:17:16.121444",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T04:23:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T04:23:05.463390",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T04:23:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T04:23:28.890589",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T04:41:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T04:41:44.309087",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T05:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T05:18:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T05:18:26.670010",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T05:18:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T05:18:30.639675",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T05:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T08:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T08:17:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T08:17:23.742525",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T08:17:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T08:17:27.594446",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T09:54:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T09:54:18.970674",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T09:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:40.925303",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:45.004240",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:52.579306",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T10:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T10:12:58.079021",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-21T10:13:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-21T10:13:03.545851",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-22T13:02:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-22T13:02:41.027987",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-22T13:02:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-22T13:02:45.057575",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-22T13:02:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-22T13:02:55.877379",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-22T13:00:00",
-    "symbol": "BTCUSDT",
-    "signal": "buy_soon",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-22T13:04:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-22T13:04:33.861450",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-22T13:04:00",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "GenericAgent/rule_based"
-  },
-  {
-    "timestamp": "2025-07-22T13:04:37.920794",
-    "symbol": "BTCUSDT",
-    "signal": "searching",
-    "confidence": 1.0,
-    "source": "agent_predictions_batch"
-  },
-  {
-    "timestamp": "2025-07-22T13:34:00",
+    "timestamp": "2025-07-22T14:15:00",
     "symbol": "BTCUSDT",
     "signal": "sell",
     "confidence": 1.0,
     "source": "GenericAgent/rule_based"
   },
   {
-    "timestamp": "2025-07-22T13:34:46.780572",
+    "timestamp": "2025-07-22T14:15:55.754033",
     "symbol": "BTCUSDT",
     "signal": "sell",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
   },
   {
-    "timestamp": "2025-07-22T13:34:00",
+    "timestamp": "2025-07-22T14:16:00",
     "symbol": "BTCUSDT",
     "signal": "sell",
     "confidence": 1.0,
     "source": "GenericAgent/rule_based"
   },
   {
-    "timestamp": "2025-07-22T13:34:50.724079",
+    "timestamp": "2025-07-22T14:16:00.339477",
     "symbol": "BTCUSDT",
     "signal": "sell",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
   },
   {
-    "timestamp": "2025-07-22T13:34:00",
+    "timestamp": "2025-07-22T14:16:00",
     "symbol": "BTCUSDT",
     "signal": "sell",
     "confidence": 1.0,
     "source": "GenericAgent/rule_based"
   },
   {
-    "timestamp": "2025-07-22T13:34:58.359917",
+    "timestamp": "2025-07-22T14:16:12.255224",
     "symbol": "BTCUSDT",
     "signal": "sell",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
   },
   {
-    "timestamp": "2025-07-22T13:00:00",
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:16:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:16:37.058014",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T14:16:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:16:41.315660",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:26:00",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-22T14:26:45.508446",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T14:26:00",
     "symbol": "BTCUSDT",
     "signal": "hold",
     "confidence": 1.0,
     "source": "GenericAgent/rule_based"
   },
   {
-    "timestamp": "2025-07-22T13:00:00",
+    "timestamp": "2025-07-22T14:26:50.375526",
     "symbol": "BTCUSDT",
     "signal": "hold",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T14:27:00",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:27:12.511399",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T14:27:00",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T14:27:16.718564",
+    "symbol": "BTCUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T14:00:00",
+    "symbol": "BTCUSDT",
+    "signal": "sell",
     "confidence": 1.0,
     "source": "GenericAgent/rule_based"
   }

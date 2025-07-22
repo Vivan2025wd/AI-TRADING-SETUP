@@ -2,11 +2,11 @@
   {
     "symbol": "SOLUSDT",
     "signal": "buy",
-    "confidence": 0.99,
-    "score": 0.99,
-    "last_price": 182.19,
-    "price": 182.19,
-    "timestamp": "2025-07-20T14:42:47.589885",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 198.26,
+    "price": 198.26,
+    "timestamp": "2025-07-22T14:02:31.615644",
     "source": "mother_ai_decision"
   }
 ]

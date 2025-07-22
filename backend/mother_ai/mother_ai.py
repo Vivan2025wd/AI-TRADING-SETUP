@@ -194,10 +194,16 @@ class MotherAI:
                         "qty": qty
                     }
             elif signal == "sell":
-                order = place_market_order(symbol.replace("USDT", "/USDT"), signal, 0)  # qty ignored for sells
-                if order:
+                qty = self.position_tracker.get(symbol, {}).get("qty", 0)
+                if qty <= 0:
+                    print(f"❌ No quantity to sell for {symbol}")
+                    return  # Only return if no qty to sell
+            order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
+            if order:
                     self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = None
+
+
         except Exception as e:
             print(f"❌ Trade error: {e}")
 
