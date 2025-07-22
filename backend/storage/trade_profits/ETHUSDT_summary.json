@@ -1,0 +1,17 @@
+{
+  "symbol": "ETHUSDT",
+  "total_profit": 71.74,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-22T14:26:00.638212",
+      "entry_price": 3658.57,
+      "exit_time": "2025-07-22T16:25:39.038061",
+      "exit_price": 3730.31,
+      "pnl": 71.74
+    }
+  ]
+}

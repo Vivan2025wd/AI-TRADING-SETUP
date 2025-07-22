@@ -17,7 +17,7 @@ from backend.storage.auto_cleanup import auto_cleanup_logs
 TRADE_HISTORY_DIR =  "backend/storage/trade_history"
 PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
 TRADE_COOLDOWN_SECONDS = 600
-MAX_HOLD_SECONDS = 21600   # 6 hours (6 * 60 * 60)
+MAX_HOLD_SECONDS = 21600  # 6 hours (6 * 60 * 60)
 RISK_PER_TRADE = 0.01  # 1% of capital
 DEFAULT_BALANCE_USD = 1000  # for mock position sizing
 TP_RATIO = 1.5  # Take Profit: 1.5x Risk

@@ -8,5 +8,15 @@
     "price": 3658.57,
     "timestamp": "2025-07-22T14:26:00.638212",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 0.83,
+    "score": 0.83,
+    "last_price": 3730.31,
+    "price": 3730.31,
+    "timestamp": "2025-07-22T16:25:39.038061",
+    "source": "mother_ai_decision"
   }
 ]
