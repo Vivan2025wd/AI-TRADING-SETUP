@@ -17,7 +17,7 @@ class GenericAgent:
         self.model_path = model_path or f"backend/agents/models/{symbol.lower()}_model.pkl"
         self.model = self._load_model()
         self.tracker = PerformanceTracker(log_dir_type="trade_history")
-        self.position_state = None  # 'long' if in position, None if flat
+        self.position_state = self._load_position_state()  # ✅ FIXED
 
     def _load_model(self):
         if os.path.exists(self.model_path):
@@ -166,3 +166,24 @@ class GenericAgent:
 
     def predict(self, ohlcv_data: pd.DataFrame) -> Dict:
         return self.evaluate(ohlcv_data)
+
+    def _load_position_state(self) -> Optional[str]:
+        path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path, "r") as f:
+                trades = json.load(f)
+                if trades:
+                    last_signal = trades[-1].get("signal", None)
+                    if last_signal == "buy":
+                        print(f"📦 Loaded position state for {self.symbol}: long")
+                        return "long"
+                    elif last_signal == "sell":
+                        print(f"📦 Loaded position state for {self.symbol}: flat")
+                        return None
+            print(f"📦 No signals found in trades file for {self.symbol}")
+            return None
+        except Exception as e:
+            print(f"⚠️ Failed to determine position state from trade log: {e}")
+            return None

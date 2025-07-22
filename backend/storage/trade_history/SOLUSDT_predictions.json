@@ -614,5 +614,138 @@
     "signal": "buy_soon",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:02:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-22T13:02:43.042170",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:02:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-22T13:02:47.106533",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:02:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-22T13:02:57.908027",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:00:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T13:04:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T13:04:35.870816",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:04:00",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T13:04:39.895177",
+    "symbol": "SOLUSDT",
+    "signal": "buy_soon",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:34:00",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 0.92,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-22T13:34:48.751128",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 0.92,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:34:00",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 0.92,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-22T13:34:52.749941",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 0.92,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:34:00",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 0.94,
+    "source": "GenericAgent/ml"
+  },
+  {
+    "timestamp": "2025-07-22T13:35:00.525692",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 0.94,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-22T13:00:00",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
+  },
+  {
+    "timestamp": "2025-07-22T13:00:00",
+    "symbol": "SOLUSDT",
+    "signal": "hold",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based"
   }
 ]
