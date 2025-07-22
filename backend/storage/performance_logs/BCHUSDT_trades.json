@@ -8,5 +8,15 @@
     "price": 516.4,
     "timestamp": "2025-07-22T14:26:13.765401",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 519.8,
+    "price": 519.8,
+    "timestamp": "2025-07-22T15:52:06.176932",
+    "source": "mother_ai_decision"
   }
 ]

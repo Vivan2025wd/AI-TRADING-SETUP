@@ -1,0 +1,17 @@
+{
+  "symbol": "BCHUSDT",
+  "total_profit": 3.4,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-22T14:26:13.765401",
+      "entry_price": 516.4,
+      "exit_time": "2025-07-22T15:52:06.176932",
+      "exit_price": 519.8,
+      "pnl": 3.4
+    }
+  ]
+}

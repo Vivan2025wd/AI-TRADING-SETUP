@@ -1,0 +1,17 @@
+{
+  "symbol": "BTCUSDT",
+  "total_profit": 1307.8,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-22T14:03:49.662952",
+      "entry_price": 117727.82,
+      "exit_time": "2025-07-22T15:41:55.292282",
+      "exit_price": 119035.62,
+      "pnl": 1307.8
+    }
+  ]
+}

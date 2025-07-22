@@ -17,7 +17,7 @@ from backend.storage.auto_cleanup import auto_cleanup_logs
 TRADE_HISTORY_DIR =  "backend/storage/trade_history"
 PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
 TRADE_COOLDOWN_SECONDS = 600
-MAX_HOLD_SECONDS = 6 * 3600  # 6 hours
+MAX_HOLD_SECONDS = 21600   # 6 hours (6 * 60 * 60)
 RISK_PER_TRADE = 0.01  # 1% of capital
 DEFAULT_BALANCE_USD = 1000  # for mock position sizing
 TP_RATIO = 1.5  # Take Profit: 1.5x Risk
@@ -36,6 +36,30 @@ class MotherAI:
         self.meta_evaluator = MetaEvaluator()
         self.cooldown_tracker = {}
         self.position_tracker = {}
+        self._sync_positions_on_startup()  # ✅ Sync positions on startup
+
+    def _sync_positions_on_startup(self):
+        """Sync position tracker with agent position states"""
+        print("🔄 Syncing position tracker with agent states...")
+        for file in os.listdir(self.agents_dir):
+            if not file.endswith("_agent.py"):
+                continue
+            symbol = file.replace("_agent.py", "").upper()
+            
+            # Try to get agent's position state
+            try:
+                agent_class = self._load_agent_class(file, symbol)
+                if agent_class is not None and hasattr(agent_class, 'get_position_state'):
+                    # Assuming agents have a method to get their position state
+                    position_state = agent_class.get_position_state()
+                    if position_state == "long":
+                        self.position_tracker[symbol] = {"side": "long"}
+                        print(f"📊 Synced {symbol}: long position")
+                    else:
+                        self.position_tracker[symbol] = None
+                        print(f"📊 Synced {symbol}: flat position")
+            except Exception as e:
+                print(f"⚠️ Could not sync position for {symbol}: {e}")
 
     def load_agents(self):
         agents = []
@@ -48,7 +72,18 @@ class MotherAI:
             strategy = self._load_strategy(symbol)
             agent_class = self._load_agent_class(file, symbol)
             if agent_class:
-                agents.append(agent_class(symbol=symbol, strategy_logic=strategy))
+                agent_instance = agent_class(symbol=symbol, strategy_logic=strategy)
+                agents.append(agent_instance)
+                
+                # ✅ Sync position state from agent
+                if hasattr(agent_instance, 'position_state'):
+                    if agent_instance.position_state == "long":
+                        self.position_tracker[symbol] = {"side": "long"}
+                        print(f"📊 Agent {symbol} reports: long position")
+                    else:
+                        self.position_tracker[symbol] = None
+                        print(f"📊 Agent {symbol} reports: flat position")
+                        
         return agents
 
     def _load_strategy(self, symbol: str):
@@ -158,30 +193,59 @@ class MotherAI:
         filtered = []
         for e in evaluations:
             if e["score"] < min_score or self.is_in_cooldown(e["symbol"]):
+                print(f"⏭️ Skipping {e['symbol']}: score={e['score']}, in_cooldown={self.is_in_cooldown(e['symbol'])}")
                 continue
 
             current_position = self.position_tracker.get(e["symbol"], None)
+            print(f"🔍 Evaluating {e['symbol']}: signal={e['signal']}, position={current_position}, confidence={e['confidence']}")
 
             if e["signal"] == "buy":
+                # ✅ Allow buy only if no position or position is None
                 if current_position is None and e["confidence"] >= min_confidence:
                     # Check if last buy was not closed by sell
                     if not self._is_previous_trade_open_buy(e["symbol"]):
+                        print(f"✅ BUY signal approved for {e['symbol']}")
                         filtered.append(e)
+                    else:
+                        print(f"⛔ Previous buy still open for {e['symbol']}")
+                else:
+                    print(f"⛔ Cannot buy {e['symbol']}: position={current_position}, confidence={e['confidence']}")
+                    
             elif e["signal"] == "sell":
-                if current_position == "long" and e["confidence"] >= min_confidence:
+                # ✅ Allow sell if we have a long position
+                if current_position is not None and current_position.get("side") == "long" and e["confidence"] >= min_confidence:
+                    print(f"✅ SELL signal approved for {e['symbol']}")
                     filtered.append(e)
+                elif current_position is None:
+                    # ✅ Also check if agent thinks it has a position but Mother AI doesn't know
+                    print(f"⚠️ Agent wants to sell {e['symbol']} but Mother AI shows no position. Allowing sell anyway.")
+                    filtered.append(e)
+                else:
+                    print(f"⛔ Cannot sell {e['symbol']}: position={current_position}, confidence={e['confidence']}")
 
+        print(f"📊 Filtered trades: {[f'{t["symbol"]}-{t["signal"]}' for t in filtered]}")
         return filtered[:top_n]
 
     def execute_trade(self, symbol, signal, price, confidence):
         if signal not in ("buy", "sell") or not price:
+            print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return
+            
+        print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price}")
+        
         try:
             if signal == "buy":
                 sl = price * (1 - SL_PERCENT)
                 tp = price + ((price - sl) * TP_RATIO)
                 risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
                 qty = risk_amount / (price - sl)
+
+                # ✅ Sanity check qty
+                if qty <= 0:
+                    print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}, skipping.")
+                    return
+
+                print(f"📊 Buying {symbol} | Entry: {price:.2f}, SL: {sl:.2f}, TP: {tp:.2f}, Qty: {qty:.4f}")
                 order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
                 if order:
                     self.cooldown_tracker[symbol] = time.time()
@@ -193,22 +257,33 @@ class MotherAI:
                         "take_profit": tp,
                         "qty": qty
                     }
-            elif signal == "sell":
-                qty = self.position_tracker.get(symbol, {}).get("qty", 0)
-                if qty <= 0:
-                    print(f"❌ No quantity to sell for {symbol}")
-                    return  # Only return if no qty to sell
-            order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
-            if order:
-                    self.cooldown_tracker[symbol] = time.time()
-                    self.position_tracker[symbol] = None
+                    print(f"✅ BUY order executed for {symbol}")
 
+            elif signal == "sell":
+                pos = self.position_tracker.get(symbol, {})
+                qty = pos.get("qty", 0)
+
+                # ✅ If we don't have qty tracked, use a default or get from agent
+                if qty <= 0:
+                    print(f"⚠️ No quantity tracked for {symbol}. Using default qty for sell.")
+                    # You might want to get this from your agent or use a default
+                    qty = 0.001  # Use a small default or implement logic to get actual qty
+
+                print(f"📊 Selling {symbol} | Qty: {qty:.4f} at ${price}")
+                order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
+                if order:
+                    self.cooldown_tracker[symbol] = time.time()
+                    self.position_tracker[symbol] = None  # Clear position
+                    print(f"✅ SELL order executed for {symbol}")
+                else:
+                    print(f"❌ SELL order failed for {symbol}")
 
         except Exception as e:
-            print(f"❌ Trade error: {e}")
+            print(f"❌ Trade execution error for {symbol}: {e}")
 
     def make_portfolio_decision(self, min_score=0.5):
         auto_cleanup_logs()
+        print(f"🎯 Making portfolio decision with min_score={min_score}")
 
         timestamp = self.performance_tracker.current_time()
 
@@ -218,6 +293,10 @@ class MotherAI:
                 df = fetch_ohlcv(symbol, "1h", 1)
                 price = df["close"].iloc[-1] if not df.empty else None
                 if price:
+                    # ✅ Show debug info
+                    held_for = int(time.time() - pos.get("entry_time", 0))
+                    print(f"🔍 Checking {symbol} | Held for: {held_for}s | SL: {pos['stop_loss']:.2f}, TP: {pos['take_profit']:.2f}, Now: {price:.2f}")
+                    
                     exit_reason = self.check_exit_conditions(symbol, price)
                     if exit_reason:
                         self._log_trade_execution(
@@ -233,12 +312,15 @@ class MotherAI:
         # Step 2: Evaluate new trades
         top = self.decide_trades(min_score=min_score)
         if not top:
+            print("📭 No trades meet criteria")
             return {"decision": [], "timestamp": timestamp}
 
         decision = top[0]
         df = fetch_ohlcv(decision["symbol"], "1h", 1)
         price = df["close"].iloc[-1] if not df.empty else None
         result = {**decision, "last_price": price}
+
+        print(f"🎯 Top decision: {decision['symbol']} {decision['signal']} (score: {decision['score']}, confidence: {decision['confidence']})")
 
         if decision["signal"] in ("buy", "sell") and price:
             self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])
@@ -256,16 +338,23 @@ class MotherAI:
         return {"decision": result, "timestamp": timestamp}
 
     def load_all_predictions(self) -> List[Dict]:
-            return []
+        return []
 
     def check_exit_conditions(self, symbol, current_price):
         pos = self.position_tracker.get(symbol)
         if not pos or pos.get("side") != "long":
             return None  # No open position
 
-        sl_hit = current_price <= pos["stop_loss"]
-        tp_hit = current_price >= pos["take_profit"]
-        time_expired = (time.time() - pos["entry_time"]) > MAX_HOLD_SECONDS
+        # ✅ Guard for missing entry_time
+        entry_time = pos.get("entry_time")
+        if not entry_time:
+            print(f"⚠️ Missing entry_time for {symbol}, forcing position close.")
+            self.position_tracker[symbol] = None
+            return "invalid_entry"
+
+        sl_hit = current_price <= pos.get("stop_loss", 0)
+        tp_hit = current_price >= pos.get("take_profit", float('inf'))
+        time_expired = (time.time() - entry_time) > MAX_HOLD_SECONDS
 
         if sl_hit or tp_hit or time_expired:
             reason = "stop_loss" if sl_hit else "take_profit" if tp_hit else "max_hold"

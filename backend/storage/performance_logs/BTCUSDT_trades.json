@@ -8,5 +8,15 @@
     "price": 117727.82,
     "timestamp": "2025-07-22T14:03:49.662952",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 119035.62,
+    "price": 119035.62,
+    "timestamp": "2025-07-22T15:41:55.292282",
+    "source": "mother_ai_decision"
   }
 ]
