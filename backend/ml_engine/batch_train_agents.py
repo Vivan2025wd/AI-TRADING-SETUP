@@ -4,6 +4,10 @@ import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Optional
 import logging
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import joblib
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,8 +16,39 @@ logger = logging.getLogger(__name__)
 OHLCV_DIR = "data/ohlcv"
 TRADES_DIR = "backend/storage/trade_history"
 LABELS_DIR = "data/labels"
+MODELS_DIR = "backend/agents/models"
 
 os.makedirs(LABELS_DIR, exist_ok=True)
+os.makedirs(MODELS_DIR, exist_ok=True)
+
+class MLModel:
+    def __init__(self, symbol: str, model_path: str = None):
+        self.symbol = symbol
+        self.model_path = model_path or os.path.join(MODELS_DIR, f"{self.symbol}_model.pkl")
+        self.model = self.load_model()
+
+    def train(self, features: pd.DataFrame, labels: pd.Series):
+        X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
+        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        logger.info(f"Model for {self.symbol} trained with accuracy: {accuracy}")
+
+        joblib.dump(model, self.model_path)
+        self.model = model
+        return accuracy
+
+    def predict(self, features: pd.DataFrame) -> np.ndarray:
+        if self.model is None:
+            raise Exception("Model not loaded.")
+        return self.model.predict(features)
+
+    def load_model(self):
+        if os.path.exists(self.model_path):
+            return joblib.load(self.model_path)
+        return None
 
 class OptimizedLabelGenerator:
     """Optimized label generator specifically for training compatibility"""
@@ -156,24 +191,24 @@ class OptimizedLabelGenerator:
         
         return balanced_labels
 
-    def generate_training_labels(self, symbol: str) -> Tuple[pd.Series, Dict]:
-        """Generate labels optimized for training"""
-        logger.info(f"Generating training labels for {symbol}...")
+    def generate_training_data(self, symbol: str) -> Tuple[pd.DataFrame, pd.Series, Dict]:
+        """Generate features and labels for training"""
+        logger.info(f"Generating training data for {symbol}...")
         
         try:
-            # Load data
             ohlcv = self.load_ohlcv(symbol)
-            
-            # Generate outcome-based labels
             raw_labels = self.generate_outcome_labels(ohlcv)
             
             if len(raw_labels) == 0:
                 raise ValueError(f"No labels generated for {symbol}")
             
-            # Balance the dataset
             balanced_labels = self.balance_labels(raw_labels)
             
-            # Create statistics
+            features = self.extract_features(ohlcv)
+
+            # Align features and labels
+            aligned_features = features.loc[balanced_labels.index]
+
             stats = {
                 'symbol': symbol,
                 'total_samples': len(balanced_labels),
@@ -183,32 +218,43 @@ class OptimizedLabelGenerator:
                 'balance_ratio': balanced_labels.value_counts().min() / balanced_labels.value_counts().max()
             }
             
-            # Save in format expected by batch_train.py
-            self.save_training_labels(balanced_labels, symbol)
+            self.save_training_data(aligned_features, balanced_labels, symbol)
             
-            return balanced_labels, stats
+            return aligned_features, balanced_labels, stats
             
         except Exception as e:
-            logger.error(f"Failed to generate training labels for {symbol}: {e}")
+            logger.error(f"Failed to generate training data for {symbol}: {e}")
             raise
 
-    def save_training_labels(self, labels: pd.Series, symbol: str):
-        """Save labels in the format expected by batch_train.py"""
-        # Create a DataFrame with 'action' column (expected by batch_train.py)
-        df = pd.DataFrame({'action': labels})
+    def extract_features(self, ohlcv: pd.DataFrame) -> pd.DataFrame:
+        """Extract features from OHLCV data"""
+        features = pd.DataFrame(index=ohlcv.index)
+        features['returns'] = ohlcv['close'].pct_change()
+        features['sma_15'] = ohlcv['close'].rolling(15).mean()
+        features['sma_50'] = ohlcv['close'].rolling(50).mean()
+        features['rsi'] = self.calculate_rsi(ohlcv['close'])
+        return features.dropna()
+
+    def calculate_rsi(self, series, period=14):
+        delta = series.diff(1)
+        gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+        rs = gain / loss
+        return 100 - (100 / (1 + rs))
+
+    def save_training_data(self, features: pd.DataFrame, labels: pd.Series, symbol: str):
+        """Save features and labels"""
+        features_path = os.path.join(LABELS_DIR, f"{symbol}_features.csv")
+        labels_path = os.path.join(LABELS_DIR, f"{symbol}_labels.csv")
         
-        # Save with the expected filename format
-        output_path = os.path.join(LABELS_DIR, f"{symbol}_labels.csv")
-        df.to_csv(output_path)
+        features.to_csv(features_path)
+        labels.to_csv(labels_path)
         
-        logger.info(f"Saved {len(df)} training labels to {output_path}")
-        
-        # Also save the outcome-based version for reference
-        outcome_path = os.path.join(LABELS_DIR, f"{symbol}_outcome_labels.csv")
-        df.to_csv(outcome_path)
+        logger.info(f"Saved {len(features)} features to {features_path}")
+        logger.info(f"Saved {len(labels)} labels to {labels_path}")
 
 def main():
-    """Generate training labels for all symbols"""
+    """Generate training data and train models for all symbols"""
     symbols = [
         "DOGEUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT",
         "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"
@@ -216,41 +262,35 @@ def main():
     
     generator = OptimizedLabelGenerator(
         forward_window=24,
-        min_return_threshold=0.025,  # 2.5%
-        stop_loss_threshold=-0.04,   # -4%
-        min_samples_per_class=100    # Minimum samples per class
+        min_return_threshold=0.025,
+        stop_loss_threshold=-0.04,
+        min_samples_per_class=100
     )
     
     all_stats = []
-    successful_symbols = []
     
     for symbol in symbols:
         try:
-            labels, stats = generator.generate_training_labels(symbol)
+            features, labels, stats = generator.generate_training_data(symbol)
             all_stats.append(stats)
-            successful_symbols.append(symbol)
             
+            model = MLModel(symbol)
+            accuracy = model.train(features, labels)
+            stats['accuracy'] = accuracy
+
             logger.info(f"✅ {symbol}: {stats['total_samples']} samples, "
-                       f"balance ratio: {stats['balance_ratio']:.3f}")
+                       f"balance ratio: {stats['balance_ratio']:.3f}, "
+                       f"accuracy: {accuracy:.3f}")
             
         except Exception as e:
             logger.error(f"❌ Failed to process {symbol}: {e}")
     
-    # Save summary
     if all_stats:
         summary_df = pd.DataFrame(all_stats)
-        summary_path = os.path.join(LABELS_DIR, "training_labels_summary.csv")
+        summary_path = os.path.join(LABELS_DIR, "training_summary.csv")
         summary_df.to_csv(summary_path, index=False)
         
-        logger.info(f"📊 Generated labels for {len(successful_symbols)}/{len(symbols)} symbols")
-        logger.info(f"📈 Total samples: {summary_df['total_samples'].sum()}")
-        logger.info(f"📊 Average balance ratio: {summary_df['balance_ratio'].mean():.3f}")
-        logger.info(f"💾 Summary saved to {summary_path}")
-        
-        # Print ready-to-train symbols
-        print(f"\n🚀 Ready for training: {', '.join(successful_symbols)}")
-    else:
-        logger.error("❌ No labels generated for any symbol")
+        logger.info(f"📊 Training summary saved to {summary_path}")
 
 if __name__ == "__main__":
     main()
