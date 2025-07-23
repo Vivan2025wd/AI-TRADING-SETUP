@@ -1849,5 +1849,37 @@
     "signal": "searching",
     "confidence": 0.664,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-23T14:56:17.016988",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.648,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.664,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-23T14:56:21.570728",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.664,
+    "source": "agent_predictions_batch"
   }
 ]

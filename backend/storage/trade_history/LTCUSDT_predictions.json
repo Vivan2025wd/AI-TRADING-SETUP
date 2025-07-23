@@ -1849,5 +1849,37 @@
     "signal": "buy",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:17.433990",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:21.985497",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
   }
 ]

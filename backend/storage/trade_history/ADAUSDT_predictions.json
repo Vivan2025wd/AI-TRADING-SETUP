@@ -1807,5 +1807,37 @@
     "signal": "hold",
     "confidence": 0.8,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:00",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:14.565678",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:00",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-23T14:56:18.837065",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
   }
 ]
