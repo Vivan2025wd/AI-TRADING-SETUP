@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -24,6 +24,8 @@ const SuspenseWrapper = ({ children }) => (
 );
 
 export default function App() {
+  const [isLive, setIsLive] = useState(false);
+
   return (
     <BrowserRouter>
       <header className="bg-gray-900 text-white shadow-sm sticky top-0 z-50">
@@ -49,6 +51,14 @@ export default function App() {
           <NavLink to="/strategy-performance" className={getNavClass}>
             Strategy Performance
           </NavLink>
+          <div className="flex items-center space-x-2">
+            <span>Mock Trading</span>
+            <label className="switch">
+              <input type="checkbox" checked={isLive} onChange={() => setIsLive(!isLive)} />
+              <span className="slider round"></span>
+            </label>
+            <span>Live Trading</span>
+          </div>
         </nav>
       </header>
 
@@ -91,7 +101,7 @@ export default function App() {
               path="/mother-ai-decision"
               element={
                 <SuspenseWrapper>
-                  <MotherAIDecisionCard />
+                  <MotherAIDecisionCard isLive={isLive} />
                 </SuspenseWrapper>
               }
             />

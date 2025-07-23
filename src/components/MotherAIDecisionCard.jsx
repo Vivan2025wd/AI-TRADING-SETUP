@@ -4,7 +4,7 @@ import { ArrowUpRight, AlertCircle, Clock, RefreshCw, Loader2 } from "lucide-rea
 const CACHE_KEY = "mother_ai_decision_cache";
 const CACHE_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
 
-export default function MotherAIDecisionCard() {
+export default function MotherAIDecisionCard({ isLive }) {
   const [decisionData, setDecisionData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -14,7 +14,8 @@ export default function MotherAIDecisionCard() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:8000/api/mother-ai/decision");
+      const url = `http://localhost:8000/api/mother-ai/decision?is_live=${isLive}`;
+      const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch Mother AI decision");
 
       const data = await res.json();
@@ -83,7 +84,7 @@ export default function MotherAIDecisionCard() {
     }
 
     fetchDecision();
-  }, []);
+  }, [isLive]);
 
   return (
     <div className="bg-gray-900 text-white shadow-md rounded-xl p-6 max-w-xl mx-auto space-y-6 border border-gray-700">
