@@ -18,5 +18,85 @@
     "price": 119035.62,
     "timestamp": "2025-07-22T15:41:55.292282",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118286.8,
+    "price": 118286.8,
+    "timestamp": "2025-07-23T08:51:44.198315",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118094.81,
+    "price": 118094.81,
+    "timestamp": "2025-07-23T09:45:50.771884",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118094.81,
+    "price": 118094.81,
+    "timestamp": "2025-07-23T09:45:58.123640",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118120.01,
+    "price": 118120.01,
+    "timestamp": "2025-07-23T09:47:52.401273",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118192.0,
+    "price": 118192.0,
+    "timestamp": "2025-07-23T10:21:31.554355",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118200.0,
+    "price": 118200.0,
+    "timestamp": "2025-07-23T10:21:43.769889",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118372.12,
+    "price": 118372.12,
+    "timestamp": "2025-07-23T10:57:41.867802",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118310.7,
+    "price": 118310.7,
+    "timestamp": "2025-07-23T11:19:06.174832",
+    "source": "mother_ai_decision"
   }
 ]

@@ -46,20 +46,26 @@ class MotherAI:
                 continue
             symbol = file.replace("_agent.py", "").upper()
             
-            # Try to get agent's position state
+            # Try to get agent's position state by creating an instance
             try:
+                strategy = self._load_strategy(symbol)
                 agent_class = self._load_agent_class(file, symbol)
-                if agent_class is not None and hasattr(agent_class, 'get_position_state'):
-                    # Assuming agents have a method to get their position state
-                    position_state = agent_class.get_position_state()
-                    if position_state == "long":
-                        self.position_tracker[symbol] = {"side": "long"}
-                        print(f"📊 Synced {symbol}: long position")
+                if agent_class is not None:
+                    # Create agent instance to access position_state
+                    agent_instance = agent_class(symbol=symbol, strategy_logic=strategy)
+                    if hasattr(agent_instance, 'position_state'):
+                        if agent_instance.position_state == "long":
+                            self.position_tracker[symbol] = {"side": "long"}
+                            print(f"📊 Synced {symbol}: long position")
+                        else:
+                            self.position_tracker[symbol] = None
+                            print(f"📊 Synced {symbol}: flat position")
                     else:
                         self.position_tracker[symbol] = None
-                        print(f"📊 Synced {symbol}: flat position")
+                        print(f"📊 Synced {symbol}: no position state available")
             except Exception as e:
                 print(f"⚠️ Could not sync position for {symbol}: {e}")
+                self.position_tracker[symbol] = None
 
     def load_agents(self):
         agents = []
@@ -75,7 +81,7 @@ class MotherAI:
                 agent_instance = agent_class(symbol=symbol, strategy_logic=strategy)
                 agents.append(agent_instance)
                 
-                # ✅ Sync position state from agent
+                # ✅ Sync position state from agent instance
                 if hasattr(agent_instance, 'position_state'):
                     if agent_instance.position_state == "long":
                         self.position_tracker[symbol] = {"side": "long"}
@@ -83,6 +89,9 @@ class MotherAI:
                     else:
                         self.position_tracker[symbol] = None
                         print(f"📊 Agent {symbol} reports: flat position")
+                else:
+                    self.position_tracker[symbol] = None
+                    print(f"📊 Agent {symbol} has no position state")
                         
         return agents
 
@@ -104,7 +113,14 @@ class MotherAI:
             return None
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        return getattr(module, f"{symbol}Agent", None)
+        
+        # Try to get the agent class - could be GenericAgent or {symbol}Agent
+        agent_class = getattr(module, f"{symbol}Agent", None)
+        if agent_class is None:
+            # Fallback to GenericAgent if specific agent class not found
+            agent_class = getattr(module, "GenericAgent", None)
+        
+        return agent_class
 
     def evaluate_agents(self, agents):
         results = []
@@ -126,13 +142,15 @@ class MotherAI:
 
     def _safe_predict(self, agent, ohlcv):
         try:
-            prediction = agent.predict(ohlcv)
+            # Use the evaluate method from GenericAgent which returns a dict
+            prediction = agent.evaluate(ohlcv)
             return {
                 "symbol": agent.symbol,
                 "signal": prediction.get("action", "hold").lower(),
                 "confidence": prediction.get("confidence", 0.0)
             }
-        except Exception:
+        except Exception as e:
+            print(f"⚠️ Prediction error for {agent.symbol}: {e}")
             return {"symbol": agent.symbol, "signal": "hold", "confidence": 0.0}
 
     def _calculate_score(self, prediction, health):
@@ -168,18 +186,25 @@ class MotherAI:
             json.dump(history, f, indent=2)
 
     def _is_previous_trade_open_buy(self, symbol: str) -> bool:
+        """Check if the last trade was a buy that hasn't been closed by a sell"""
         path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")
         if not os.path.exists(path):
             return False
         try:
             with open(path, "r") as f:
                 history = json.load(f)
+                if not history:
+                    return False
+                    
+                # Look through recent trades to see if last buy was closed
                 for entry in reversed(history):
                     if entry["signal"] == "buy":
                         return True
-                    if entry["signal"] == "sell":
+                    elif entry["signal"] == "sell":
                         return False
-        except Exception:
+                        
+        except Exception as e:
+            print(f"⚠️ Error checking previous trade for {symbol}: {e}")
             return False
         return False
 
@@ -193,11 +218,11 @@ class MotherAI:
         filtered = []
         for e in evaluations:
             if e["score"] < min_score or self.is_in_cooldown(e["symbol"]):
-                print(f"⏭️ Skipping {e['symbol']}: score={e['score']}, in_cooldown={self.is_in_cooldown(e['symbol'])}")
+                print(f"⏭️ Skipping {e['symbol']}: score={e['score']:.3f}, in_cooldown={self.is_in_cooldown(e['symbol'])}")
                 continue
 
             current_position = self.position_tracker.get(e["symbol"], None)
-            print(f"🔍 Evaluating {e['symbol']}: signal={e['signal']}, position={current_position}, confidence={e['confidence']}")
+            print(f"🔍 Evaluating {e['symbol']}: signal={e['signal']}, position={current_position}, confidence={e['confidence']:.3f}")
 
             if e["signal"] == "buy":
                 # ✅ Allow buy only if no position or position is None
@@ -209,19 +234,21 @@ class MotherAI:
                     else:
                         print(f"⛔ Previous buy still open for {e['symbol']}")
                 else:
-                    print(f"⛔ Cannot buy {e['symbol']}: position={current_position}, confidence={e['confidence']}")
+                    reason = "has_position" if current_position else "low_confidence"
+                    print(f"⛔ Cannot buy {e['symbol']}: {reason} (confidence={e['confidence']:.3f})")
                     
             elif e["signal"] == "sell":
-                # ✅ Allow sell if we have a long position
+                # ✅ Allow sell if we have a long position or if agent thinks it should sell
                 if current_position is not None and current_position.get("side") == "long" and e["confidence"] >= min_confidence:
                     print(f"✅ SELL signal approved for {e['symbol']}")
                     filtered.append(e)
-                elif current_position is None:
-                    # ✅ Also check if agent thinks it has a position but Mother AI doesn't know
+                elif current_position is None and e["confidence"] >= min_confidence:
+                    # ✅ Agent might know about a position we don't track
                     print(f"⚠️ Agent wants to sell {e['symbol']} but Mother AI shows no position. Allowing sell anyway.")
                     filtered.append(e)
                 else:
-                    print(f"⛔ Cannot sell {e['symbol']}: position={current_position}, confidence={e['confidence']}")
+                    reason = "no_position" if current_position is None else "low_confidence"
+                    print(f"⛔ Cannot sell {e['symbol']}: {reason} (confidence={e['confidence']:.3f})")
 
         print(f"📊 Filtered trades: {[f'{t["symbol"]}-{t["signal"]}' for t in filtered]}")
         return filtered[:top_n]
@@ -231,7 +258,7 @@ class MotherAI:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return
             
-        print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price}")
+        print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f}")
         
         try:
             if signal == "buy":
@@ -245,8 +272,12 @@ class MotherAI:
                     print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}, skipping.")
                     return
 
-                print(f"📊 Buying {symbol} | Entry: {price:.2f}, SL: {sl:.2f}, TP: {tp:.2f}, Qty: {qty:.4f}")
-                order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
+                print(f"📊 Buying {symbol} | Entry: {price:.4f}, SL: {sl:.4f}, TP: {tp:.4f}, Qty: {qty:.6f}")
+                
+                # Format symbol for Binance API
+                binance_symbol = symbol.replace("USDT", "/USDT") if not "/" in symbol else symbol
+                order = place_market_order(binance_symbol, signal, qty)
+                
                 if order:
                     self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = {
@@ -258,19 +289,26 @@ class MotherAI:
                         "qty": qty
                     }
                     print(f"✅ BUY order executed for {symbol}")
+                else:
+                    print(f"❌ BUY order failed for {symbol}")
 
             elif signal == "sell":
                 pos = self.position_tracker.get(symbol, {})
-                qty = pos.get("qty", 0)
+                qty = pos.get("qty", 0) if isinstance(pos, dict) else 0
 
                 # ✅ If we don't have qty tracked, use a default or get from agent
                 if qty <= 0:
                     print(f"⚠️ No quantity tracked for {symbol}. Using default qty for sell.")
-                    # You might want to get this from your agent or use a default
-                    qty = 0.001  # Use a small default or implement logic to get actual qty
+                    # Calculate a reasonable default quantity based on risk amount
+                    risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
+                    qty = risk_amount / price  # Simple approximation
 
-                print(f"📊 Selling {symbol} | Qty: {qty:.4f} at ${price}")
-                order = place_market_order(symbol.replace("USDT", "/USDT"), signal, qty)
+                print(f"📊 Selling {symbol} | Qty: {qty:.6f} at ${price:.4f}")
+                
+                # Format symbol for Binance API
+                binance_symbol = symbol.replace("USDT", "/USDT") if not "/" in symbol else symbol
+                order = place_market_order(binance_symbol, signal, qty)
+                
                 if order:
                     self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = None  # Clear position
@@ -290,16 +328,15 @@ class MotherAI:
         # Step 1: Check open positions for SL/TP/Timeout exit
         for symbol, pos in list(self.position_tracker.items()):
             if isinstance(pos, dict) and pos.get("side") == "long":
-                df = fetch_ohlcv(symbol, "1h", 1)
-                price = df["close"].iloc[-1] if not df.empty else None
+                df = self._fetch_agent_data(symbol)
+                price = df["close"].iloc[-1] if df is not None and not df.empty else None
                 if price:
                     # ✅ Show debug info
                     held_for = int(time.time() - pos.get("entry_time", 0))
                     print(
-    f"🔍 Checking {symbol} | Held for: {held_for}s | "
-    f"SL: {pos.get('stop_loss', 0):.2f}, TP: {pos.get('take_profit', 0):.2f}, Now: {price:.2f}"
-)
-
+                        f"🔍 Checking {symbol} | Held for: {held_for}s | "
+                        f"SL: {pos.get('stop_loss', 0):.4f}, TP: {pos.get('take_profit', 0):.4f}, Now: {price:.4f}"
+                    )
                     
                     exit_reason = self.check_exit_conditions(symbol, price)
                     if exit_reason:
@@ -320,11 +357,11 @@ class MotherAI:
             return {"decision": [], "timestamp": timestamp}
 
         decision = top[0]
-        df = fetch_ohlcv(decision["symbol"], "1h", 1)
-        price = df["close"].iloc[-1] if not df.empty else None
+        df = self._fetch_agent_data(decision["symbol"])
+        price = df["close"].iloc[-1] if df is not None and not df.empty else None
         result = {**decision, "last_price": price}
 
-        print(f"🎯 Top decision: {decision['symbol']} {decision['signal']} (score: {decision['score']}, confidence: {decision['confidence']})")
+        print(f"🎯 Top decision: {decision['symbol']} {decision['signal']} (score: {decision['score']:.3f}, confidence: {decision['confidence']:.3f})")
 
         if decision["signal"] in ("buy", "sell") and price:
             self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])

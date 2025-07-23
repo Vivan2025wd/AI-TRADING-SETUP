@@ -18,5 +18,45 @@
     "price": 203.5,
     "timestamp": "2025-07-22T17:05:16.124686",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.99,
+    "score": 0.99,
+    "last_price": 198.06,
+    "price": 198.06,
+    "timestamp": "2025-07-23T09:47:52.401273",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 198.05,
+    "price": 198.05,
+    "timestamp": "2025-07-23T09:48:05.956144",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 197.0,
+    "price": 197.0,
+    "timestamp": "2025-07-23T10:22:09.193351",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 196.92,
+    "price": 196.92,
+    "timestamp": "2025-07-23T10:22:22.297019",
+    "source": "mother_ai_decision"
   }
 ]

@@ -78,5 +78,115 @@
     "price": 0.8846,
     "timestamp": "2025-07-22T17:05:39.362739",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8699,
+    "price": 0.8699,
+    "timestamp": "2025-07-23T08:51:39.238976",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8634,
+    "price": 0.8634,
+    "timestamp": "2025-07-23T09:45:50.771884",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8637,
+    "price": 0.8637,
+    "timestamp": "2025-07-23T09:45:50.771884",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8639,
+    "price": 0.8639,
+    "timestamp": "2025-07-23T09:46:06.700624",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8633,
+    "price": 0.8633,
+    "timestamp": "2025-07-23T09:57:39.224786",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8605,
+    "price": 0.8605,
+    "timestamp": "2025-07-23T10:21:37.746220",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.861,
+    "price": 0.861,
+    "timestamp": "2025-07-23T10:21:37.746220",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8605,
+    "price": 0.8605,
+    "timestamp": "2025-07-23T10:21:50.264856",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8623,
+    "price": 0.8623,
+    "timestamp": "2025-07-23T10:55:02.219739",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8603,
+    "price": 0.8603,
+    "timestamp": "2025-07-23T11:19:06.174832",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8602,
+    "price": 0.8602,
+    "timestamp": "2025-07-23T11:19:06.174832",
+    "source": "mother_ai_decision"
   }
 ]
