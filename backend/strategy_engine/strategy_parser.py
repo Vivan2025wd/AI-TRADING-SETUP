@@ -1,5 +1,10 @@
 import pandas as pd
-from backend.ml_engine.indicators import calculate_rsi, calculate_ema
+from backend.ml_engine.indicators import (
+    calculate_rsi,
+    calculate_ema,
+    calculate_sma,
+    calculate_macd
+)
 
 class StrategyParser:
     def __init__(self, strategy_json: dict):
@@ -9,7 +14,7 @@ class StrategyParser:
 
     def apply_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Adds indicator columns (e.g., RSI, EMA) to the OHLCV dataframe based on strategy.
+        Adds indicator columns (RSI, EMA, SMA, MACD) to the OHLCV dataframe based on strategy.
         Assumes df has 'close' price column.
         """
         if "rsi" in self.indicators:
@@ -20,52 +25,85 @@ class StrategyParser:
             period = self.indicators["ema"].get("period", 20)
             df["ema"] = calculate_ema(df["close"], period)
 
+        if "sma" in self.indicators:
+            period = self.indicators["sma"].get("period", 20)
+            df["sma"] = calculate_sma(df["close"], period)
+
+        if "macd" in self.indicators:
+            fast = self.indicators["macd"].get("fast_period", 12)
+            slow = self.indicators["macd"].get("slow_period", 26)
+            signal = self.indicators["macd"].get("signal_period", 9)
+            macd_line, signal_line, _ = calculate_macd(df["close"], fast, slow, signal)
+            df["macd"] = macd_line
+            df["macd_signal"] = signal_line
+
         return df
 
     def evaluate_conditions(self, df: pd.DataFrame) -> list[str]:
-        """
-        Evaluate buy/sell/hold logic for each row in the dataframe.
-        Returns a list of signals (strings): ["buy", "hold", "sell", ...]
-        """
         signals = []
 
-        for _, row in df.iterrows():
-            buy_signal = False
-            sell_signal = False
+        for i in range(1, len(df)):
+            row = df.iloc[i]
+            prev_row = df.iloc[i - 1]
 
             # RSI logic
+            rsi_buy = rsi_sell = False
             if "rsi" in self.indicators:
-                rsi_val = row.get("rsi", None)
+                rsi_val = row.get("rsi")
                 rsi_conf = self.indicators["rsi"]
                 if rsi_val is not None:
-                    buy_below = rsi_conf.get("buy_below", 30)
-                    sell_above = rsi_conf.get("sell_above", 70)
-                    if rsi_val < buy_below:
-                        buy_signal = True
-                    elif rsi_val > sell_above:
-                        sell_signal = True
+                    rsi_buy = rsi_val < rsi_conf.get("buy_below", 30)
+                    rsi_sell = rsi_val > rsi_conf.get("sell_above", 70)
 
-            # EMA logic
+            # EMA crossover logic
+            ema_buy = ema_sell = False
             if "ema" in self.indicators:
-                price = row.get("close", None)
-                ema_val = row.get("ema", None)
-                ema_conf = self.indicators["ema"]
-                if price is not None and ema_val is not None:
-                    # Buy when price crosses above EMA if buy_crosses_above is True
-                    if ema_conf.get("buy_crosses_above", False) and price > ema_val:
-                        buy_signal = True
-                    # Sell when price crosses below EMA if sell_crosses_below is True
-                    elif ema_conf.get("sell_crosses_below", False) and price < ema_val:
-                        sell_signal = True
+                price_now = row.get("close")
+                price_prev = prev_row.get("close")
+                ema_now = row.get("ema")
+                ema_prev = prev_row.get("ema")
+                if price_now and ema_now and price_prev and ema_prev:
+                    ema_buy = (
+                        self.indicators["ema"].get("buy_crosses_above", False)
+                        and price_prev < ema_prev and price_now > ema_now
+                    )
+                    ema_sell = (
+                        self.indicators["ema"].get("sell_crosses_below", False)
+                        and price_prev > ema_prev and price_now < ema_now
+                    )
 
-            # Combine conditions to determine final signal
-            if buy_signal and not sell_signal:
+            # SMA crossover logic
+            sma_buy = sma_sell = False
+            if "sma" in self.indicators:
+                price_now = row.get("close")
+                price_prev = prev_row.get("close")
+                sma_now = row.get("sma")
+                sma_prev = prev_row.get("sma")
+                if price_now and sma_now and price_prev and sma_prev:
+                    sma_buy = price_prev < sma_prev and price_now > sma_now
+                    sma_sell = price_prev > sma_prev and price_now < sma_now
+
+            # MACD crossover logic
+            macd_buy = macd_sell = False
+            if "macd" in self.indicators:
+                macd_now = row.get("macd")
+                macd_prev = prev_row.get("macd")
+                signal_now = row.get("macd_signal")
+                signal_prev = prev_row.get("macd_signal")
+                if macd_now is not None and macd_prev is not None and signal_now is not None and signal_prev is not None:
+                    macd_buy = macd_prev < signal_prev and macd_now > signal_now
+                    macd_sell = macd_prev > signal_prev and macd_now < signal_now
+
+            # Combine signals: simple logic — buy if any indicator signals buy, sell if any sell, else hold
+            if any([rsi_buy, ema_buy, sma_buy, macd_buy]):
                 signals.append("buy")
-            elif sell_signal and not buy_signal:
+            elif any([rsi_sell, ema_sell, sma_sell, macd_sell]):
                 signals.append("sell")
             else:
                 signals.append("hold")
 
+        # pad first row with "hold" since we skip index 0
+        signals.insert(0, "hold")
         return signals
 
     @staticmethod
@@ -87,7 +125,7 @@ class StrategyParser:
         signals = self.evaluate_conditions(df)
         action = signals[-1] if signals else "hold"
 
-    # Optional: in future, use more complex logic to assign real confidence values
+        # Optional: in future, use more complex logic to assign real confidence values
         confidence = 1.0 if action in ["buy", "sell"] else 0.0
 
         return {
