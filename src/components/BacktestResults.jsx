@@ -31,30 +31,25 @@ export default function BacktestResults() {
       setLoading(true);
       setError(null);
       try {
-
         const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results?page=1&limit=100");
         if (!res.ok) throw new Error("Failed to fetch backtest results");
         const data = await res.json();
 
+        // Preprocess trades
         const rawTrades = Array.isArray(data.data) ? data.data : [];
-
         const processedTrades = rawTrades.map((trade) => ({
           timestamp: trade.timestamp,
           price: trade.price,
           profit_percent: trade.profit_percent,
           balance: trade.balance,
-          type: trade.profit_percent >= 0 ? "SELL" : "BUY", // Simple type assignment
+          type: trade.profit_percent >= 0 ? "SELL" : "BUY",
         }));
 
-        setTrades(processedTrades);
+        setResults({
+          capital_over_time: data.capital_over_time || [],
+          trades: processedTrades,
+        });
 
-        // This is a placeholder for where you might trigger a backtest.
-        // For now, we'll just fetch the results.
-        const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results?page=1&limit=100");
-        if (!res.ok) throw new Error("Failed to fetch backtest results");
-        const data = await res.json();
-        setResults(data);
- main
       } catch (err) {
         console.error(err);
         setError(err.message || "Unknown error occurred");
@@ -100,7 +95,7 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : !results?.capital_over_time || results.capital_over_time.length === 0 ? (
+        ) : !results?.capital_over_time.length ? (
           <p className="text-gray-400 text-center">No backtest data found.</p>
         ) : (
           <Line
@@ -139,7 +134,7 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : !results?.trades || results.trades.length === 0 ? (
+        ) : !results?.trades.length ? (
           <p className="text-gray-400 text-center p-4">No trades to display.</p>
         ) : (
           <table className="min-w-full text-sm text-left">
@@ -153,7 +148,7 @@ export default function BacktestResults() {
               </tr>
             </thead>
             <tbody>
-              {[...results.trades]
+              {results.trades
                 .slice(-10)
                 .reverse()
                 .map((trade, i) => (
@@ -166,9 +161,7 @@ export default function BacktestResults() {
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           trade.type === "BUY"
                             ? "bg-blue-700 text-blue-200"
-                            : trade.type === "SELL"
-                            ? "bg-red-700 text-red-200"
-                            : "bg-gray-700 text-gray-300"
+                            : "bg-red-700 text-red-200"
                         }`}
                       >
                         {trade.type}
@@ -186,12 +179,10 @@ export default function BacktestResults() {
                     </td>
                     <td
                       className={`px-6 py-3 font-semibold ${
-                        typeof trade.profit_percent === "number"
-                          ? trade.profit_percent > 0
-                            ? "text-green-400"
-                            : trade.profit_percent < 0
-                            ? "text-red-400"
-                            : "text-gray-400"
+                        trade.profit_percent > 0
+                          ? "text-green-400"
+                          : trade.profit_percent < 0
+                          ? "text-red-400"
                           : "text-gray-400"
                       }`}
                     >
