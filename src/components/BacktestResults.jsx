@@ -12,7 +12,6 @@ import {
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
-// Helper: fetch with timeout
 const fetchWithTimeout = (url, options = {}, timeout = 10000) =>
   Promise.race([
     fetch(url, options),
@@ -25,19 +24,37 @@ export default function BacktestResults() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retry, setRetry] = useState(0); // trigger for retry
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     async function fetchBacktestResults() {
       setLoading(true);
       setError(null);
       try {
+
+        const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results?page=1&limit=100");
+        if (!res.ok) throw new Error("Failed to fetch backtest results");
+        const data = await res.json();
+
+        const rawTrades = Array.isArray(data.data) ? data.data : [];
+
+        const processedTrades = rawTrades.map((trade) => ({
+          timestamp: trade.timestamp,
+          price: trade.price,
+          profit_percent: trade.profit_percent,
+          balance: trade.balance,
+          type: trade.profit_percent >= 0 ? "SELL" : "BUY", // Simple type assignment
+        }));
+
+        setTrades(processedTrades);
+
         // This is a placeholder for where you might trigger a backtest.
         // For now, we'll just fetch the results.
         const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results?page=1&limit=100");
         if (!res.ok) throw new Error("Failed to fetch backtest results");
         const data = await res.json();
         setResults(data);
+ main
       } catch (err) {
         console.error(err);
         setError(err.message || "Unknown error occurred");
@@ -70,7 +87,6 @@ export default function BacktestResults() {
         Backtest Results
       </h2>
 
-      {/* Chart Section */}
       <div className="bg-gray-900 p-6 rounded-xl shadow-lg" style={{ minHeight: 250 }}>
         {loading ? (
           <p className="text-gray-400 text-center">⏳ Loading chart...</p>
@@ -110,7 +126,6 @@ export default function BacktestResults() {
         )}
       </div>
 
-      {/* Table Section */}
       <div className="overflow-x-auto bg-gray-900 rounded-xl shadow-lg">
         {loading ? (
           <p className="text-gray-400 text-center p-4">⏳ Loading table...</p>

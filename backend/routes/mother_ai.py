@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import JSONResponse
 from backend.mother_ai.mother_ai import MotherAI
-from backend.mother_ai.trade_executer import execute_mother_ai_decision
 from backend.mother_ai.profit_calculator import compute_trade_profits
 
 import os
@@ -56,31 +55,6 @@ def trigger_decision():
     latest_decision = mother_ai_instance.make_portfolio_decision(min_score=0.5)
     print(f"[DEBUG] Latest decision: {latest_decision}")
     return latest_decision
-
-
-@router.post("/execute")
-@log_endpoint
-def execute_mother_decision():
-    result = mother_ai_instance.make_portfolio_decision()
-    decision = result.get("decision", {})
-
-    if not decision:
-        return JSONResponse(
-            status_code=200,
-            content={"message": "No valid decision to execute.", "executed_trades": []}
-        )
-
-    executed = execute_mother_ai_decision(result)
-    symbol = decision.get("symbol")
-    signal = decision.get("signal", "").lower()
-
-    if signal == "sell" and symbol:
-        compute_trade_profits(symbol)
-
-    return {
-        "message": f"{len(executed)} trades executed.",
-        "executed_trades": executed
-    }
 
 
 @router.get("/decision")

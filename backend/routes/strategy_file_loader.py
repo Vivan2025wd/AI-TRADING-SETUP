@@ -28,14 +28,53 @@ def load_all_strategies() -> List[Dict]:
 
 
 def load_trade_profits_summary(symbol: str) -> Dict:
-    """Load trade profits summary for a symbol"""
+    """Load and format trade profits summary for a symbol"""
     try:
         summary_path = TRADE_PROFITS_DIR / f"{symbol.upper()}_summary.json"
         if not summary_path.exists():
             return {}
-        
+
         with open(summary_path, "r") as f:
-            return json.load(f)
+            raw_data = json.load(f)
+
+        total_profit = float(raw_data.get("total_profit_dollars", 0.0))
+        total_trades = int(raw_data.get("total_trades", 0))
+        wins = int(raw_data.get("wins", 0))
+        losses = int(raw_data.get("losses", 0))
+        win_rate = float(raw_data.get("win_rate", 0.0))
+        trades = raw_data.get("trades", [])
+
+        # Ensure proper formatting of trades
+        formatted_trades = []
+        for trade in trades:
+            formatted_trade = {
+                "entry_time": trade["entry_time"],
+                "entry_price": round(float(trade["entry_price"]), 4),
+                "exit_time": trade["exit_time"],
+                "exit_price": round(float(trade["exit_price"]), 4),
+                "qty": round(float(trade["qty"]), 6),
+                "entry_value": round(float(trade.get("entry_value", trade["entry_price"] * trade["qty"])), 4),
+                "exit_value": round(float(trade.get("exit_value", trade["exit_price"] * trade["qty"])), 4),
+                "pnl_dollars": round(float(trade["pnl_dollars"]), 6),
+                "pnl_percentage": round(float(trade["pnl_percentage"]), 4)
+            }
+            formatted_trades.append(formatted_trade)
+
+        avg_profit = total_profit / total_trades if total_trades > 0 else 0.0
+
+        formatted_summary = {
+            "symbol": symbol.upper(),
+            "total_profit_dollars": round(total_profit, 6),
+            "avg_profit_per_trade": round(avg_profit, 6),
+            "total_trades": total_trades,
+            "wins": wins,
+            "losses": losses,
+            "win_rate": round(win_rate, 2),
+            "trades": formatted_trades
+        }
+
+        return formatted_summary
+
     except Exception as e:
         print(f"[Error loading trade profits for {symbol}]: {e}")
         return {}
@@ -66,33 +105,27 @@ async def rate_strategies_for_symbol(symbol: str):
     """Get rated strategies for a specific symbol with performance data"""
     symbol = symbol.upper()
     
-    # Load all strategies for this symbol
     all_strategies = load_all_strategies()
     symbol_strategies = [s for s in all_strategies if s["symbol"] == symbol]
     
     if not symbol_strategies:
         raise HTTPException(status_code=404, detail=f"No strategies found for {symbol}")
     
-    # Load trade profits summary for this symbol
     trade_profits = load_trade_profits_summary(symbol)
     
-    # Create rated strategies with performance data
     rated_strategies = []
     for strategy in symbol_strategies:
         strategy_id = strategy["strategy_id"]
         
-        # Calculate performance metrics from trade_profits data
-        win_rate = trade_profits.get("win_rate", 0) / 100.0  # Convert percentage to decimal
+        win_rate = trade_profits.get("win_rate", 0.0) / 100.0
         total_trades = trade_profits.get("total_trades", 0)
-        total_profit = trade_profits.get("total_profit", 0)
+        total_profit = trade_profits.get("total_profit_dollars", 0.0)
         wins = trade_profits.get("wins", 0)
         losses = trade_profits.get("losses", 0)
-        
-        # Calculate average profit per trade
-        avg_profit = total_profit / total_trades if total_trades > 0 else 0
-        
-        # For now, we'll use a mock confidence score (you can implement actual logic)
-        avg_confidence = 0.75  # 75% confidence as default
+        avg_profit = trade_profits.get("avg_profit_per_trade", 0.0)
+
+        # Mock confidence for now
+        avg_confidence = 0.75
         
         rated_strategy = {
             "strategy_id": strategy_id,
@@ -135,7 +168,6 @@ async def get_strategy_performance(symbol: str, strategy_id: str):
     """Get performance data for a specific strategy"""
     symbol = symbol.upper()
     
-    # First try to load from performance_logs (if you have strategy-specific data)
     perf_path = PERFORMANCE_DIR / f"{symbol}_strategy_{strategy_id}.json"
     if perf_path.exists():
         try:
@@ -146,15 +178,14 @@ async def get_strategy_performance(symbol: str, strategy_id: str):
                 win_rate = wins / total if total else 0
                 return {"win_rate": round(win_rate, 4), "total_trades": total}
         except Exception as e:
-            pass
+            print(f"[Error loading performance log]: {e}")
     
-    # Fallback to symbol-level trade profits summary
     trade_profits = load_trade_profits_summary(symbol)
     if trade_profits:
         return {
-            "win_rate": trade_profits.get("win_rate", 0) / 100.0,
+            "win_rate": trade_profits.get("win_rate", 0.0) / 100.0,
             "total_trades": trade_profits.get("total_trades", 0),
-            "total_profit": trade_profits.get("total_profit", 0),
+            "total_profit": trade_profits.get("total_profit_dollars", 0.0),
             "wins": trade_profits.get("wins", 0),
             "losses": trade_profits.get("losses", 0)
         }

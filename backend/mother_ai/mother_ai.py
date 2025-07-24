@@ -162,7 +162,8 @@ class MotherAI:
             "is_sell": int(prediction["signal"] == "sell")
         })
 
-    def _log_trade_execution(self, symbol, signal, price, confidence, score, timestamp):
+    def _log_trade_execution(self, symbol, signal, price, confidence, score, timestamp, qty=None):
+        """Log trade execution with quantity information"""
         path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")
         entry = {
             "symbol": symbol,
@@ -171,6 +172,7 @@ class MotherAI:
             "score": round(score, 4),
             "last_price": round(price, 4),
             "price": round(price, 4),
+            "qty": round(qty, 6) if qty is not None else None,  # ✅ Fixed: Handle None case
             "timestamp": timestamp,
             "source": "mother_ai_decision"
         }
@@ -256,9 +258,11 @@ class MotherAI:
     def execute_trade(self, symbol, signal, price, confidence):
         if signal not in ("buy", "sell") or not price:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
-            return
+            return None
             
         print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f}")
+        
+        qty = None  # Initialize qty variable
         
         try:
             if signal == "buy":
@@ -270,7 +274,7 @@ class MotherAI:
                 # ✅ Sanity check qty
                 if qty <= 0:
                     print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}, skipping.")
-                    return
+                    return None
 
                 print(f"📊 Buying {symbol} | Entry: {price:.4f}, SL: {sl:.4f}, TP: {tp:.4f}, Qty: {qty:.6f}")
                 
@@ -318,6 +322,9 @@ class MotherAI:
 
         except Exception as e:
             print(f"❌ Trade execution error for {symbol}: {e}")
+            
+        # ✅ Return the quantity so it can be used for logging
+        return qty
 
     def make_portfolio_decision(self, min_score=0.5):
         auto_cleanup_logs()
@@ -340,13 +347,16 @@ class MotherAI:
                     
                     exit_reason = self.check_exit_conditions(symbol, price)
                     if exit_reason:
+                        # Get qty from position tracker for logging
+                        exit_qty = pos.get("qty", None)
                         self._log_trade_execution(
                             symbol=symbol,
                             signal="sell",
                             price=price,
                             confidence=1.0,
                             score=1.0,
-                            timestamp=timestamp
+                            timestamp=timestamp,
+                            qty=exit_qty  # ✅ Pass quantity
                         )
                         compute_trade_profits(symbol)
 
@@ -364,14 +374,17 @@ class MotherAI:
         print(f"🎯 Top decision: {decision['symbol']} {decision['signal']} (score: {decision['score']:.3f}, confidence: {decision['confidence']:.3f})")
 
         if decision["signal"] in ("buy", "sell") and price:
-            self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])
+            # ✅ Get quantity from execute_trade
+            executed_qty = self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])
+            
             self._log_trade_execution(
                 symbol=decision["symbol"],
                 signal=decision["signal"],
                 price=price,
                 confidence=decision["confidence"],
                 score=decision["score"],
-                timestamp=timestamp
+                timestamp=timestamp,
+                qty=executed_qty  # ✅ Pass the executed quantity
             )
             if decision["signal"] == "sell":
                 compute_trade_profits(decision["symbol"])
