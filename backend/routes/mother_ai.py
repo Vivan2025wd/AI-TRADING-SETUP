@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import JSONResponse
 from backend.mother_ai.mother_ai import MotherAI
 from backend.mother_ai.profit_calculator import compute_trade_profits
@@ -20,7 +20,7 @@ latest_decision = None
 def log_endpoint(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        log(f"📥 {func.__name__} called")
+.        log(f"📥 {func.__name__} called")
         try:
             result = func(*args, **kwargs)
             log(f"✅ {func.__name__} completed successfully")
@@ -59,7 +59,11 @@ def trigger_decision():
 
 @router.get("/decision")
 @log_endpoint
-def get_mother_ai_decision():
+def get_mother_ai_decision(is_live: bool = Query(False)):
+    if is_live:
+        # Placeholder for live trading logic
+        return {"message": "Live trading not implemented yet."}
+
     result = mother_ai_instance.make_portfolio_decision()
     decision = result.get("decision", {})
 
