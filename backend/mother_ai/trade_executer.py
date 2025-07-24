@@ -8,7 +8,6 @@ from backend.utils.logger import logger
 # --- Paths ---
 BASE_DIR = os.path.dirname(__file__)
 STORAGE_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'storage'))
-
 MOCK_BALANCE_FILE = os.path.join(STORAGE_DIR, 'mock_balance.json')
 # Removed TRADE_HISTORY_DIR since we no longer use trade_history logs
 PERFORMANCE_LOG_DIR = os.path.join(STORAGE_DIR, 'performance_logs')
