@@ -4,29 +4,10 @@
     "signal": "buy",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 3.4818,
-    "price": 3.4818,
-    "timestamp": "2025-07-22T14:26:19.782560",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "XRPUSDT",
-    "signal": "sell",
-    "confidence": 0.99,
-    "score": 0.99,
-    "last_price": 3.5103,
-    "price": 3.5103,
-    "timestamp": "2025-07-22T16:24:39.144830",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "XRPUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 3.4536,
-    "price": 3.4536,
-    "timestamp": "2025-07-23T09:46:06.700624",
+    "last_price": 3.2285,
+    "price": 3.2285,
+    "qty": 103.247122,
+    "timestamp": "2025-07-24T01:57:38.779213",
     "source": "mother_ai_decision"
   },
   {
@@ -34,29 +15,10 @@
     "signal": "sell",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 3.4549,
-    "price": 3.4549,
-    "timestamp": "2025-07-23T09:47:59.403935",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "XRPUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 3.4421,
-    "price": 3.4421,
-    "timestamp": "2025-07-23T10:22:15.880595",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "XRPUSDT",
-    "signal": "sell",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 3.4421,
-    "price": 3.4421,
-    "timestamp": "2025-07-23T10:22:28.328638",
+    "last_price": 3.2303,
+    "price": 3.2303,
+    "qty": null,
+    "timestamp": "2025-07-24T01:58:40.656155",
     "source": "mother_ai_decision"
   }
 ]

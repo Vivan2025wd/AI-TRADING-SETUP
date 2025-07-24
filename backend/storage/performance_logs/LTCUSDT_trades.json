@@ -4,9 +4,10 @@
     "signal": "buy",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 113.75,
-    "price": 113.75,
-    "timestamp": "2025-07-22T14:26:07.213422",
+    "last_price": 114.17,
+    "price": 114.17,
+    "qty": 2.919623,
+    "timestamp": "2025-07-24T01:57:17.700932",
     "source": "mother_ai_decision"
   },
   {
@@ -14,69 +15,10 @@
     "signal": "sell",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 116.51,
-    "price": 116.51,
-    "timestamp": "2025-07-22T17:05:39.362739",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "LTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 116.54,
-    "price": 116.54,
-    "timestamp": "2025-07-22T17:05:53.445292",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "LTCUSDT",
-    "signal": "sell",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 117.73,
-    "price": 117.73,
-    "timestamp": "2025-07-23T08:51:44.198315",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "LTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 117.06,
-    "price": 117.06,
-    "timestamp": "2025-07-23T09:45:18.885585",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "LTCUSDT",
-    "signal": "sell",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 117.2,
-    "price": 117.2,
-    "timestamp": "2025-07-23T09:45:58.123640",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "LTCUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 117.19,
-    "price": 117.19,
-    "timestamp": "2025-07-23T10:22:02.968427",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "LTCUSDT",
-    "signal": "sell",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 117.34,
-    "price": 117.34,
-    "timestamp": "2025-07-23T10:22:15.880595",
+    "last_price": 114.18,
+    "price": 114.18,
+    "qty": null,
+    "timestamp": "2025-07-24T01:57:38.779213",
     "source": "mother_ai_decision"
   }
 ]

@@ -29,6 +29,9 @@ def compute_trade_profits(symbol: str):
         signal = trade.get("signal", "").lower()
         price = trade.get("price")
         timestamp = trade.get("timestamp")
+        
+        # NEW: Get quantity from trade data if available
+        qty = trade.get("qty", None)
 
         # Skip invalid entries
         if price is None or signal not in {"buy", "sell"}:
@@ -36,37 +39,71 @@ def compute_trade_profits(symbol: str):
 
         # Buy: open position if none is open
         if signal == "buy" and position is None:
+            # Calculate quantity if not provided
+            if qty is None:
+                # Fallback calculation using the same logic as MotherAI
+                RISK_PER_TRADE = 0.01
+                DEFAULT_BALANCE_USD = 1000
+                SL_PERCENT = 0.03
+                
+                risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE  # $10
+                sl_price = price * (1 - SL_PERCENT)
+                qty = risk_amount / (price - sl_price)
+                
+                print(f"📊 Calculated qty for {symbol}: {qty:.6f} (risk: ${risk_amount})")
+
             position = {
                 "entry_price": price,
-                "entry_time": timestamp
+                "entry_time": timestamp,
+                "qty": qty,
+                "capital_invested": price * qty  # Track actual capital invested
             }
 
         # Sell: close position if one is open
         elif signal == "sell" and position is not None:
-            pnl = price - position["entry_price"]
-            total_profit += pnl
+            # Use the same quantity as the buy order
+            sell_qty = qty if qty is not None else position.get("qty", 0)
+            
+            # Calculate ACTUAL profit in dollars
+            entry_value = position["entry_price"] * sell_qty
+            exit_value = price * sell_qty
+            pnl_dollars = exit_value - entry_value
+            
+            # Calculate percentage return on invested capital
+            pnl_percentage = (pnl_dollars / entry_value) * 100 if entry_value > 0 else 0
+            
+            total_profit += pnl_dollars
             total_trades += 1
 
-            if pnl >= 0:
+            if pnl_dollars >= 0:
                 wins += 1
             else:
                 losses += 1
 
             trade_log.append({
                 "entry_time": position["entry_time"],
-                "entry_price": round(position["entry_price"], 4),
+                "entry_price": round(position["entry_price"], 6),
                 "exit_time": timestamp,
-                "exit_price": round(price, 4),
-                "pnl": round(pnl, 4)
+                "exit_price": round(price, 6),
+                "qty": round(sell_qty, 6),
+                "entry_value": round(entry_value, 4),
+                "exit_value": round(exit_value, 4),
+                "pnl_dollars": round(pnl_dollars, 4),
+                "pnl_percentage": round(pnl_percentage, 2)
             })
+
+            print(f"💰 {symbol} Trade: Entry=${position['entry_price']:.6f}, Exit=${price:.6f}, "
+                  f"Qty={sell_qty:.6f}, P&L=${pnl_dollars:.4f} ({pnl_percentage:.2f}%)")
 
             position = None  # Reset after closing trade
 
     win_rate = round((wins / total_trades) * 100, 2) if total_trades > 0 else 0.0
+    avg_profit_per_trade = round(total_profit / total_trades, 4) if total_trades > 0 else 0.0
 
     summary = {
         "symbol": symbol,
-        "total_profit": round(total_profit, 4),
+        "total_profit_dollars": round(total_profit, 4),
+        "avg_profit_per_trade": avg_profit_per_trade,
         "total_trades": total_trades,
         "wins": wins,
         "losses": losses,

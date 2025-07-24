@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, ChevronDown, ChevronUp } from "lucide-react";
 
 // Helpers
 const getOperator = (k) => (k.includes("below") ? "<" : k.includes("above") ? ">" : "==");
@@ -18,10 +18,11 @@ export default function StrategyPerformance() {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
 
-  const [deleting, setDeleting] = useState(null); // for confirmation modal
+  const [deleting, setDeleting] = useState(null);
+  const [expanded, setExpanded] = useState({});
 
   useEffect(() => {
-    const fetchRatedStrategies = async () => {
+    const fetchStrategies = async () => {
       setLoading(true);
       setError(null);
 
@@ -33,21 +34,33 @@ export default function StrategyPerformance() {
 
         const strategiesRaw = listData.data || [];
         const symbolSet = [...new Set(strategiesRaw.map((s) => s.symbol))];
-        let allRatedStrategies = [];
+        let allStrategies = [];
 
         for (const symbol of symbolSet) {
           try {
+            // Get trade profits data first
+            const resTradeProfits = await fetch(`/api/strategies/trade-profits/${symbol}`);
+            const tradeProfitsData = resTradeProfits.ok ? await resTradeProfits.json() : null;
+
+            // Get rated strategies data
             const resRated = await fetch(`/api/strategies/${symbol}/rate-strategies`);
             if (!resRated.ok) continue;
             const ratedData = await resRated.json();
+
             if (ratedData.strategies?.length) {
-              const mapped = ratedData.strategies.map((s) => ({ ...s, symbol }));
-              allRatedStrategies.push(...mapped);
+              const mapped = ratedData.strategies.map((s) => ({
+                ...s,
+                symbol,
+                tradeProfitsData // Attach the full trade profits data
+              }));
+              allStrategies.push(...mapped);
             }
-          } catch {}
+          } catch (err) {
+            console.error(`Error fetching data for ${symbol}:`, err);
+          }
         }
 
-        const paged = allRatedStrategies.slice(0, limit);
+        const paged = allStrategies.slice(0, limit);
 
         const enriched = await Promise.all(
           paged.map(async (strat) => {
@@ -71,17 +84,28 @@ export default function StrategyPerformance() {
                 )
               : [];
 
+            // Use data from tradeProfitsData if available, otherwise fall back to rated data
+            const tradeProfits = strat.tradeProfitsData;
+            const winRate = tradeProfits ? tradeProfits.win_rate : (strat.win_rate * 100 || 0);
+            const totalProfit = tradeProfits ? tradeProfits.total_profit_dollars : (strat.total_profit || 0);
+            const avgProfit = tradeProfits ? tradeProfits.avg_profit_per_trade : (strat.avg_profit || 0);
+            const totalTrades = tradeProfits ? tradeProfits.total_trades : (strat.total || 0);
+            const wins = tradeProfits ? tradeProfits.wins : (strat.wins || 0);
+            const losses = tradeProfits ? tradeProfits.losses : (strat.losses || 0);
+            const trades = tradeProfits ? tradeProfits.trades : [];
+
             return {
               id: strat.strategy_id,
               agent: strat.symbol,
-              winRate: strat.win_rate * 100 || 0,
-              avgProfit: strat.avg_profit || 0,
+              winRate: winRate,
+              avgProfit: avgProfit,
               avgConfidence: strat.avg_confidence * 100 || 0,
-              totalPredictions: strat.total || 0,
-              totalProfit: strat.total_profit || 0,
-              wins: strat.wins || 0,
-              losses: strat.losses || 0,
+              totalPredictions: totalTrades,
+              totalProfit: totalProfit,
+              wins: wins,
+              losses: losses,
               rules,
+              trades: trades || [],
               symbol: strat.symbol,
             };
           })
@@ -96,7 +120,7 @@ export default function StrategyPerformance() {
       }
     };
 
-    fetchRatedStrategies();
+    fetchStrategies();
   }, [page]);
 
   const handleDelete = async () => {
@@ -112,6 +136,10 @@ export default function StrategyPerformance() {
     } catch (err) {
       alert("Delete failed: " + err.message);
     }
+  };
+
+  const toggleExpand = (id) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
@@ -130,17 +158,7 @@ export default function StrategyPerformance() {
             <table className="w-full text-sm border border-gray-700 rounded">
               <thead className="bg-gray-800 text-left">
                 <tr>
-                  {[
-                    "Agent",
-                    "Strategy ID",
-                    "Win Rate",
-                    "Profit",
-                    "Avg Profit",
-                    "Confidence",
-                    "Trades",
-                    "Rules",
-                    "Action",
-                  ].map((h) => (
+                  {["Agent", "Strategy ID", "Win Rate", "Total Profit", "Avg Profit", "Confidence", "Trades", "Rules", "Action"].map((h) => (
                     <th key={h} className="px-4 py-2 border border-gray-700 font-medium">
                       {h}
                     </th>
@@ -149,68 +167,122 @@ export default function StrategyPerformance() {
               </thead>
               <tbody>
                 {strategies.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-800">
-                    <td className="px-4 py-2 border border-gray-700">{s.agent}</td>
-                    <td className="px-4 py-2 border border-gray-700 text-gray-400">{s.id}</td>
-                    <td className="px-4 py-2 border border-gray-700">
-                      <span
-                        className={`px-2 py-1 text-xs font-bold rounded-full ${
-                          s.winRate >= 70
-                            ? "bg-green-800 text-green-300"
-                            : s.winRate >= 50
-                            ? "bg-yellow-800 text-yellow-300"
-                            : "bg-red-800 text-red-300"
-                        }`}
-                      >
-                        {s.winRate.toFixed(1)}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 border border-gray-700">
-                      <span className={s.totalProfit >= 0 ? "text-green-400" : "text-red-400"}>
-                        ${s.totalProfit.toFixed(2)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 border border-gray-700 text-sm">
-                      <span className={s.avgProfit >= 0 ? "text-green-400" : "text-red-400"}>
-                        ${s.avgProfit.toFixed(2)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 border border-gray-700 text-blue-400">
-                      {s.avgConfidence.toFixed(1)}%
-                    </td>
-                    <td className="px-4 py-2 border border-gray-700 text-sm">
-                      <div className="flex flex-col">
-                        <span>Total: {s.totalPredictions}</span>
-                        <span className="text-green-400">W: {s.wins}</span>
-                        <span className="text-red-400">L: {s.losses}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-2 border border-gray-700 text-xs max-w-sm">
-                      <div className="max-h-24 overflow-y-auto space-y-1">
-                        {s.rules.length > 0 ? (
-                          s.rules.map((r, i) => (
-                            <div key={i}>
-                              <span className="text-gray-200">
-                                IF {r.indicator} {r.condition} {r.value} →{" "}
-                                <span className="font-semibold text-green-400">{r.action}</span>
-                              </span>
-                            </div>
-                          ))
-                        ) : (
-                          <span className="text-gray-500 italic">No rules</span>
+                  <React.Fragment key={s.id}>
+                    <tr className="hover:bg-gray-800">
+                      <td className="px-4 py-2 border border-gray-700">{s.agent}</td>
+                      <td className="px-4 py-2 border border-gray-700 text-gray-400">{s.id}</td>
+                      <td className="px-4 py-2 border border-gray-700">
+                        <span
+                          className={`px-2 py-1 text-xs font-bold rounded-full ${
+                            s.winRate >= 70
+                              ? "bg-green-800 text-green-300"
+                              : s.winRate >= 50
+                              ? "bg-yellow-800 text-yellow-300"
+                              : "bg-red-800 text-red-300"
+                          }`}
+                        >
+                          {s.winRate.toFixed(1)}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 border border-gray-700">
+                        <span className={s.totalProfit >= 0 ? "text-green-400" : "text-red-400"}>
+                          ${s.totalProfit.toFixed(6)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 border border-gray-700 text-sm">
+                        <span className={s.avgProfit >= 0 ? "text-green-400" : "text-red-400"}>
+                          ${s.avgProfit.toFixed(6)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 border border-gray-700 text-blue-400">
+                        {s.avgConfidence.toFixed(1)}%
+                      </td>
+                      <td className="px-4 py-2 border border-gray-700 text-sm">
+                        <div className="flex flex-col">
+                          <span>Total: {s.totalPredictions}</span>
+                          <span className="text-green-400">W: {s.wins}</span>
+                          <span className="text-red-400">L: {s.losses}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 border border-gray-700 text-xs max-w-sm">
+                        <div className="max-h-24 overflow-y-auto space-y-1">
+                          {s.rules.length > 0 ? (
+                            s.rules.map((r, i) => (
+                              <div key={i}>
+                                <span className="text-gray-200">
+                                  IF {r.indicator} {r.condition} {r.value} →{" "}
+                                  <span className="font-semibold text-green-400">{r.action}</span>
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <span className="text-gray-500 italic">No rules</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 border border-gray-700 text-center">
+                        <button
+                          onClick={() => setDeleting({ symbol: s.symbol, id: s.id })}
+                          className="text-red-400 hover:text-red-600 transition mr-2"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        {s.trades.length > 0 && (
+                          <button
+                            onClick={() => toggleExpand(s.id)}
+                            className="text-blue-400 hover:text-blue-600 transition"
+                            title="Toggle Trades"
+                          >
+                            {expanded[s.id] ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </button>
                         )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-2 border border-gray-700 text-center">
-                      <button
-                        onClick={() => setDeleting({ symbol: s.symbol, id: s.id })}
-                        className="text-red-400 hover:text-red-600 transition"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
+
+                    {expanded[s.id] && s.trades.length > 0 && (
+                      <tr>
+                        <td colSpan="9" className="p-4 border-t border-gray-700 bg-gray-800">
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs">
+                              <thead>
+                                <tr className="text-gray-300">
+                                  <th className="text-left p-2">Entry Time</th>
+                                  <th className="text-left p-2">Exit Time</th>
+                                  <th className="text-left p-2">Entry Price</th>
+                                  <th className="text-left p-2">Exit Price</th>
+                                  <th className="text-left p-2">Quantity</th>
+                                  <th className="text-left p-2">Entry Value</th>
+                                  <th className="text-left p-2">Exit Value</th>
+                                  <th className="text-left p-2">PnL $</th>
+                                  <th className="text-left p-2">PnL %</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {s.trades.map((t, idx) => (
+                                  <tr key={idx} className="border-t border-gray-700">
+                                    <td className="p-2">{new Date(t.entry_time).toLocaleString()}</td>
+                                    <td className="p-2">{new Date(t.exit_time).toLocaleString()}</td>
+                                    <td className="p-2">${t.entry_price.toFixed(2)}</td>
+                                    <td className="p-2">${t.exit_price.toFixed(2)}</td>
+                                    <td className="p-2">{t.qty.toFixed(6)}</td>
+                                    <td className="p-2">${t.entry_value.toFixed(4)}</td>
+                                    <td className="p-2">${t.exit_value.toFixed(4)}</td>
+                                    <td className={`p-2 ${t.pnl_dollars >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                      ${t.pnl_dollars.toFixed(6)}
+                                    </td>
+                                    <td className={`p-2 ${t.pnl_percentage >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                      {t.pnl_percentage.toFixed(2)}%
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -222,9 +294,7 @@ export default function StrategyPerformance() {
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
               className={`px-4 py-2 rounded ${
-                page === 1
-                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                page === 1 ? "bg-gray-700 text-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
               Previous
