@@ -12,7 +12,6 @@ import {
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
-// Helper: fetch with timeout
 const fetchWithTimeout = (url, options = {}, timeout = 10000) =>
   Promise.race([
     fetch(url, options),
@@ -22,22 +21,31 @@ const fetchWithTimeout = (url, options = {}, timeout = 10000) =>
   ]);
 
 export default function BacktestResults() {
-  const [results, setResults] = useState(null);
+  const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retry, setRetry] = useState(0); // trigger for retry
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     async function fetchBacktestResults() {
       setLoading(true);
       setError(null);
       try {
-        // This is a placeholder for where you might trigger a backtest.
-        // For now, we'll just fetch the results.
         const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results?page=1&limit=100");
         if (!res.ok) throw new Error("Failed to fetch backtest results");
         const data = await res.json();
-        setResults(data);
+
+        const rawTrades = Array.isArray(data.data) ? data.data : [];
+
+        const processedTrades = rawTrades.map((trade) => ({
+          timestamp: trade.timestamp,
+          price: trade.price,
+          profit_percent: trade.profit_percent,
+          balance: trade.balance,
+          type: trade.profit_percent >= 0 ? "SELL" : "BUY", // Simple type assignment
+        }));
+
+        setTrades(processedTrades);
       } catch (err) {
         console.error(err);
         setError(err.message || "Unknown error occurred");
@@ -50,11 +58,13 @@ export default function BacktestResults() {
   }, [retry]);
 
   const chartData = {
-    labels: results?.capital_over_time?.map((c) => new Date(c.timestamp).toLocaleString()) || [],
+    labels: trades.map((trade) =>
+      trade.timestamp ? new Date(trade.timestamp).toLocaleString() : "-"
+    ),
     datasets: [
       {
-        label: "Capital Over Time",
-        data: results?.capital_over_time?.map((c) => c.capital) || [],
+        label: "Balance Over Time",
+        data: trades.map((trade) => trade.balance ?? null),
         fill: true,
         borderColor: "rgb(34,197,94)",
         backgroundColor: "rgba(34,197,94,0.2)",
@@ -70,7 +80,6 @@ export default function BacktestResults() {
         Backtest Results
       </h2>
 
-      {/* Chart Section */}
       <div className="bg-gray-900 p-6 rounded-xl shadow-lg" style={{ minHeight: 250 }}>
         {loading ? (
           <p className="text-gray-400 text-center">⏳ Loading chart...</p>
@@ -84,8 +93,8 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : !results?.capital_over_time || results.capital_over_time.length === 0 ? (
-          <p className="text-gray-400 text-center">No backtest data found.</p>
+        ) : trades.length === 0 ? (
+          <p className="text-gray-400 text-center">No backtest trades found.</p>
         ) : (
           <Line
             data={chartData}
@@ -110,7 +119,6 @@ export default function BacktestResults() {
         )}
       </div>
 
-      {/* Table Section */}
       <div className="overflow-x-auto bg-gray-900 rounded-xl shadow-lg">
         {loading ? (
           <p className="text-gray-400 text-center p-4">⏳ Loading table...</p>
@@ -124,7 +132,7 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : !results?.trades || results.trades.length === 0 ? (
+        ) : trades.length === 0 ? (
           <p className="text-gray-400 text-center p-4">No trades to display.</p>
         ) : (
           <table className="min-w-full text-sm text-left">
@@ -138,7 +146,7 @@ export default function BacktestResults() {
               </tr>
             </thead>
             <tbody>
-              {[...results.trades]
+              {[...trades]
                 .slice(-10)
                 .reverse()
                 .map((trade, i) => (

@@ -4,9 +4,10 @@
     "signal": "buy",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 4.376,
-    "price": 4.376,
-    "timestamp": "2025-07-22T14:25:42.308144",
+    "last_price": 4.119,
+    "price": 4.119,
+    "qty": 80.925791,
+    "timestamp": "2025-07-24T04:30:34.312173",
     "source": "mother_ai_decision"
   },
   {
@@ -14,49 +15,10 @@
     "signal": "sell",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 4.425,
-    "price": 4.425,
-    "timestamp": "2025-07-22T17:00:58.307430",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "DOTUSDT",
-    "signal": "buy",
-    "confidence": 0.98,
-    "score": 0.98,
-    "last_price": 4.375,
-    "price": 4.375,
-    "timestamp": "2025-07-23T09:47:59.403935",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "DOTUSDT",
-    "signal": "sell",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 4.373,
-    "price": 4.373,
-    "timestamp": "2025-07-23T09:48:11.859617",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "DOTUSDT",
-    "signal": "buy",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 4.352,
-    "price": 4.352,
-    "timestamp": "2025-07-23T10:21:50.264856",
-    "source": "mother_ai_decision"
-  },
-  {
-    "symbol": "DOTUSDT",
-    "signal": "sell",
-    "confidence": 1.0,
-    "score": 1.0,
-    "last_price": 4.353,
-    "price": 4.353,
-    "timestamp": "2025-07-23T10:22:02.968427",
+    "last_price": 4.123,
+    "price": 4.123,
+    "qty": null,
+    "timestamp": "2025-07-24T04:31:04.558005",
     "source": "mother_ai_decision"
   }
 ]

@@ -21,7 +21,7 @@ latest_decision = None
 def log_endpoint(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-.        log(f"📥 {func.__name__} called")
+        log(f"📥 {func.__name__} called")
         try:
             result = func(*args, **kwargs)
             log(f"✅ {func.__name__} completed successfully")
@@ -30,7 +30,6 @@ def log_endpoint(func):
             log(f"❌ {func.__name__} failed: {e}")
             raise HTTPException(status_code=500, detail=str(e))
     return wrapper
-
 
 # --- Logging Helper ---
 def log(message: str):
