@@ -41,8 +41,9 @@ def get_recent_backtest_results(
     if not logs_dir.exists():
         raise HTTPException(status_code=404, detail="Trade profits directory not found.")
 
-    all_trades = []
+    all_trades_raw = []
 
+    # Step 1: Load all trade summaries
     for summary_file in logs_dir.glob("*_summary.json"):
         try:
             with open(summary_file, "r") as f:
@@ -50,29 +51,41 @@ def get_recent_backtest_results(
                 symbol = summary.get("symbol", summary_file.stem.replace("_summary", ""))
                 trades = summary.get("trades", [])
 
-                balance = 100.0  # Starting virtual balance
                 for trade in trades:
-                    pnl = trade.get("pnl", 0)
-                    balance += balance * pnl
-
-                    all_trades.append({
-                        "type": "TRADE",
-                        "timestamp": trade.get("exit_time"),
-                        "price": trade.get("exit_price"),
-                        "profit_percent": pnl * 100,
-                        "balance": balance,
-                        "symbol": symbol
+                    all_trades_raw.append({
+                        "symbol": symbol,
+                        "exit_time": trade.get("exit_time"),
+                        "exit_price": trade.get("exit_price"),
+                        "pnl_dollars": trade.get("pnl_dollars", 0.0),
+                        "pnl_percentage": trade.get("pnl_percentage", 0.0)
                     })
         except Exception as e:
             print(f"Error reading {summary_file}: {e}")
 
-    # Sort by timestamp descending
-    sorted_trades = sorted(all_trades, key=lambda x: x.get("timestamp", ""), reverse=True)
+    # Step 2: Sort trades chronologically
+    sorted_trades = sorted(all_trades_raw, key=lambda x: x.get("exit_time", ""))
 
-    total = len(sorted_trades)
+    # Step 3: Calculate cumulative balance across all trades
+    balance = 100.0  # Starting Capital
+    processed_trades = []
+    for trade in sorted_trades:
+        pnl_dollars = trade.get("pnl_dollars", 0.0)
+        balance += pnl_dollars
+
+        processed_trades.append({
+            "type": "TRADE",
+            "timestamp": trade.get("exit_time"),
+            "price": trade.get("exit_price"),
+            "profit_percent": trade.get("pnl_percentage"),
+            "balance": balance,
+            "symbol": trade.get("symbol")
+        })
+
+    # Step 4: Pagination after balance calculation
+    total = len(processed_trades)
     start = (page - 1) * limit
     end = start + limit
-    paginated = sorted_trades[start:end]
+    paginated = processed_trades[start:end]
 
     return {
         "page": page,

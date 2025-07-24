@@ -20,7 +20,9 @@ export default function MotherAIBalanceChart() {
   const [error, setError] = useState(null);
   const [refreshToggle, setRefreshToggle] = useState(false);
 
-  // 1. Fetch available symbols
+  const initialCapital = 100; // <-- Set your starting capital here
+
+  // Fetch available symbols
   useEffect(() => {
     async function fetchSymbols() {
       try {
@@ -45,7 +47,7 @@ export default function MotherAIBalanceChart() {
     fetchSymbols();
   }, []);
 
-  // 2. Fetch profit summary and build capital growth history
+  // Fetch profit summary and build capital growth history
   useEffect(() => {
     if (!selectedSymbol) return;
 
@@ -66,15 +68,13 @@ export default function MotherAIBalanceChart() {
           (a, b) => new Date(a.exit_time) - new Date(b.exit_time)
         );
 
-        let capital = 0;
+        let capital = initialCapital;
         const historyData = sorted.map((trade) => {
-          capital += trade.pnl;
+          capital += trade.pnl_dollars; // <-- Fix 1: Use pnl_dollars
           return {
             timestamp: trade.exit_time,
             balance: capital,
-            profit_percent: trade.entry_price
-              ? (capital / trade.entry_price) * 100
-              : 0,
+            profit_percent: ((capital - initialCapital) / initialCapital) * 100, // <-- Fix 2
           };
         });
 
@@ -96,7 +96,6 @@ export default function MotherAIBalanceChart() {
     };
   }, [selectedSymbol, refreshToggle]);
 
-  // 3. Chart Setup
   const labels = history.map((d) => new Date(d.timestamp).toLocaleString());
   const balanceDataset = {
     label: "Net Capital ($)",
@@ -143,7 +142,6 @@ export default function MotherAIBalanceChart() {
     },
   };
 
-  // 4. UI Render
   return (
     <div className="space-y-4">
       <h2 className="text-white text-xl font-semibold">

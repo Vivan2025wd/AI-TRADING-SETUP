@@ -1,77 +1,22 @@
 {
   "symbol": "AVAXUSDT",
-  "total_profit_dollars": 5.6294,
-  "avg_profit_per_trade": 0.9382,
-  "total_trades": 6,
-  "wins": 4,
-  "losses": 2,
-  "win_rate": 66.67,
+  "total_profit_dollars": 0.138,
+  "avg_profit_per_trade": 0.138,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
   "trades": [
     {
-      "entry_time": "2025-07-22T14:16:24.766721",
-      "entry_price": 25.05,
-      "exit_time": "2025-07-22T17:05:39.362739",
-      "exit_price": 25.07,
-      "qty": 13.30672,
+      "entry_time": "2025-07-24T01:56:15.419548",
+      "entry_price": 24.15,
+      "exit_time": "2025-07-24T01:56:54.940757",
+      "exit_price": 24.16,
+      "qty": 13.802622,
       "entry_value": 333.3333,
-      "exit_value": 333.5995,
-      "pnl_dollars": 0.2661,
-      "pnl_percentage": 0.08
-    },
-    {
-      "entry_time": "2025-07-22T17:05:39.362739",
-      "entry_price": 25.07,
-      "exit_time": "2025-07-22T17:06:09.434669",
-      "exit_price": 25.05,
-      "qty": 13.296104,
-      "entry_value": 333.3333,
-      "exit_value": 333.0674,
-      "pnl_dollars": -0.2659,
-      "pnl_percentage": -0.08
-    },
-    {
-      "entry_time": "2025-07-22T17:07:18.039000",
-      "entry_price": 25.05,
-      "exit_time": "2025-07-23T08:51:44.198315",
-      "exit_price": 25.38,
-      "qty": 13.30672,
-      "entry_value": 333.3333,
-      "exit_value": 337.7246,
-      "pnl_dollars": 4.3912,
-      "pnl_percentage": 1.32
-    },
-    {
-      "entry_time": "2025-07-23T10:22:22.297019",
-      "entry_price": 24.97,
-      "exit_time": "2025-07-23T10:22:52.001273",
-      "exit_price": 24.99,
-      "qty": 13.349353,
-      "entry_value": 333.3333,
-      "exit_value": 333.6003,
-      "pnl_dollars": 0.267,
-      "pnl_percentage": 0.08
-    },
-    {
-      "entry_time": "2025-07-23T15:33:46.128486",
-      "entry_price": 24.06,
-      "exit_time": "2025-07-24T01:32:09.634545",
-      "exit_price": 24.03,
-      "qty": 13.854253,
-      "entry_value": 333.3333,
-      "exit_value": 332.9177,
-      "pnl_dollars": -0.4156,
-      "pnl_percentage": -0.12
-    },
-    {
-      "entry_time": "2025-07-24T01:32:18.506997",
-      "entry_price": 24.04,
-      "exit_time": "2025-07-24T01:52:04.770889",
-      "exit_price": 24.14,
-      "qty": 13.865779,
-      "entry_value": 333.3333,
-      "exit_value": 334.7199,
-      "pnl_dollars": 1.3866,
-      "pnl_percentage": 0.42
+      "exit_value": 333.4713,
+      "pnl_dollars": 0.138,
+      "pnl_percentage": 0.04
     }
   ]
 }

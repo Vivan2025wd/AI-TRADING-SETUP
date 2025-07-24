@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,7 +12,6 @@ import {
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
-// Helper: fetch with timeout
 const fetchWithTimeout = (url, options = {}, timeout = 10000) =>
   Promise.race([
     fetch(url, options),
@@ -25,20 +24,28 @@ export default function BacktestResults() {
   const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retry, setRetry] = useState(0); // trigger for retry
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     async function fetchBacktestResults() {
       setLoading(true);
       setError(null);
       try {
-        // Add pagination query params here as needed
         const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results?page=1&limit=100");
         if (!res.ok) throw new Error("Failed to fetch backtest results");
         const data = await res.json();
 
-        // data object has 'data' property with the trades array
-        setTrades(Array.isArray(data.data) ? data.data : []);
+        const rawTrades = Array.isArray(data.data) ? data.data : [];
+
+        const processedTrades = rawTrades.map((trade) => ({
+          timestamp: trade.timestamp,
+          price: trade.price,
+          profit_percent: trade.profit_percent,
+          balance: trade.balance,
+          type: trade.profit_percent >= 0 ? "SELL" : "BUY", // Simple type assignment
+        }));
+
+        setTrades(processedTrades);
       } catch (err) {
         console.error(err);
         setError(err.message || "Unknown error occurred");
@@ -73,7 +80,6 @@ export default function BacktestResults() {
         Backtest Results
       </h2>
 
-      {/* Chart Section */}
       <div className="bg-gray-900 p-6 rounded-xl shadow-lg" style={{ minHeight: 250 }}>
         {loading ? (
           <p className="text-gray-400 text-center">⏳ Loading chart...</p>
@@ -113,7 +119,6 @@ export default function BacktestResults() {
         )}
       </div>
 
-      {/* Table Section */}
       <div className="overflow-x-auto bg-gray-900 rounded-xl shadow-lg">
         {loading ? (
           <p className="text-gray-400 text-center p-4">⏳ Loading table...</p>
