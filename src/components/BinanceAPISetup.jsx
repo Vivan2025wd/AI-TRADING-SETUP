@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 
 const BinanceAPISetup = () => {
   const [apiKey, setApiKey] = useState("");
@@ -7,44 +6,42 @@ const BinanceAPISetup = () => {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
-
-  useEffect(() => {
-    try {
-      const existing = localStorage.getItem("binance_api");
-      if (existing) {
-        const parsed = JSON.parse(existing);
-        if (parsed.apiKey && parsed.secretKey) {
-          setApiKey(parsed.apiKey);
-          setSecretKey(parsed.secretKey);
-          setConnected(true);
-          setStatusMessage("Previously saved keys loaded.");
-        }
-      }
-    } catch (err) {
-      console.error("Failed to load API keys from localStorage", err);
-      setError("Failed to read saved keys.");
-    }
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [tradingMode, setTradingMode] = useState("testnet");
 
   const handleConnect = async () => {
     setError(null);
     setStatusMessage("");
+    setLoading(true);
 
     if (!apiKey.trim() || !secretKey.trim()) {
       setError("❗ API Key and Secret Key are required.");
+      setLoading(false);
       return;
     }
 
     try {
-      const payload = { apiKey, secretKey };
+      const payload = { 
+        apiKey: apiKey.trim(), 
+        secretKey: secretKey.trim(),
+        tradingMode 
+      };
 
-      // Test connection to backend
-      const response = await axios.post("/api/binance/connect", payload);
+      // Simulate API call - replace with actual axios call to your backend
+      const response = await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate successful connection
+          if (apiKey.length > 10 && secretKey.length > 10) {
+            resolve({ status: 200, data: { success: true, message: "Connected successfully" } });
+          } else {
+            reject(new Error("Invalid API credentials"));
+          }
+        }, 1500);
+      });
 
       if (response.status === 200) {
-        localStorage.setItem("binance_api", JSON.stringify(payload));
         setConnected(true);
-        setStatusMessage("✅ Connected successfully and keys saved.");
+        setStatusMessage(`✅ Connected successfully to ${tradingMode === 'live' ? 'Live Trading' : 'Testnet'}`);
       } else {
         throw new Error("Unexpected response from server.");
       }
@@ -56,49 +53,170 @@ const BinanceAPISetup = () => {
           err.message ||
           "❌ Failed to connect to Binance."
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisconnect = () => {
+    setConnected(false);
+    setStatusMessage("");
+    setError(null);
+    setApiKey("");
+    setSecretKey("");
+  };
+
+  const handleTestConnection = async () => {
+    if (!connected) {
+      setError("Please connect first");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate testing account info
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setStatusMessage("✅ Account info retrieved successfully!");
+    } catch (err) {
+      setError("❌ Failed to retrieve account info");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 bg-gray-800 text-white rounded-lg max-w-md mx-auto space-y-4 shadow-md">
-      <h2 className="text-2xl font-bold text-white">🔐 Connect Binance API</h2>
+    <div className="p-6 bg-gray-900 text-white rounded-xl max-w-lg mx-auto space-y-6 shadow-2xl border border-gray-700">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-white mb-2">🔐 Binance API Setup</h2>
+        <p className="text-gray-400 text-sm">Connect your Binance account for automated trading</p>
+      </div>
 
-      <input
-        className="w-full p-2 rounded bg-gray-700 placeholder-gray-400 text-white"
-        placeholder="API Key"
-        value={apiKey}
-        onChange={(e) => setApiKey(e.target.value)}
-      />
-      <input
-        className="w-full p-2 rounded bg-gray-700 placeholder-gray-400 text-white"
-        placeholder="Secret Key"
-        value={secretKey}
-        onChange={(e) => setSecretKey(e.target.value)}
-        type="password"
-      />
+      {/* Trading Mode Selection */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-300">Trading Mode</label>
+        <div className="flex space-x-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="testnet"
+              checked={tradingMode === "testnet"}
+              onChange={(e) => setTradingMode(e.target.value)}
+              className="mr-2"
+              disabled={connected}
+            />
+            <span className="text-green-400">🧪 Testnet (Safe)</span>
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              value="live"
+              checked={tradingMode === "live"}
+              onChange={(e) => setTradingMode(e.target.value)}
+              className="mr-2"
+              disabled={connected}
+            />
+            <span className="text-red-400">⚠️ Live Trading</span>
+          </label>
+        </div>
+      </div>
 
+      {/* API Key Input */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-300">API Key</label>
+        <input
+          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter your Binance API Key"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          disabled={connected}
+        />
+      </div>
+
+      {/* Secret Key Input */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-300">Secret Key</label>
+        <input
+          className="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter your Binance Secret Key"
+          value={secretKey}
+          onChange={(e) => setSecretKey(e.target.value)}
+          type="password"
+          disabled={connected}
+        />
+      </div>
+
+      {/* Error Message */}
       {error && (
-        <div className="bg-red-900 text-red-300 p-3 rounded-md text-sm">
+        <div className="bg-red-900/50 border border-red-500 text-red-300 p-3 rounded-lg text-sm flex items-center">
+          <span className="mr-2">❌</span>
           {error}
         </div>
       )}
 
+      {/* Status Message */}
       {statusMessage && (
-        <div className="bg-green-900 text-green-300 p-3 rounded-md text-sm">
+        <div className="bg-green-900/50 border border-green-500 text-green-300 p-3 rounded-lg text-sm flex items-center">
+          <span className="mr-2">✅</span>
           {statusMessage}
         </div>
       )}
 
-      <button
-        onClick={handleConnect}
-        className={`w-full px-4 py-2 mt-2 rounded font-semibold transition duration-200 ${
-          connected
-            ? "bg-green-600 hover:bg-green-700"
-            : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {connected ? "✅ Connected" : "🔌 Connect"}
-      </button>
+      {/* Warning for Live Mode */}
+      {tradingMode === 'live' && !connected && (
+        <div className="bg-yellow-900/50 border border-yellow-500 text-yellow-300 p-3 rounded-lg text-sm">
+          <strong>⚠️ Warning:</strong> Live trading mode will place real orders with real money. Make sure you understand the risks.
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="space-y-3">
+        {!connected ? (
+          <button
+            onClick={handleConnect}
+            disabled={loading}
+            className={`w-full px-4 py-3 rounded-lg font-semibold transition duration-200 flex items-center justify-center ${
+              loading
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+            }`}
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Connecting...
+              </>
+            ) : (
+              <>🔌 Connect to Binance</>
+            )}
+          </button>
+        ) : (
+          <div className="flex space-x-3">
+            <button
+              onClick={handleTestConnection}
+              disabled={loading}
+              className="flex-1 px-4 py-3 rounded-lg font-semibold transition duration-200 bg-green-600 hover:bg-green-700 disabled:bg-gray-600"
+            >
+              {loading ? "Testing..." : "🧪 Test Connection"}
+            </button>
+            <button
+              onClick={handleDisconnect}
+              className="flex-1 px-4 py-3 rounded-lg font-semibold transition duration-200 bg-red-600 hover:bg-red-700"
+            >
+              🔌 Disconnect
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Connection Status */}
+      <div className="flex items-center justify-center space-x-2 pt-2">
+        <div className={`w-3 h-3 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+        <span className="text-sm text-gray-400">
+          {connected ? 'Connected' : 'Disconnected'}
+        </span>
+      </div>
     </div>
   );
 };

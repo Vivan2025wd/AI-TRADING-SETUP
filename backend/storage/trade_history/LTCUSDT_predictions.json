@@ -211,5 +211,96 @@
     "signal": "searching",
     "confidence": 0.8,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:44.050944",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:48.225160",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:45.994262",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:50.376356",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "searching",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
   }
 ]

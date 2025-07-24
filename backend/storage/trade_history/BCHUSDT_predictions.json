@@ -211,5 +211,96 @@
     "signal": "sell",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-24T09:55:41.905060",
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-24T09:55:46.126020",
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:43.953265",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:48.291916",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
   }
 ]

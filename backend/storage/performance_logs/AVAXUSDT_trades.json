@@ -31,5 +31,27 @@
     "qty": 14.684288,
     "timestamp": "2025-07-24T07:04:14.617016",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 23.49,
+    "price": 23.49,
+    "qty": null,
+    "timestamp": "2025-07-24T09:56:31.629520",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 23.53,
+    "price": 23.53,
+    "qty": 14.166313,
+    "timestamp": "2025-07-24T09:58:17.181394",
+    "source": "mother_ai_decision"
   }
 ]

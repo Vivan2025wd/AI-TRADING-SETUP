@@ -211,5 +211,96 @@
     "signal": "searching",
     "confidence": 0.8,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:41.104921",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.99,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:45.253463",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.99,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:43.153898",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:47.444445",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
   }
 ]

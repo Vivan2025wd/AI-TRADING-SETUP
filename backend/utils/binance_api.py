@@ -1,9 +1,20 @@
 import os
+import sys
 from binance.client import Client
 from dotenv import load_dotenv
-from backend.utils.logger import log
 from typing import Optional
-import sys
+
+# Add the project root to Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+# Import logger after path setup
+try:
+    from backend.utils.logger import log
+except ImportError:
+    # Fallback to basic logging if custom logger isn't available
+    import logging
+    log = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
@@ -38,15 +49,19 @@ def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = 
         return {"success": False, "message": "Missing API key or secret."}
 
     try:
+        # Create Binance client instance
         client = Client(api_key=key, api_secret=secret)
-        # To use Binance Testnet, provide API keys generated from the Testnet website.
-        # The client will automatically point to testnet endpoints.
-        # If using a specific domain like Binance.US, client might need tld='us'.
-        # For general spot testnet, keys are sufficient.
-
-        client.get_account()  # Test credentials
-
+        
+        # For testnet, you need to set the testnet flag
+        # If you want to use testnet, uncomment the line below:
+        # client = Client(api_key=key, api_secret=secret, testnet=True)
+        
+        # Test credentials with a simple API call
+        account_info = client.get_account()
+        
+        # Store the client globally
         user_binance_client = client
+        
         log.info("[Binance] API connection successful.")
         if is_real_trading_mode():
             log.warning("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -62,22 +77,30 @@ def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = 
         log.error(f"[Binance Init Error] {e}")
         return {"success": False, "message": f"Connection failed: {str(e)}"}
 
-
 def get_binance_client() -> Client:
     """
     Returns the connected Binance client, or raises error if not connected.
     """
     if user_binance_client is None:
-        raise Exception("Binance API client not initialized.")
+        raise Exception("Binance API client not initialized. Call connect_user_api() first.")
     return user_binance_client
 
-def fetch_ohlcv(symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limit: int = 100):
+def fetch_ohlcv(symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limit: int = 100) -> list:
     """
     Fetches OHLCV candle data for a given symbol and interval.
+    
+    Args:
+        symbol: Trading pair symbol (e.g., 'BTCUSDT')
+        interval: Kline interval (use Client.KLINE_INTERVAL_* constants)
+        limit: Number of klines to fetch (max 1000)
+        
+    Returns:
+        List of OHLCV dictionaries
     """
     try:
         client = get_binance_client()
         klines = client.get_klines(symbol=symbol.upper(), interval=interval, limit=limit)
+        
         return [
             {
                 "timestamp": int(k[0]),
@@ -92,11 +115,19 @@ def fetch_ohlcv(symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limi
     except Exception as e:
         log.error(f"[Binance OHLCV Error] {e}")
         return []
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 def get_symbol_price(symbol: str) -> float:
     """
     Fetches the current ticker price for the given symbol from Binance.
+    
+    Args:
+        symbol: Trading pair symbol (e.g., 'BTCUSDT')
+        
+    Returns:
+        Current price as float
+        
+    Raises:
+        Exception: If price fetch fails
     """
     try:
         client = get_binance_client()
@@ -105,3 +136,82 @@ def get_symbol_price(symbol: str) -> float:
     except Exception as e:
         log.error(f"[Binance Price Fetch Error] {e}")
         raise e
+
+def get_account_info() -> dict:
+    """
+    Get account information including balances.
+    
+    Returns:
+        Account information dictionary
+    """
+    try:
+        client = get_binance_client()
+        return client.get_account()
+    except Exception as e:
+        log.error(f"[Binance Account Info Error] {e}")
+        raise e
+
+def get_exchange_info(symbol: Optional[str] = None) -> dict:
+    """
+    Get exchange information for symbols.
+    
+    Args:
+        symbol: Optional specific symbol to get info for
+        
+    Returns:
+        Exchange information dictionary
+        
+    Raises:
+        Exception: If symbol not found or API call fails
+    """
+    try:
+        client = get_binance_client()
+        if symbol:
+            result = client.get_symbol_info(symbol.upper())
+            if result is None:
+                raise Exception(f"Symbol '{symbol}' not found")
+            return result
+        else:
+            return client.get_exchange_info()
+    except Exception as e:
+        log.error(f"[Binance Exchange Info Error] {e}")
+        raise e
+
+def disconnect_client():
+    """
+    Disconnect the current Binance client.
+    """
+    global user_binance_client
+    user_binance_client = None
+    log.info("[Binance] Client disconnected.")
+
+# Test function to verify connection
+def test_connection() -> dict:
+    """
+    Test the current Binance connection.
+    
+    Returns:
+        Test result dictionary with success status and details
+    """
+    try:
+        client = get_binance_client()
+        
+        # Test server connectivity
+        server_time = client.get_server_time()
+        
+        # Test account access
+        account_info = client.get_account()
+        
+        return {
+            "success": True,
+            "server_time": server_time,
+            "account_type": account_info.get("accountType"),
+            "can_trade": account_info.get("canTrade"),
+            "permissions": account_info.get("permissions", [])
+        }
+    except Exception as e:
+        log.error(f"[Binance Connection Test Error] {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }

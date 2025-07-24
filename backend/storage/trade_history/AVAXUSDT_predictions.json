@@ -211,5 +211,96 @@
     "signal": "sell",
     "confidence": 1.0,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:41.530286",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:00",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:55:45.714817",
+    "symbol": "AVAXUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:43.556730",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T09:57:47.879387",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T09:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
   }
 ]
