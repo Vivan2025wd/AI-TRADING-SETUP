@@ -20,5 +20,16 @@
     "qty": null,
     "timestamp": "2025-07-24T01:57:03.430127",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 497.9,
+    "price": 497.9,
+    "qty": 0.669478,
+    "timestamp": "2025-07-24T07:13:34.385120",
+    "source": "mother_ai_decision"
   }
 ]

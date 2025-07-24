@@ -30,45 +30,26 @@ export default function StrategyPerformance() {
         const resList = await fetch(`/api/strategies/list?page=${page}&limit=${limit}`);
         if (!resList.ok) throw new Error("Failed to fetch strategy list");
         const listData = await resList.json();
+
         setTotalPages(listData.totalPages || 1);
-
         const strategiesRaw = listData.data || [];
-        const symbolSet = [...new Set(strategiesRaw.map((s) => s.symbol))];
-        let allStrategies = [];
 
-        for (const symbol of symbolSet) {
+        let enriched = [];
+
+        for (const strat of strategiesRaw) {
           try {
-            // Get trade profits data first
-            const resTradeProfits = await fetch(`/api/strategies/trade-profits/${symbol}`);
-            const tradeProfitsData = resTradeProfits.ok ? await resTradeProfits.json() : null;
-
-            // Get rated strategies data
-            const resRated = await fetch(`/api/strategies/${symbol}/rate-strategies`);
+            // Fetch rated performance for the symbol
+            const resRated = await fetch(`/api/strategies/${strat.symbol}/rate-strategies`);
             if (!resRated.ok) continue;
             const ratedData = await resRated.json();
 
-            if (ratedData.strategies?.length) {
-              const mapped = ratedData.strategies.map((s) => ({
-                ...s,
-                symbol,
-                tradeProfitsData // Attach the full trade profits data
-              }));
-              allStrategies.push(...mapped);
-            }
-          } catch (err) {
-            console.error(`Error fetching data for ${symbol}:`, err);
-          }
-        }
+            const stratPerf = ratedData.strategies.find((s) => s.strategy_id === strat.strategy_id);
+            if (!stratPerf) continue;
 
-        const paged = allStrategies.slice(0, limit);
-
-        const enriched = await Promise.all(
-          paged.map(async (strat) => {
+            // Fetch strategy details for rules
             let strategy_json = {};
-            try {
-              const res = await fetch(`/api/strategies/${strat.symbol}/${strat.strategy_id}`);
-              if (res.ok) strategy_json = await res.json();
-            } catch {}
+            const resDetails = await fetch(`/api/strategies/${strat.symbol}/${strat.strategy_id}`);
+            if (resDetails.ok) strategy_json = await resDetails.json();
 
             const rules = strategy_json.indicators
               ? Object.entries(strategy_json.indicators).flatMap(([indicator, config]) =>
@@ -84,32 +65,24 @@ export default function StrategyPerformance() {
                 )
               : [];
 
-            // Use data from tradeProfitsData if available, otherwise fall back to rated data
-            const tradeProfits = strat.tradeProfitsData;
-            const winRate = tradeProfits ? tradeProfits.win_rate : (strat.win_rate * 100 || 0);
-            const totalProfit = tradeProfits ? tradeProfits.total_profit_dollars : (strat.total_profit || 0);
-            const avgProfit = tradeProfits ? tradeProfits.avg_profit_per_trade : (strat.avg_profit || 0);
-            const totalTrades = tradeProfits ? tradeProfits.total_trades : (strat.total || 0);
-            const wins = tradeProfits ? tradeProfits.wins : (strat.wins || 0);
-            const losses = tradeProfits ? tradeProfits.losses : (strat.losses || 0);
-            const trades = tradeProfits ? tradeProfits.trades : [];
-
-            return {
+            enriched.push({
               id: strat.strategy_id,
               agent: strat.symbol,
-              winRate: winRate,
-              avgProfit: avgProfit,
-              avgConfidence: strat.avg_confidence * 100 || 0,
-              totalPredictions: totalTrades,
-              totalProfit: totalProfit,
-              wins: wins,
-              losses: losses,
+              winRate: stratPerf.win_rate * 100 || 0,
+              avgProfit: stratPerf.avg_profit || 0,
+              avgConfidence: stratPerf.avg_confidence * 100 || 0,
+              totalPredictions: stratPerf.total || 0,
+              totalProfit: stratPerf.total_profit || 0,
+              wins: stratPerf.wins || 0,
+              losses: stratPerf.losses || 0,
               rules,
-              trades: trades || [],
+              trades: stratPerf.trades || [],
               symbol: strat.symbol,
-            };
-          })
-        );
+            });
+          } catch (err) {
+            console.error(`Error processing strategy ${strat.strategy_id}:`, err);
+          }
+        }
 
         setStrategies(enriched);
       } catch (err) {
@@ -317,7 +290,6 @@ export default function StrategyPerformance() {
         </>
       )}
 
-      {/* Delete Confirmation Modal */}
       {deleting && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white w-full max-w-md">

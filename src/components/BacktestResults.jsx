@@ -21,7 +21,7 @@ const fetchWithTimeout = (url, options = {}, timeout = 10000) =>
   ]);
 
 export default function BacktestResults() {
-  const [results, setResults] = useState(null);
+  const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retry, setRetry] = useState(0);
@@ -31,25 +31,23 @@ export default function BacktestResults() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results?page=1&limit=100");
+        const res = await fetchWithTimeout(
+          "http://localhost:8000/api/backtest/results?page=1&limit=100"
+        );
         if (!res.ok) throw new Error("Failed to fetch backtest results");
         const data = await res.json();
 
-        // Preprocess trades
         const rawTrades = Array.isArray(data.data) ? data.data : [];
+
         const processedTrades = rawTrades.map((trade) => ({
           timestamp: trade.timestamp,
           price: trade.price,
           profit_percent: trade.profit_percent,
           balance: trade.balance,
-          type: trade.profit_percent >= 0 ? "SELL" : "BUY",
+          type: trade.profit_percent >= 0 ? "SELL" : "BUY", // Simple type assignment
         }));
 
-        setResults({
-          capital_over_time: data.capital_over_time || [],
-          trades: processedTrades,
-        });
-
+        setTrades(processedTrades);
       } catch (err) {
         console.error(err);
         setError(err.message || "Unknown error occurred");
@@ -62,11 +60,13 @@ export default function BacktestResults() {
   }, [retry]);
 
   const chartData = {
-    labels: results?.capital_over_time?.map((c) => new Date(c.timestamp).toLocaleString()) || [],
+    labels: trades.map((trade) =>
+      trade.timestamp ? new Date(trade.timestamp).toLocaleString() : "-"
+    ),
     datasets: [
       {
-        label: "Capital Over Time",
-        data: results?.capital_over_time?.map((c) => c.capital) || [],
+        label: "Balance Over Time",
+        data: trades.map((trade) => trade.balance ?? null),
         fill: true,
         borderColor: "rgb(34,197,94)",
         backgroundColor: "rgba(34,197,94,0.2)",
@@ -95,8 +95,8 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : !results?.capital_over_time.length ? (
-          <p className="text-gray-400 text-center">No backtest data found.</p>
+        ) : trades.length === 0 ? (
+          <p className="text-gray-400 text-center">No backtest trades found.</p>
         ) : (
           <Line
             data={chartData}
@@ -134,7 +134,7 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : !results?.trades.length ? (
+        ) : trades.length === 0 ? (
           <p className="text-gray-400 text-center p-4">No trades to display.</p>
         ) : (
           <table className="min-w-full text-sm text-left">
@@ -148,7 +148,7 @@ export default function BacktestResults() {
               </tr>
             </thead>
             <tbody>
-              {results.trades
+              {[...trades]
                 .slice(-10)
                 .reverse()
                 .map((trade, i) => (
@@ -161,7 +161,9 @@ export default function BacktestResults() {
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           trade.type === "BUY"
                             ? "bg-blue-700 text-blue-200"
-                            : "bg-red-700 text-red-200"
+                            : trade.type === "SELL"
+                            ? "bg-red-700 text-red-200"
+                            : "bg-gray-700 text-gray-300"
                         }`}
                       >
                         {trade.type}
@@ -179,10 +181,12 @@ export default function BacktestResults() {
                     </td>
                     <td
                       className={`px-6 py-3 font-semibold ${
-                        trade.profit_percent > 0
-                          ? "text-green-400"
-                          : trade.profit_percent < 0
-                          ? "text-red-400"
+                        typeof trade.profit_percent === "number"
+                          ? trade.profit_percent > 0
+                            ? "text-green-400"
+                            : trade.profit_percent < 0
+                            ? "text-red-400"
+                            : "text-gray-400"
                           : "text-gray-400"
                       }`}
                     >

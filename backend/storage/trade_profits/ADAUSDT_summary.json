@@ -1,0 +1,22 @@
+{
+  "symbol": "ADAUSDT",
+  "total_profit_dollars": 5.2138,
+  "avg_profit_per_trade": 5.2138,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-07-24T07:04:06.299567",
+      "entry_price": 0.7672,
+      "exit_time": "2025-07-24T07:13:34.385120",
+      "exit_price": 0.7792,
+      "qty": 434.480361,
+      "entry_value": 333.3333,
+      "exit_value": 338.5471,
+      "pnl_dollars": 5.2138,
+      "pnl_percentage": 1.56
+    }
+  ]
+}

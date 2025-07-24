@@ -20,5 +20,16 @@
     "qty": null,
     "timestamp": "2025-07-24T01:56:54.940757",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 22.7,
+    "price": 22.7,
+    "qty": 14.684288,
+    "timestamp": "2025-07-24T07:04:14.617016",
+    "source": "mother_ai_decision"
   }
 ]

@@ -43,7 +43,6 @@ def get_recent_backtest_results(
 
     all_trades = []
 
-    # Load and process each summary file
     for summary_file in logs_dir.glob("*_summary.json"):
         try:
             with open(summary_file, "r") as f:
@@ -51,10 +50,10 @@ def get_recent_backtest_results(
                 symbol = summary.get("symbol", summary_file.stem.replace("_summary", ""))
                 trades = summary.get("trades", [])
 
-                balance = 100.0  # Starting virtual balance
+                balance = 1000.0  # Starting capital (set accordingly)
                 for trade in trades:
                     pnl_dollars = trade.get("pnl_dollars", 0.0)
-                    pnl_percentage = trade.get("pnl_percentage", 0.0)
+                    pnl_percent = trade.get("pnl_percentage", 0.0)
 
                     balance += pnl_dollars
 
@@ -62,17 +61,16 @@ def get_recent_backtest_results(
                         "type": "TRADE",
                         "timestamp": trade.get("exit_time"),
                         "price": trade.get("exit_price"),
-                        "profit_percent": pnl_percentage,
+                        "profit_percent": pnl_percent,
                         "balance": balance,
                         "symbol": symbol
                     })
         except Exception as e:
             print(f"Error reading {summary_file}: {e}")
 
-    # Sort trades by timestamp (newest last)
-    sorted_trades = sorted(all_trades, key=lambda x: x.get("timestamp", ""))
+    # Sort by timestamp descending
+    sorted_trades = sorted(all_trades, key=lambda x: x.get("timestamp", ""), reverse=True)
 
-    # Pagination
     total = len(sorted_trades)
     start = (page - 1) * limit
     end = start + limit
