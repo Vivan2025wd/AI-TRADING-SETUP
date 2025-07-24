@@ -6,15 +6,15 @@ from datetime import datetime
 from typing import Optional
 
 class BacktestRunner:
-    def __init__(self, data_dir="data"):
+    def __init__(self, data_dir="data/ohlcv"):
         self.data_dir = data_dir
 
     def load_ohlcv(self, symbol: str) -> pd.DataFrame:
         """
         Loads OHLCV data for the given symbol from a CSV file.
-        Assumes files are stored as 'data/{symbol}.csv'.
+        Assumes files are stored as 'data/ohlcv/{symbol}_1h.csv'.
         """
-        file_path = os.path.join(self.data_dir, f"{symbol}.csv")
+        file_path = os.path.join(self.data_dir, f"{symbol}_1h.csv")
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"OHLCV data file not found: {file_path}")
         df = pd.read_csv(file_path, index_col=0, parse_dates=True)
@@ -46,6 +46,7 @@ class BacktestRunner:
         trades = []
         position = None
         entry_price = 0.0
+        capital_over_time = []
 
         for i in range(50, len(df)):  # skip first 50 rows for indicators
             row = df.iloc[i]
@@ -81,13 +82,16 @@ class BacktestRunner:
                 })
                 position = None
 
+            capital_over_time.append({"timestamp": timestamp_str, "capital": round(balance, 2)})
+
         return {
             "final_balance": round(balance, 2),
             "trades": trades,
             "total_trades": len(trades),
             "symbol": symbol,
             "start_date": df.index[0].isoformat() if not df.empty else "",
-            "end_date": df.index[-1].isoformat() if not df.empty else ""
+            "end_date": df.index[-1].isoformat() if not df.empty else "",
+            "capital_over_time": capital_over_time
         }
 
 # Helper function for FastAPI
