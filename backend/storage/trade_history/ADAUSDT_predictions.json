@@ -465,5 +465,73 @@
     "source": "GenericAgent/rule_based",
     "ml_available": true,
     "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T05:08:00",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T05:08:08.515664",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-25T05:08:00",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T05:08:12.934504",
+    "symbol": "ADAUSDT",
+    "signal": "hold",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-25T11:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T11:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T11:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T11:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
   }
 ]

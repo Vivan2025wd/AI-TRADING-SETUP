@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from backend.utils.binance_api import connect_user_api, get_safe_binance_client
+from backend.utils.binance_api import connect_user_api, get_safe_binance_client,disconnect_client
 from backend.binance.fetch_live_ohlcv import fetch_ohlcv
 
 router = APIRouter(tags=["BinanceAPI"])
@@ -75,3 +75,25 @@ def test_route():
     Simple health check endpoint.
     """
     return {"message": "Binance route is working!"}
+
+@router.post("/disconnect")
+def disconnect_binance_client():
+    """
+    Disconnect the current Binance API session.
+    """
+    try:
+        disconnect_client()
+        return {"message": "Disconnected from Binance successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to disconnect: {str(e)}")
+    
+
+@router.get("/status")
+def get_connection_status():
+    """
+    Check if Binance API client is connected.
+    """
+    from backend.utils.binance_api import user_binance_client, get_trading_mode
+    is_connected = user_binance_client is not None
+    mode = get_trading_mode()
+    return {"connected": is_connected, "mode": mode}

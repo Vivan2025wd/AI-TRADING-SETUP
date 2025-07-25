@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import JSONResponse
 from backend.mother_ai.mother_ai import MotherAI
 from backend.mother_ai.profit_calculator import compute_trade_profits
+from backend.utils.binance_api import place_live_order
 
 import os
 import json
@@ -60,10 +61,6 @@ def trigger_decision():
 @router.get("/decision")
 @log_endpoint
 def get_mother_ai_decision(is_live: bool = Query(False)):
-    if is_live:
-        # Placeholder for live trading logic
-        return {"message": "Live trading not implemented yet."}
-
     result = mother_ai_instance.make_portfolio_decision()
     decision = result.get("decision", {})
 
@@ -76,11 +73,19 @@ def get_mother_ai_decision(is_live: bool = Query(False)):
     symbol = decision.get("symbol")
     signal = decision.get("signal", "").lower()
 
-    if signal == "sell" and symbol:
-        compute_trade_profits(symbol)
+    if is_live:
+        try:
+            order_result = place_live_order(symbol=symbol, side=signal)
+            log(f"Placed LIVE order: {order_result}")
+            result["live_order"] = order_result
+        except Exception as e:
+            log(f"Live order failed: {e}")
+            raise HTTPException(status_code=500, detail=f"Live order failed: {e}")
+    else:
+        if signal == "sell" and symbol:
+            compute_trade_profits(symbol)
 
     return result
-
 
 @router.get("/trades/{symbol}")
 @log_endpoint

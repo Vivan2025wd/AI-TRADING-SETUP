@@ -1,4 +1,5 @@
 import os
+import math
 import sys
 from binance.client import Client
 from dotenv import load_dotenv
@@ -176,3 +177,61 @@ def get_safe_binance_client() -> Client:
     if user_binance_client is None:
         raise Exception("Binance client not connected. Please connect API keys first.")
     return user_binance_client
+
+def place_live_order(symbol: str, side: str, quantity: Optional[float] = None) -> dict:
+    """
+    Place a live market order on Binance.
+    If quantity is not provided, it will auto-calculate based on available balance.
+    """
+    try:
+        client = get_binance_client()
+
+        # Get symbol info for lot size/filtering
+        symbol_info = client.get_symbol_info(symbol.upper())
+        if not symbol_info:
+            raise Exception(f"Symbol '{symbol}' not found on Binance.")
+
+        # Auto-calculate quantity if not provided
+        if quantity is None:
+            account = client.get_account()
+            balances = {b['asset']: float(b['free']) for b in account['balances']}
+
+            quote_asset = symbol_info['quoteAsset']
+            base_asset = symbol_info['baseAsset']
+
+            if side.lower() == 'buy':
+                # Use quote asset balance to determine buy amount
+                quote_balance = balances.get(quote_asset, 0.0)
+                price = get_symbol_price(symbol)
+                quantity = (quote_balance * 0.95) / price  # Use 95% of balance
+            else:
+                # Use base asset balance for sell quantity
+                quantity = balances.get(base_asset, 0.0)
+
+            if quantity <= 0:
+                raise Exception(f"Insufficient balance to place {side.upper()} order on {symbol}.")
+
+        # Adjust quantity to symbol's allowed step size
+        step_size = 0.0
+        for f in symbol_info['filters']:
+            if f['filterType'] == 'LOT_SIZE':
+                step_size = float(f['stepSize'])
+                break
+
+        precision = int(round(-1 * (math.log10(step_size))))
+        quantity = round(quantity, precision)
+
+        # Place market order
+        order = client.create_order(
+            symbol=symbol.upper(),
+            side=side.upper(),
+            type='MARKET',
+            quantity=quantity
+        )
+
+        log.info(f"[Live Order] {side.upper()} {quantity} {symbol} executed.")
+        return order
+
+    except Exception as e:
+        log.error(f"[Place Live Order Error] {e}")
+        raise e

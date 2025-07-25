@@ -119,5 +119,16 @@
     "qty": 41.315485,
     "timestamp": "2025-07-25T04:46:37.106738",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8143,
+    "price": 0.8143,
+    "qty": null,
+    "timestamp": "2025-07-25T11:09:33.598865",
+    "source": "mother_ai_decision"
   }
 ]
