@@ -220,7 +220,7 @@ class GenericAgent:
             return "searching", 0.0
 
     def _fuse_decisions(self, ml_action: str, ml_confidence: float, 
-                       rule_action: str, rule_confidence: float) -> Tuple[str, float, str]:
+                        rule_action: str, rule_confidence: float) -> Tuple[str, float, str]:
         """Intelligent decision fusion between ML and rule-based signals"""
         
         # High confidence rule-based takes priority

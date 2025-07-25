@@ -25,7 +25,7 @@ class TradeLog(BaseModel):
 # ========== Strategy Config ==========
 
 class IndicatorCondition(BaseModel):
-    indicator: Literal["rsi", "macd", "ema"]
+    indicator: Literal["rsi", "macd", "ema", "sma"]
     condition: str  # Example: "rsi < 30"
     timeframe: str = "1m"  # Default 1 minute
 

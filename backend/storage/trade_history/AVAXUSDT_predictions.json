@@ -597,5 +597,14 @@
     "signal": "searching",
     "confidence": 0.8,
     "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-25T12:00:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.92,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": "long"
   }
 ]
