@@ -1,11 +1,11 @@
 {
   "symbol": "AVAXUSDT",
-  "total_profit_dollars": 11.7386,
-  "avg_profit_per_trade": 5.8693,
-  "total_trades": 2,
-  "wins": 2,
-  "losses": 0,
-  "win_rate": 100.0,
+  "total_profit_dollars": 7.6273,
+  "avg_profit_per_trade": 1.5255,
+  "total_trades": 5,
+  "wins": 3,
+  "losses": 2,
+  "win_rate": 60.0,
   "trades": [
     {
       "entry_time": "2025-07-24T01:56:15.419548",
@@ -28,6 +28,39 @@
       "exit_value": 344.9339,
       "pnl_dollars": 11.6006,
       "pnl_percentage": 3.48
+    },
+    {
+      "entry_time": "2025-07-24T09:58:17.181394",
+      "entry_price": 23.53,
+      "exit_time": "2025-07-25T02:47:01.913737",
+      "exit_price": 23.26,
+      "qty": 14.166313,
+      "entry_value": 333.3333,
+      "exit_value": 329.5084,
+      "pnl_dollars": -3.8249,
+      "pnl_percentage": -1.15
+    },
+    {
+      "entry_time": "2025-07-25T02:47:07.160036",
+      "entry_price": 23.27,
+      "exit_time": "2025-07-25T03:13:25.553848",
+      "exit_price": 23.24,
+      "qty": 14.324595,
+      "entry_value": 333.3333,
+      "exit_value": 332.9036,
+      "pnl_dollars": -0.4297,
+      "pnl_percentage": -0.13
+    },
+    {
+      "entry_time": "2025-07-25T03:13:25.553848",
+      "entry_price": 23.25,
+      "exit_time": "2025-07-25T03:26:54.573960",
+      "exit_price": 23.26,
+      "qty": 14.336918,
+      "entry_value": 333.3333,
+      "exit_value": 333.4767,
+      "pnl_dollars": 0.1434,
+      "pnl_percentage": 0.04
     }
   ]
 }

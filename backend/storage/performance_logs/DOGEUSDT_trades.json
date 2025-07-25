@@ -20,5 +20,16 @@
     "qty": null,
     "timestamp": "2025-07-24T01:57:17.700932",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.2269,
+    "price": 0.2269,
+    "qty": 1469.205454,
+    "timestamp": "2025-07-25T03:27:04.562569",
+    "source": "mother_ai_decision"
   }
 ]

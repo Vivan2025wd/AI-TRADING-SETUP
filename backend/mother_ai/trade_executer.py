@@ -4,20 +4,20 @@ from datetime import datetime, timedelta
 from typing import Dict, List
 
 from backend.utils.logger import logger
+from backend.utils.binance_api import get_trading_mode, get_binance_client
 
 # --- Paths ---
 BASE_DIR = os.path.dirname(__file__)
 STORAGE_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'storage'))
 MOCK_BALANCE_FILE = os.path.join(STORAGE_DIR, 'mock_balance.json')
-# Removed TRADE_HISTORY_DIR since we no longer use trade_history logs
 PERFORMANCE_LOG_DIR = os.path.join(STORAGE_DIR, 'performance_logs')
-TRADE_PROFITS_DIR = os.path.join(STORAGE_DIR, 'trade_profits')  # new folder
+TRADE_PROFITS_DIR = os.path.join(STORAGE_DIR, 'trade_profits')
 LAST_EXECUTION_FILE = os.path.join(STORAGE_DIR, 'last_execution_time.json')
-MOCK_PROFIT_FILE = os.path.join(TRADE_PROFITS_DIR, 'mock_profit.json')  # moved here
+MOCK_PROFIT_FILE = os.path.join(TRADE_PROFITS_DIR, 'mock_profit.json')
 
 # --- Ensure directories exist ---
 os.makedirs(PERFORMANCE_LOG_DIR, exist_ok=True)
-os.makedirs(TRADE_PROFITS_DIR, exist_ok=True)  # ensure it exists
+os.makedirs(TRADE_PROFITS_DIR, exist_ok=True)
 
 # --- Defaults ---
 DEFAULT_BALANCE = {
@@ -89,7 +89,7 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
     usd_balance = balance.get("USD", 0)
 
     symbol = symbol.upper()
-    perf_path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")  # unified log path
+    perf_path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")
 
     if action.lower() == "buy":
         amount = round((usd_balance * 0.1) / price, 6)
@@ -129,7 +129,6 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
             balance["USD"] += revenue
             del balance["holdings"][symbol]
 
-            # Update profit tracker
             profit_tracker["total_profit_usd"] += round(profit_usd, 2)
             profit_tracker["total_trades"] += 1
             save_profit_tracker(profit_tracker)
@@ -157,10 +156,39 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
 
     save_mock_balance(balance)
     append_json_log(perf_path, result)
-
-    # Removed the separate trade_history log append (hist_path and snapshot)
-
     return result
+
+def execute_live_trade(symbol: str, action: str, price: float, confidence: float) -> dict:
+    client = get_binance_client()
+    result = {}
+    try:
+        quantity = round((100 / price), 3)  # Example: Buy $100 worth (adjust sizing logic)
+        if action.lower() == "buy":
+            order = client.order_market_buy(symbol=f"{symbol}USDT", quantity=quantity)
+        elif action.lower() == "sell":
+            order = client.order_market_sell(symbol=f"{symbol}USDT", quantity=quantity)
+        else:
+            return {"status": "INVALID_ACTION"}
+        
+        result = {
+            "status": "EXECUTED",
+            "symbol": symbol,
+            "action": action.upper(),
+            "executed_qty": quantity,
+            "order_id": order['orderId']
+        }
+        logger.info(f"[LIVE TRADE] {action.upper()} {quantity} {symbol} at market price.")
+    except Exception as e:
+        logger.error(f"[LIVE TRADE ERROR] {e}")
+        result = {"status": "ERROR", "detail": str(e)}
+    return result
+
+def execute_trade(symbol: str, action: str, price: float, confidence: float) -> Dict:
+    mode = get_trading_mode()
+    if mode == "live":
+        return execute_live_trade(symbol, action, price, confidence)
+    else:
+        return execute_mock_trade(symbol, action, price, confidence)
 
 # --- Execute Mother AI Trades (every 15 min) ---
 def execute_mother_ai_decision(decision_data: Dict) -> List[Dict]:
@@ -179,7 +207,7 @@ def execute_mother_ai_decision(decision_data: Dict) -> List[Dict]:
         logger.warning("Mother AI returned no decision.")
         return []
 
-    logger.info(f"🧠 Executing {len(decisions)} Mother AI trades...")
+    logger.info(f"🧠 Executing {len(decisions)} Mother AI trades... (Mode: {get_trading_mode().upper()})")
     trade_results = []
 
     for d in decisions:
@@ -191,7 +219,7 @@ def execute_mother_ai_decision(decision_data: Dict) -> List[Dict]:
         confidence = d.get("confidence", 0.0)
 
         if symbol and action and price:
-            res = execute_mock_trade(symbol, action, price, confidence)
+            res = execute_trade(symbol, action, price, confidence)
             trade_results.append(res)
         else:
             logger.warning(f"Invalid trade decision skipped: {d}")

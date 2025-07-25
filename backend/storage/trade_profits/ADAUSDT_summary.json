@@ -1,11 +1,11 @@
 {
   "symbol": "ADAUSDT",
-  "total_profit_dollars": 4.9633,
-  "avg_profit_per_trade": 2.4817,
-  "total_trades": 2,
-  "wins": 1,
+  "total_profit_dollars": 6.6344,
+  "avg_profit_per_trade": 1.6586,
+  "total_trades": 4,
+  "wins": 3,
   "losses": 1,
-  "win_rate": 50.0,
+  "win_rate": 75.0,
   "trades": [
     {
       "entry_time": "2025-07-24T07:04:06.299567",
@@ -28,6 +28,28 @@
       "exit_value": 333.0829,
       "pnl_dollars": -0.2504,
       "pnl_percentage": -0.08
+    },
+    {
+      "entry_time": "2025-07-24T09:56:56.438745",
+      "entry_price": 0.798,
+      "exit_time": "2025-07-24T10:01:06.084171",
+      "exit_price": 0.8014,
+      "qty": 417.710944,
+      "entry_value": 333.3333,
+      "exit_value": 334.7536,
+      "pnl_dollars": 1.4202,
+      "pnl_percentage": 0.43
+    },
+    {
+      "entry_time": "2025-07-25T02:47:01.913737",
+      "entry_price": 0.7973,
+      "exit_time": "2025-07-25T03:13:25.553848",
+      "exit_price": 0.7979,
+      "qty": 418.077679,
+      "entry_value": 333.3333,
+      "exit_value": 333.5842,
+      "pnl_dollars": 0.2508,
+      "pnl_percentage": 0.08
     }
   ]
 }

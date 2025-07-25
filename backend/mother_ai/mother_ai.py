@@ -255,33 +255,37 @@ class MotherAI:
         print(f"📊 Filtered trades: {[f'{t["symbol"]}-{t["signal"]}' for t in filtered]}")
         return filtered[:top_n]
 
-    def execute_trade(self, symbol, signal, price, confidence):
+    def execute_trade(self, symbol, signal, price, confidence, live=False):
         if signal not in ("buy", "sell") or not price:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return None
-            
-        print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f}")
-        
-        qty = None  # Initialize qty variable
-        
+
+        print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f} | Live mode: {live}")
+
+        qty = None
+
         try:
+            # Format symbol for Binance API: e.g. "BTCUSDT" -> "BTC/USDT"
+            binance_symbol = symbol if "/" in symbol else symbol.replace("USDT", "/USDT")
+
             if signal == "buy":
                 sl = price * (1 - SL_PERCENT)
                 tp = price + ((price - sl) * TP_RATIO)
                 risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
                 qty = risk_amount / (price - sl)
 
-                # ✅ Sanity check qty
                 if qty <= 0:
                     print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}, skipping.")
                     return None
 
                 print(f"📊 Buying {symbol} | Entry: {price:.4f}, SL: {sl:.4f}, TP: {tp:.4f}, Qty: {qty:.6f}")
-                
-                # Format symbol for Binance API
-                binance_symbol = symbol.replace("USDT", "/USDT") if not "/" in symbol else symbol
-                order = place_market_order(binance_symbol, signal, qty)
-                
+
+                if live:
+                    order = place_market_order(binance_symbol, signal, qty)
+                else:
+                    print(f"ℹ️ Mock order: BUY {qty:.6f} {symbol} at ${price:.4f}")
+                    order = {"mock": True}
+
                 if order:
                     self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = {
@@ -300,19 +304,19 @@ class MotherAI:
                 pos = self.position_tracker.get(symbol, {})
                 qty = pos.get("qty", 0) if isinstance(pos, dict) else 0
 
-                # ✅ If we don't have qty tracked, use a default or get from agent
                 if qty <= 0:
                     print(f"⚠️ No quantity tracked for {symbol}. Using default qty for sell.")
-                    # Calculate a reasonable default quantity based on risk amount
                     risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
-                    qty = risk_amount / price  # Simple approximation
+                    qty = risk_amount / price
 
                 print(f"📊 Selling {symbol} | Qty: {qty:.6f} at ${price:.4f}")
-                
-                # Format symbol for Binance API
-                binance_symbol = symbol.replace("USDT", "/USDT") if not "/" in symbol else symbol
-                order = place_market_order(binance_symbol, signal, qty)
-                
+
+                if live:
+                    order = place_market_order(binance_symbol, signal, qty)
+                else:
+                    print(f"ℹ️ Mock order: SELL {qty:.6f} {symbol} at ${price:.4f}")
+                    order = {"mock": True}
+
                 if order:
                     self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = None  # Clear position
@@ -322,8 +326,7 @@ class MotherAI:
 
         except Exception as e:
             print(f"❌ Trade execution error for {symbol}: {e}")
-            
-        # ✅ Return the quantity so it can be used for logging
+
         return qty
 
     def make_portfolio_decision(self, min_score=0.5):

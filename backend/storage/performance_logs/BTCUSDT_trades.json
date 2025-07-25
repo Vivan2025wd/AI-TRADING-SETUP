@@ -20,5 +20,38 @@
     "qty": null,
     "timestamp": "2025-07-24T01:57:10.652573",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 116240.02,
+    "price": 116240.02,
+    "qty": 0.002868,
+    "timestamp": "2025-07-25T03:14:22.418334",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 116013.3,
+    "price": 116013.3,
+    "qty": null,
+    "timestamp": "2025-07-25T03:26:54.573960",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 116060.0,
+    "price": 116060.0,
+    "qty": 0.002872,
+    "timestamp": "2025-07-25T03:26:54.573960",
+    "source": "mother_ai_decision"
   }
 ]

@@ -1,11 +1,11 @@
 {
   "symbol": "BTCUSDT",
-  "total_profit_dollars": 0.0,
-  "avg_profit_per_trade": 0.0,
-  "total_trades": 1,
+  "total_profit_dollars": -0.6502,
+  "avg_profit_per_trade": -0.3251,
+  "total_trades": 2,
   "wins": 1,
-  "losses": 0,
-  "win_rate": 100.0,
+  "losses": 1,
+  "win_rate": 50.0,
   "trades": [
     {
       "entry_time": "2025-07-24T01:56:54.940757",
@@ -17,6 +17,17 @@
       "exit_value": 333.3433,
       "pnl_dollars": 0.0,
       "pnl_percentage": 0.0
+    },
+    {
+      "entry_time": "2025-07-25T03:14:22.418334",
+      "entry_price": 116240.02,
+      "exit_time": "2025-07-25T03:26:54.573960",
+      "exit_price": 116013.3,
+      "qty": 0.002868,
+      "entry_value": 333.3764,
+      "exit_value": 332.7261,
+      "pnl_dollars": -0.6502,
+      "pnl_percentage": -0.2
     }
   ]
 }

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const BinanceAPISetup = () => {
   const [apiKey, setApiKey] = useState("");
@@ -7,7 +8,7 @@ const BinanceAPISetup = () => {
   const [error, setError] = useState(null);
   const [statusMessage, setStatusMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [tradingMode, setTradingMode] = useState("testnet");
+  const [tradingMode, setTradingMode] = useState("testnet"); // "testnet" or "live"
 
   const handleConnect = async () => {
     setError(null);
@@ -21,27 +22,17 @@ const BinanceAPISetup = () => {
     }
 
     try {
-      const payload = { 
-        apiKey: apiKey.trim(), 
+      const payload = {
+        apiKey: apiKey.trim(),
         secretKey: secretKey.trim(),
-        tradingMode 
+        tradingMode: tradingMode === "testnet" ? "mock" : "live", // Map for backend
       };
 
-      // Simulate API call - replace with actual axios call to your backend
-      const response = await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // Simulate successful connection
-          if (apiKey.length > 10 && secretKey.length > 10) {
-            resolve({ status: 200, data: { success: true, message: "Connected successfully" } });
-          } else {
-            reject(new Error("Invalid API credentials"));
-          }
-        }, 1500);
-      });
+      const response = await axios.post("/api/binance/connect", payload);
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.message) {
         setConnected(true);
-        setStatusMessage(`✅ Connected successfully to ${tradingMode === 'live' ? 'Live Trading' : 'Testnet'}`);
+        setStatusMessage(`✅ ${response.data.message}`);
       } else {
         throw new Error("Unexpected response from server.");
       }
@@ -74,10 +65,10 @@ const BinanceAPISetup = () => {
 
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate testing account info
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // TODO: Replace with actual call to test connection endpoint, e.g. /api/binance/account/balance
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setStatusMessage("✅ Account info retrieved successfully!");
     } catch (err) {
       setError("❌ Failed to retrieve account info");
@@ -90,7 +81,9 @@ const BinanceAPISetup = () => {
     <div className="p-6 bg-gray-900 text-white rounded-xl max-w-lg mx-auto space-y-6 shadow-2xl border border-gray-700">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-white mb-2">🔐 Binance API Setup</h2>
-        <p className="text-gray-400 text-sm">Connect your Binance account for automated trading</p>
+        <p className="text-gray-400 text-sm">
+          Connect your Binance account for automated trading
+        </p>
       </div>
 
       {/* Trading Mode Selection */}
@@ -164,9 +157,10 @@ const BinanceAPISetup = () => {
       )}
 
       {/* Warning for Live Mode */}
-      {tradingMode === 'live' && !connected && (
+      {tradingMode === "live" && !connected && (
         <div className="bg-yellow-900/50 border border-yellow-500 text-yellow-300 p-3 rounded-lg text-sm">
-          <strong>⚠️ Warning:</strong> Live trading mode will place real orders with real money. Make sure you understand the risks.
+          <strong>⚠️ Warning:</strong> Live trading mode will place real orders with
+          real money. Make sure you understand the risks.
         </div>
       )}
 
@@ -212,9 +206,13 @@ const BinanceAPISetup = () => {
 
       {/* Connection Status */}
       <div className="flex items-center justify-center space-x-2 pt-2">
-        <div className={`w-3 h-3 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+        <div
+          className={`w-3 h-3 rounded-full ${
+            connected ? "bg-green-500" : "bg-red-500"
+          }`}
+        ></div>
         <span className="text-sm text-gray-400">
-          {connected ? 'Connected' : 'Disconnected'}
+          {connected ? "Connected" : "Disconnected"}
         </span>
       </div>
     </div>

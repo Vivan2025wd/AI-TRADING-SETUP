@@ -302,5 +302,132 @@
     "source": "GenericAgent/rule_based",
     "ml_available": true,
     "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-24T10:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.792,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-24T10:01:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.8,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-24T10:01:49.950259",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-24T10:01:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.8,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-24T10:01:54.836910",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.8,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-25T02:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T02:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T02:48:00",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T02:48:01.920236",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-25T02:48:00",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-07-25T02:48:06.109517",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-07-25T03:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.784,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-25T03:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.784,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-25T03:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.784,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-25T03:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.784,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
   }
 ]

@@ -53,5 +53,60 @@
     "qty": 14.166313,
     "timestamp": "2025-07-24T09:58:17.181394",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 23.26,
+    "price": 23.26,
+    "qty": null,
+    "timestamp": "2025-07-25T02:47:01.913737",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 23.27,
+    "price": 23.27,
+    "qty": 14.324595,
+    "timestamp": "2025-07-25T02:47:07.160036",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 23.24,
+    "price": 23.24,
+    "qty": null,
+    "timestamp": "2025-07-25T03:13:25.553848",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 23.25,
+    "price": 23.25,
+    "qty": 14.336918,
+    "timestamp": "2025-07-25T03:13:25.553848",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 23.26,
+    "price": 23.26,
+    "qty": null,
+    "timestamp": "2025-07-25T03:26:54.573960",
+    "source": "mother_ai_decision"
   }
 ]

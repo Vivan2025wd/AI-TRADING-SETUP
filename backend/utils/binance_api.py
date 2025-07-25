@@ -7,39 +7,45 @@ from typing import Optional
 # Add the project root to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-# Import logger after path setup
+# --- Logger Setup ---
 try:
     from backend.utils.logger import log
 except ImportError:
-    # Fallback to basic logging if custom logger isn't available
     import logging
     log = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.INFO)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+    log.setLevel(logging.INFO)
 
+# Load .env variables
 load_dotenv()
 
-# Global (single-user) Binance client instance
-user_binance_client: Optional[Client] = None
+# --- Global Variables ---
+CURRENT_TRADING_MODE = "mock"  # Default Mode: mock
+user_binance_client: Optional[Client] = None  # Global Binance Client Instance
 
-# Optional fallback from .env
+# Optional fallback from .env (used if API keys not provided in function call)
 DEFAULT_API_KEY = os.getenv("BINANCE_API_KEY", "")
 DEFAULT_API_SECRET = os.getenv("BINANCE_API_SECRET", "")
 
-# Trading Mode
-# Load from .env, default to "False" if not set or invalid
-REAL_TRADING_MODE_STR = os.getenv("REAL_TRADING_MODE", "False")
-REAL_TRADING_MODE = REAL_TRADING_MODE_STR.lower() == "true"
+# --- Trading Mode Functions ---
+def set_trading_mode(mode: str):
+    global CURRENT_TRADING_MODE
+    CURRENT_TRADING_MODE = mode.lower()
 
-def is_real_trading_mode() -> bool:
-    """Returns True if real trading mode is enabled, False otherwise."""
-    return REAL_TRADING_MODE
+def get_trading_mode() -> str:
+    return CURRENT_TRADING_MODE
 
-def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = None) -> dict:
+# --- API Connection Functions ---
+def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = None, mode: str = "mock") -> dict:
     """
-    Initializes the Binance client using provided or default API keys.
-    Returns a dict with 'success': True/False and a message.
+    Connect to Binance API with provided or default keys.
+    Supports 'mock' mode for Testnet and 'live' mode for real trading.
     """
     global user_binance_client
+    set_trading_mode(mode)
 
     key = api_key or DEFAULT_API_KEY
     secret = secret_key or DEFAULT_API_SECRET
@@ -49,29 +55,17 @@ def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = 
         return {"success": False, "message": "Missing API key or secret."}
 
     try:
-        # Create Binance client instance
         client = Client(api_key=key, api_secret=secret)
         
-        # For testnet, you need to set the testnet flag
-        # If you want to use testnet, uncomment the line below:
-        # client = Client(api_key=key, api_secret=secret, testnet=True)
+        if mode.lower() == "mock":
+            client.API_URL = 'https://testnet.binance.vision/api'
         
-        # Test credentials with a simple API call
-        account_info = client.get_account()
-        
-        # Store the client globally
+        # Test API connectivity
+        client.get_account()
         user_binance_client = client
         
-        log.info("[Binance] API connection successful.")
-        if is_real_trading_mode():
-            log.warning("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            log.warning("!!! REAL TRADING MODE IS ACTIVE. LIVE ORDERS WILL BE PLACED !!!")
-            log.warning("!!! Ensure you are using TESTNET keys if testing.            !!!")
-            log.warning("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        else:
-            log.info("[Binance] Connection is in MOCK TRADING MODE.")
-
-        return {"success": True, "message": "Binance API connected successfully."}
+        log.info(f"[Binance] API connected in {mode.upper()} MODE.")
+        return {"success": True, "message": f"Connected in {mode.upper()} MODE."}
 
     except Exception as e:
         log.error(f"[Binance Init Error] {e}")
@@ -79,28 +73,28 @@ def connect_user_api(api_key: Optional[str] = None, secret_key: Optional[str] = 
 
 def get_binance_client() -> Client:
     """
-    Returns the connected Binance client, or raises error if not connected.
+    Returns the connected Binance client or raises an error if not connected.
     """
     if user_binance_client is None:
         raise Exception("Binance API client not initialized. Call connect_user_api() first.")
     return user_binance_client
 
+def disconnect_client():
+    """
+    Disconnect the current Binance client.
+    """
+    global user_binance_client
+    user_binance_client = None
+    log.info("[Binance] Client disconnected.")
+
+# --- Binance API Utility Functions ---
 def fetch_ohlcv(symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limit: int = 100) -> list:
     """
-    Fetches OHLCV candle data for a given symbol and interval.
-    
-    Args:
-        symbol: Trading pair symbol (e.g., 'BTCUSDT')
-        interval: Kline interval (use Client.KLINE_INTERVAL_* constants)
-        limit: Number of klines to fetch (max 1000)
-        
-    Returns:
-        List of OHLCV dictionaries
+    Fetch OHLCV candle data for a given symbol and interval.
     """
     try:
         client = get_binance_client()
         klines = client.get_klines(symbol=symbol.upper(), interval=interval, limit=limit)
-        
         return [
             {
                 "timestamp": int(k[0]),
@@ -118,16 +112,7 @@ def fetch_ohlcv(symbol: str, interval: str = Client.KLINE_INTERVAL_1MINUTE, limi
 
 def get_symbol_price(symbol: str) -> float:
     """
-    Fetches the current ticker price for the given symbol from Binance.
-    
-    Args:
-        symbol: Trading pair symbol (e.g., 'BTCUSDT')
-        
-    Returns:
-        Current price as float
-        
-    Raises:
-        Exception: If price fetch fails
+    Fetch the current ticker price for the given symbol.
     """
     try:
         client = get_binance_client()
@@ -140,9 +125,6 @@ def get_symbol_price(symbol: str) -> float:
 def get_account_info() -> dict:
     """
     Get account information including balances.
-    
-    Returns:
-        Account information dictionary
     """
     try:
         client = get_binance_client()
@@ -153,55 +135,29 @@ def get_account_info() -> dict:
 
 def get_exchange_info(symbol: Optional[str] = None) -> dict:
     """
-    Get exchange information for symbols.
-    
-    Args:
-        symbol: Optional specific symbol to get info for
-        
-    Returns:
-        Exchange information dictionary
-        
-    Raises:
-        Exception: If symbol not found or API call fails
+    Get exchange information for all symbols or a specific symbol.
     """
     try:
         client = get_binance_client()
         if symbol:
-            result = client.get_symbol_info(symbol.upper())
-            if result is None:
-                raise Exception(f"Symbol '{symbol}' not found")
-            return result
-        else:
-            return client.get_exchange_info()
+            info = client.get_symbol_info(symbol.upper())
+            if not info:
+                raise Exception(f"Symbol '{symbol}' not found.")
+            return info
+        return client.get_exchange_info()
     except Exception as e:
         log.error(f"[Binance Exchange Info Error] {e}")
         raise e
 
-def disconnect_client():
-    """
-    Disconnect the current Binance client.
-    """
-    global user_binance_client
-    user_binance_client = None
-    log.info("[Binance] Client disconnected.")
-
-# Test function to verify connection
 def test_connection() -> dict:
     """
-    Test the current Binance connection.
-    
-    Returns:
-        Test result dictionary with success status and details
+    Test Binance API connection (server time + account check).
     """
     try:
         client = get_binance_client()
-        
-        # Test server connectivity
         server_time = client.get_server_time()
-        
-        # Test account access
         account_info = client.get_account()
-        
+
         return {
             "success": True,
             "server_time": server_time,
@@ -215,3 +171,8 @@ def test_connection() -> dict:
             "success": False,
             "error": str(e)
         }
+
+def get_safe_binance_client() -> Client:
+    if user_binance_client is None:
+        raise Exception("Binance client not connected. Please connect API keys first.")
+    return user_binance_client
