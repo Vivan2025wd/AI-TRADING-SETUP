@@ -21,33 +21,27 @@ const fetchWithTimeout = (url, options = {}, timeout = 10000) =>
   ]);
 
 export default function BacktestResults() {
-  const [trades, setTrades] = useState([]);
+  const [capitalCurve, setCapitalCurve] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [retry, setRetry] = useState(0);
+  const [initialCapital, setInitialCapital] = useState(0);
 
   useEffect(() => {
     async function fetchBacktestResults() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetchWithTimeout(
-          "http://localhost:8000/api/backtest/results?page=1&limit=100"
-        );
+        const res = await fetchWithTimeout("http://localhost:8000/api/backtest/results");
         if (!res.ok) throw new Error("Failed to fetch backtest results");
         const data = await res.json();
 
-        const rawTrades = Array.isArray(data.data) ? data.data : [];
+        if (!data.capital_curve) {
+          throw new Error("Invalid data format: missing capital_curve");
+        }
 
-        const processedTrades = rawTrades.map((trade) => ({
-          timestamp: trade.timestamp,
-          price: trade.price,
-          profit_percent: trade.profit_percent,
-          balance: trade.balance,
-          type: trade.profit_percent >= 0 ? "SELL" : "BUY", // Simple type assignment
-        }));
-
-        setTrades(processedTrades);
+        setInitialCapital(data.initial_capital || 100);
+        setCapitalCurve(data.capital_curve);
       } catch (err) {
         console.error(err);
         setError(err.message || "Unknown error occurred");
@@ -60,13 +54,13 @@ export default function BacktestResults() {
   }, [retry]);
 
   const chartData = {
-    labels: trades.map((trade) =>
-      trade.timestamp ? new Date(trade.timestamp).toLocaleString() : "-"
+    labels: capitalCurve.map((point) =>
+      point.timestamp ? new Date(point.timestamp).toLocaleString() : "-"
     ),
     datasets: [
       {
-        label: "Balance Over Time",
-        data: trades.map((trade) => trade.balance ?? null),
+        label: `Balance Over Time (Start: $${initialCapital})`,
+        data: capitalCurve.map((point) => point.balance ?? null),
         fill: true,
         borderColor: "rgb(34,197,94)",
         backgroundColor: "rgba(34,197,94,0.2)",
@@ -79,7 +73,7 @@ export default function BacktestResults() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold text-white border-b border-gray-700 pb-3 mb-6">
-        Backtest Results
+        Backtest Results - Capital Curve
       </h2>
 
       <div className="bg-gray-900 p-6 rounded-xl shadow-lg" style={{ minHeight: 250 }}>
@@ -95,8 +89,8 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : trades.length === 0 ? (
-          <p className="text-gray-400 text-center">No backtest trades found.</p>
+        ) : capitalCurve.length === 0 ? (
+          <p className="text-gray-400 text-center">No backtest data found.</p>
         ) : (
           <Line
             data={chartData}
@@ -134,21 +128,21 @@ export default function BacktestResults() {
               Retry
             </button>
           </div>
-        ) : trades.length === 0 ? (
+        ) : capitalCurve.length === 0 ? (
           <p className="text-gray-400 text-center p-4">No trades to display.</p>
         ) : (
           <table className="min-w-full text-sm text-left">
             <thead className="bg-gray-800 text-gray-300">
               <tr>
-                <th className="px-6 py-3">Type</th>
                 <th className="px-6 py-3">Timestamp</th>
-                <th className="px-6 py-3">Price</th>
-                <th className="px-6 py-3">Profit %</th>
+                <th className="px-6 py-3">Symbol</th>
+                <th className="px-6 py-3">Exit Price</th>
+                <th className="px-6 py-3">PnL ($)</th>
                 <th className="px-6 py-3">Balance</th>
               </tr>
             </thead>
             <tbody>
-              {[...trades]
+              {[...capitalCurve]
                 .slice(-10)
                 .reverse()
                 .map((trade, i) => (
@@ -156,42 +150,28 @@ export default function BacktestResults() {
                     key={i}
                     className="border-t border-gray-700 hover:bg-gray-800 transition-colors"
                   >
-                    <td className="px-6 py-3 font-semibold">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          trade.type === "BUY"
-                            ? "bg-blue-700 text-blue-200"
-                            : trade.type === "SELL"
-                            ? "bg-red-700 text-red-200"
-                            : "bg-gray-700 text-gray-300"
-                        }`}
-                      >
-                        {trade.type}
-                      </span>
-                    </td>
                     <td className="px-6 py-3 text-gray-300">
                       {trade.timestamp
                         ? new Date(trade.timestamp).toLocaleString()
                         : "-"}
                     </td>
+                    <td className="px-6 py-3 text-gray-300">{trade.symbol || "-"}</td>
                     <td className="px-6 py-3 text-gray-300">
-                      {trade.price != null
-                        ? `$${trade.price.toLocaleString()}`
+                      {trade.exit_price != null
+                        ? `$${trade.exit_price.toLocaleString()}`
                         : "-"}
                     </td>
                     <td
                       className={`px-6 py-3 font-semibold ${
-                        typeof trade.profit_percent === "number"
-                          ? trade.profit_percent > 0
-                            ? "text-green-400"
-                            : trade.profit_percent < 0
-                            ? "text-red-400"
-                            : "text-gray-400"
+                        trade.pnl_dollars > 0
+                          ? "text-green-400"
+                          : trade.pnl_dollars < 0
+                          ? "text-red-400"
                           : "text-gray-400"
                       }`}
                     >
-                      {typeof trade.profit_percent === "number"
-                        ? `${trade.profit_percent.toFixed(2)}%`
+                      {trade.pnl_dollars != null
+                        ? `$${trade.pnl_dollars.toFixed(4)}`
                         : "-"}
                     </td>
                     <td className="px-6 py-3 font-semibold text-gray-300">

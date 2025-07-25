@@ -32,9 +32,9 @@ def execute_backtest(payload: BacktestPayload):
 # GET /api/backtest/results — Mother AI trade profits
 # -----------------------------------------------
 @router.get("/results")
-def get_recent_backtest_results(
+def get_full_capital_curve(
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1)
+    limit: int = Query(100, ge=1)  # default 100 for pagination, can increase or remove pagination
 ):
     logs_dir = Path("backend/storage/trade_profits")
 
@@ -43,43 +43,60 @@ def get_recent_backtest_results(
 
     all_trades = []
 
+    # Load trades from all summary files
     for summary_file in logs_dir.glob("*_summary.json"):
         try:
             with open(summary_file, "r") as f:
                 summary = json.load(f)
                 symbol = summary.get("symbol", summary_file.stem.replace("_summary", ""))
                 trades = summary.get("trades", [])
-
-                balance = 100.0  # Starting capital (set accordingly)
+                
+                # Append trades with symbol info
                 for trade in trades:
-                    pnl_dollars = trade.get("pnl_dollars", 0.0)
-                    pnl_percent = trade.get("pnl_percentage", 0.0)
-
-                    balance += pnl_dollars
-
                     all_trades.append({
-                        "type": "TRADE",
-                        "timestamp": trade.get("exit_time"),
-                        "price": trade.get("exit_price"),
-                        "profit_percent": pnl_percent,
-                        "balance": balance,
-                        "symbol": symbol
+                        "symbol": symbol,
+                        "entry_time": trade.get("entry_time"),
+                        "exit_time": trade.get("exit_time"),
+                        "exit_price": trade.get("exit_price"),
+                        "pnl_dollars": trade.get("pnl_dollars", 0.0),
+                        "pnl_percentage": trade.get("pnl_percentage", 0.0)
                     })
         except Exception as e:
             print(f"Error reading {summary_file}: {e}")
 
-    # Sort by timestamp descending
-    sorted_trades = sorted(all_trades, key=lambda x: x.get("timestamp", ""), reverse=True)
+    if not all_trades:
+        raise HTTPException(status_code=404, detail="No trades found in summaries.")
 
-    total = len(sorted_trades)
+    # Sort trades by exit_time ascending (oldest first)
+    all_trades.sort(key=lambda x: x.get("exit_time") or "")
+
+    # Calculate running capital curve starting from initial capital
+    initial_capital = 100.0
+    running_balance = initial_capital
+    capital_curve = []
+
+    for trade in all_trades:
+        pnl = trade["pnl_dollars"] or 0.0
+        running_balance += pnl
+        capital_curve.append({
+            "timestamp": trade["exit_time"],
+            "symbol": trade["symbol"],
+            "balance": round(running_balance, 6),
+            "pnl_dollars": pnl,
+            "exit_price": trade["exit_price"]
+        })
+
+    # Pagination on capital_curve (optional)
+    total = len(capital_curve)
     start = (page - 1) * limit
     end = start + limit
-    paginated = sorted_trades[start:end]
+    paginated = capital_curve[start:end]
 
     return {
         "page": page,
         "limit": limit,
-        "total": total,
-        "totalPages": (total + limit - 1) // limit,
-        "data": paginated
+        "total_trades": total,
+        "total_pages": (total + limit - 1) // limit,
+        "initial_capital": initial_capital,
+        "capital_curve": paginated
     }
