@@ -50,7 +50,7 @@ def get_recent_backtest_results(
                 symbol = summary.get("symbol", summary_file.stem.replace("_summary", ""))
                 trades = summary.get("trades", [])
 
-                balance = 1000.0  # Starting capital (set accordingly)
+                balance = 100.0  # Starting capital (set accordingly)
                 for trade in trades:
                     pnl_dollars = trade.get("pnl_dollars", 0.0)
                     pnl_percent = trade.get("pnl_percentage", 0.0)

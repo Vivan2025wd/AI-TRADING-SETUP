@@ -42,5 +42,27 @@
     "qty": null,
     "timestamp": "2025-07-25T02:47:01.913737",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 3.887,
+    "price": 3.887,
+    "qty": 85.755939,
+    "timestamp": "2025-07-25T03:36:57.522509",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 3.948,
+    "price": 3.948,
+    "qty": null,
+    "timestamp": "2025-07-25T04:46:37.106738",
+    "source": "mother_ai_decision"
   }
 ]

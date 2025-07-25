@@ -31,5 +31,16 @@
     "qty": 1469.205454,
     "timestamp": "2025-07-25T03:27:04.562569",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.223,
+    "price": 0.223,
+    "qty": null,
+    "timestamp": "2025-07-25T03:36:35.612157",
+    "source": "mother_ai_decision"
   }
 ]

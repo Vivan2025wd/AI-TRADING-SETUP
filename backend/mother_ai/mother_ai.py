@@ -19,7 +19,7 @@ PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
 TRADE_COOLDOWN_SECONDS = 600
 MAX_HOLD_SECONDS = 21600  # 6 hours (6 * 60 * 60)
 RISK_PER_TRADE = 0.01  # 1% of capital
-DEFAULT_BALANCE_USD = 1000  # for mock position sizing
+DEFAULT_BALANCE_USD = 100  # for mock position sizing
 TP_RATIO = 1.5  # Take Profit: 1.5x Risk
 SL_PERCENT = 0.03  # 3% Stop Loss
 
