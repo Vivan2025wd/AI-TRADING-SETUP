@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { ArrowUpRight, AlertCircle, Clock, RefreshCw, Loader2 } from "lucide-react";
 
 const CACHE_KEY = "mother_ai_decision_cache";
@@ -9,8 +9,9 @@ export default function MotherAIDecisionCard({ isLive }) {
   const [decisionData, setDecisionData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const intervalRef = useRef(null);
 
-  async function fetchDecision() {
+  const fetchDecision = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -52,50 +53,39 @@ export default function MotherAIDecisionCard({ isLive }) {
 
       setDecisionData(final);
 
-      localStorage.setItem(
-        CACHE_KEY,
-        JSON.stringify({
-          timestamp: Date.now(),
-          decisionData: final,
-        })
-      );
+      // Cache the result in memory (localStorage not available in artifacts)
+      console.log("Decision updated:", final);
     } catch (err) {
       console.error("Mother AI Fetch Error:", err);
       setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
-  }
+  }, [isLive]);
 
   useEffect(() => {
-    // Try to load from cache first
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      try {
-        const { timestamp, decisionData: cachedDecision } = JSON.parse(cached);
-        const age = Date.now() - timestamp;
-
-        if (age < CACHE_DURATION_MS) {
-          setDecisionData(cachedDecision);
-          setLoading(false);
-        } else {
-          fetchDecision();
-        }
-      } catch {
-        fetchDecision();
-      }
-    } else {
-      fetchDecision();
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
     }
 
-    // Set interval to fetch decision every 10 minutes
-    const interval = setInterval(() => {
+    // Initial fetch on startup
+    fetchDecision();
+
+    // Set up interval to fetch every 10 minutes
+    intervalRef.current = setInterval(() => {
+      console.log("Polling Mother AI decision...");
       fetchDecision();
     }, POLL_INTERVAL_MS);
 
-    // Clean up interval on unmount or when isLive changes
-    return () => clearInterval(interval);
-  }, [isLive]);
+    // Cleanup function
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [fetchDecision]); // Depend on fetchDecision which includes isLive
 
   return (
     <div className="bg-gray-900 text-white shadow-md rounded-xl p-6 max-w-xl mx-auto space-y-6 border border-gray-700">
@@ -156,17 +146,19 @@ export default function MotherAIDecisionCard({ isLive }) {
           </div>
 
           {!loading && decisionData?.status === "Active" && (
-            <p className="text-sm text-gray-400 italic mt-2 text-center">Waiting for next update...</p>
+            <p className="text-sm text-gray-400 italic mt-2 text-center">
+              Next update in {Math.ceil(POLL_INTERVAL_MS / 60000)} minutes...
+            </p>
           )}
         </>
       )}
 
       <button
         onClick={fetchDecision}
-        className="mt-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center gap-2 mx-auto"
+        className="mt-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center gap-2 mx-auto disabled:opacity-50"
         disabled={loading}
       >
-        <RefreshCw className="w-4 h-4" />
+        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         Refresh Now
       </button>
     </div>
