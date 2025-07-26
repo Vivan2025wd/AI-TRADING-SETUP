@@ -18,8 +18,8 @@ TRADE_HISTORY_DIR =  "backend/storage/trade_history"
 PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
 TRADE_COOLDOWN_SECONDS = 600
 MAX_HOLD_SECONDS = 21600  # 6 hours (6 * 60 * 60)
-RISK_PER_TRADE = 0.01  # 1% of capital
-DEFAULT_BALANCE_USD = 100  # for mock position sizing
+RISK_PER_TRADE = 0.5  # 1% of capital
+DEFAULT_BALANCE_USD = 10  # for mock position sizing
 TP_RATIO = 1.5  # Take Profit: 1.5x Risk
 SL_PERCENT = 0.03  # 3% Stop Loss
 
@@ -260,33 +260,66 @@ class MotherAI:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return None
 
-        print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f} | Live mode: {live}")
+    # Get current trading mode from binance_api.py
+        from backend.utils.binance_api import get_trading_mode, get_binance_client
+        current_mode = get_trading_mode()
+    
+        print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f} | Mode: {current_mode.upper()}")
 
         qty = None
 
         try:
-            # Format symbol for Binance API: e.g. "BTCUSDT" -> "BTC/USDT"
+        # Check actual account balance before placing order
+            if current_mode == "live":
+                try:
+                    client = get_binance_client()
+                    account_info = client.get_account()
+                    balances = {b['asset']: float(b['free']) for b in account_info['balances']}
+                    usdt_balance = balances.get('USDT', 0)
+                    print(f"💰 Current USDT balance: ${usdt_balance:.2f}")
+                    
+                    if signal == "buy" and usdt_balance < 10:
+                        print(f"❌ Insufficient USDT balance for buy order. Need at least $10, have ${usdt_balance:.2f}")
+                        return None
+                    
+                # Use actual balance instead of DEFAULT_BALANCE_USD
+                    available_balance = min(usdt_balance * 0.9, 20)  # Use 90% of balance, max $20
+                    print(f"💡 Using ${available_balance:.2f} for this trade")
+                    
+                except Exception as balance_err:
+                    print(f"⚠️ Could not check balance: {balance_err}")
+                    available_balance = DEFAULT_BALANCE_USD
+            else:
+                available_balance = DEFAULT_BALANCE_USD
+
+            # Format symbol for Binance API
             binance_symbol = symbol if "/" in symbol else symbol.replace("USDT", "/USDT")
 
             if signal == "buy":
                 sl = price * (1 - SL_PERCENT)
                 tp = price + ((price - sl) * TP_RATIO)
-                risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
-                qty = risk_amount / (price - sl)
+            
+                # Calculate quantity based on available balance
+                if current_mode == "live":
+                    # For live trading, use smaller position size
+                    risk_amount = available_balance * 0.5  # Use 50% of available
+                    qty = risk_amount / price  # Simple calculation based on price
+                else:
+                    # Mock trading uses original calculation
+                    risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
+                    qty = risk_amount / (price - sl)
 
                 if qty <= 0:
                     print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}, skipping.")
                     return None
 
                 print(f"📊 Buying {symbol} | Entry: {price:.4f}, SL: {sl:.4f}, TP: {tp:.4f}, Qty: {qty:.6f}")
+                print(f"📊 Risk amount: ${risk_amount:.2f}, Total cost: ${qty * price:.2f}")
 
-                if live:
-                    order = place_market_order(binance_symbol, signal, qty)
-                else:
-                    print(f"ℹ️ Mock order: BUY {qty:.6f} {symbol} at ${price:.4f}")
-                    order = {"mock": True}
+                # Use the updated place_market_order function
+                order = place_market_order(binance_symbol, signal, qty)
 
-                if order:
+                if order and order.get("status") != "mock":
                     self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = {
                         "side": "long",
@@ -296,7 +329,19 @@ class MotherAI:
                         "take_profit": tp,
                         "qty": qty
                     }
-                    print(f"✅ BUY order executed for {symbol}")
+                    print(f"✅ BUY order executed for {symbol} in {current_mode.upper()} mode")
+                elif order and order.get("status") == "mock":
+                    # Mock order - still update tracking for simulation
+                    self.cooldown_tracker[symbol] = time.time()
+                    self.position_tracker[symbol] = {
+                        "side": "long",
+                        "entry_price": price,
+                        "entry_time": time.time(),
+                        "stop_loss": sl,
+                        "take_profit": tp,
+                        "qty": qty
+                    }
+                    print(f"✅ MOCK BUY order logged for {symbol}")
                 else:
                     print(f"❌ BUY order failed for {symbol}")
 
@@ -305,22 +350,42 @@ class MotherAI:
                 qty = pos.get("qty", 0) if isinstance(pos, dict) else 0
 
                 if qty <= 0:
-                    print(f"⚠️ No quantity tracked for {symbol}. Using default qty for sell.")
-                    risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
-                    qty = risk_amount / price
+                    print(f"⚠️ No quantity tracked for {symbol}. Checking actual balance...")
+                    if current_mode == "live":
+                        try:
+                            client = get_binance_client()
+                            account_info = client.get_account()
+                            balances = {b['asset']: float(b['free']) for b in account_info['balances']}
+                            base_asset = symbol.replace("USDT", "")
+                            actual_qty = balances.get(base_asset, 0)
+                            if actual_qty > 0:
+                                qty = actual_qty
+                                print(f"💡 Found {qty:.6f} {base_asset} in account")
+                            else:
+                                print(f"❌ No {base_asset} holdings found in account")
+                                return None
+                        except Exception as e:
+                            print(f"⚠️ Could not check holdings: {e}")
+                            return None
+                    else:
+                        # For mock, use default calculation
+                        risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
+                        qty = risk_amount / price
 
                 print(f"📊 Selling {symbol} | Qty: {qty:.6f} at ${price:.4f}")
 
-                if live:
-                    order = place_market_order(binance_symbol, signal, qty)
-                else:
-                    print(f"ℹ️ Mock order: SELL {qty:.6f} {symbol} at ${price:.4f}")
-                    order = {"mock": True}
+                # Use the updated place_market_order function
+                order = place_market_order(binance_symbol, signal, qty)
 
-                if order:
+                if order and order.get("status") != "mock":
                     self.cooldown_tracker[symbol] = time.time()
                     self.position_tracker[symbol] = None  # Clear position
-                    print(f"✅ SELL order executed for {symbol}")
+                    print(f"✅ SELL order executed for {symbol} in {current_mode.upper()} mode")
+                elif order and order.get("status") == "mock":
+                    # Mock order - still update tracking for simulation
+                    self.cooldown_tracker[symbol] = time.time()
+                    self.position_tracker[symbol] = None  # Clear position
+                    print(f"✅ MOCK SELL order logged for {symbol}")
                 else:
                     print(f"❌ SELL order failed for {symbol}")
 

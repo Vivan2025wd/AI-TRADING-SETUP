@@ -97,3 +97,116 @@ def get_connection_status():
     is_connected = user_binance_client is not None
     mode = get_trading_mode()
     return {"connected": is_connected, "mode": mode}
+
+@router.get("/test-permissions")
+def test_api_permissions():
+    """
+    Test Binance API permissions and diagnose issues
+    """
+    try:
+        from backend.binance.binance_trader import test_api_permissions as test_perms
+        result = test_perms()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Permission test failed: {str(e)}")
+
+@router.get("/test-connection")
+def test_binance_connection():
+    """
+    Enhanced connection test with detailed diagnostics
+    """
+    try:
+        from backend.utils.binance_api import get_trading_mode, get_binance_client
+        
+        client = get_binance_client()
+        mode = get_trading_mode()
+        
+        # Test basic connectivity
+        server_time = client.get_server_time()
+        account_info = client.get_account()
+        
+        # Check permissions
+        can_trade = account_info.get("canTrade", False)
+        permissions = account_info.get("permissions", [])
+        
+        return {
+            "success": True,
+            "trading_mode": mode,
+            "server_time": server_time,
+            "account_type": account_info.get("accountType"),
+            "can_trade": can_trade,
+            "permissions": permissions,
+            "api_url": getattr(client, 'API_URL', 'https://api.binance.com'),
+            "balances": [
+                {"asset": b["asset"], "free": float(b["free"]), "locked": float(b["locked"])}
+                for b in account_info.get("balances", [])
+                if float(b["free"]) > 0 or float(b["locked"]) > 0
+            ][:10]  # Show top 10 non-zero balances
+        }
+    except Exception as e:
+        error_msg = str(e)
+        suggestions = []
+        
+        if "Invalid API-key" in error_msg:
+            suggestions = [
+                "Check API key permissions in Binance dashboard",
+                "Ensure 'Spot & Margin Trading' is enabled",
+                "Verify IP restrictions",
+                "Confirm using correct API keys (mainnet vs testnet)"
+            ]
+        
+        return {
+            "success": False,
+            "error": error_msg,
+            "suggestions": suggestions
+        }
+    
+
+    # Add this to your binance routes (routes/binance.py)
+
+@router.get("/balance-summary")
+def get_balance_summary():
+    """
+    Get a summary of account balances and trading readiness
+    """
+    try:
+        client = get_safe_binance_client()
+        account_info = client.get_account()
+        balances = account_info.get("balances", [])
+        
+        # Get non-zero balances
+        non_zero_balances = [
+            {
+                "asset": b["asset"],
+                "free": float(b["free"]),
+                "locked": float(b["locked"]),
+                "total": float(b["free"]) + float(b["locked"])
+            }
+            for b in balances 
+            if float(b.get("free", 0)) > 0 or float(b.get("locked", 0)) > 0
+        ]
+        
+        # Check USDT balance for trading
+        usdt_balance = next((b for b in non_zero_balances if b["asset"] == "USDT"), None)
+        usdt_free = usdt_balance["free"] if usdt_balance else 0
+        
+        # Trading readiness check
+        can_trade_buy = usdt_free >= 10  # Minimum $10 USDT for buy orders
+        
+        # Estimate number of possible trades
+        max_trades = int(usdt_free / 10) if usdt_free > 0 else 0
+        
+        return {
+            "total_balances": len(non_zero_balances),
+            "usdt_available": usdt_free,
+            "can_trade_buy": can_trade_buy,
+            "estimated_max_trades": max_trades,
+            "balances": non_zero_balances,
+            "recommendations": [
+                "Add USDT to your account for buy orders" if not can_trade_buy else "Ready for trading!",
+                f"Current balance allows ~{max_trades} trades at $10 each" if max_trades > 0 else "Insufficient balance for trading"
+            ]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching balance summary: {str(e)}")

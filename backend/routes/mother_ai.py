@@ -61,30 +61,37 @@ def trigger_decision():
 @router.get("/decision")
 @log_endpoint
 def get_mother_ai_decision(is_live: bool = Query(False)):
+    # Get current trading mode - this overrides the is_live parameter
+    from backend.utils.binance_api import get_trading_mode
+    current_mode = get_trading_mode()
+    
+    # Log what mode we're actually in
+    print(f"🔍 Current trading mode: {current_mode.upper()}")
+    print(f"🔍 is_live parameter: {is_live}")
+    
     result = mother_ai_instance.make_portfolio_decision()
     decision = result.get("decision", {})
 
     if not decision:
         return {
             "decision": [],
-            "timestamp": mother_ai_instance.performance_tracker.current_time()
+            "timestamp": mother_ai_instance.performance_tracker.current_time(),
+            "trading_mode": current_mode
         }
 
     symbol = decision.get("symbol")
     signal = decision.get("signal", "").lower()
 
-    if is_live:
-        try:
-            order_result = place_live_order(symbol=symbol, side=signal)
-            log(f"Placed LIVE order: {order_result}")
-            result["live_order"] = order_result
-        except Exception as e:
-            log(f"Live order failed: {e}")
-            raise HTTPException(status_code=500, detail=f"Live order failed: {e}")
-    else:
-        if signal == "sell" and symbol:
-            compute_trade_profits(symbol)
+    # Note: The execute_trade method now automatically uses the correct trading mode
+    # from binance_api.py, so we don't need to handle live orders separately here
+    
+    if signal == "sell" and symbol:
+        compute_trade_profits(symbol)
 
+    # Add trading mode info to response
+    result["trading_mode"] = current_mode
+    result["note"] = f"Executed in {current_mode.upper()} mode"
+    
     return result
 
 @router.get("/trades/{symbol}")

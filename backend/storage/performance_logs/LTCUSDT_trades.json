@@ -20,5 +20,126 @@
     "qty": null,
     "timestamp": "2025-07-24T01:57:38.779213",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.58,
+    "price": 112.58,
+    "qty": 0.296086,
+    "timestamp": "2025-07-26T02:14:37.793782",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.59,
+    "price": 112.59,
+    "qty": null,
+    "timestamp": "2025-07-26T02:14:59.688675",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 113.16,
+    "price": 113.16,
+    "qty": 0.294568,
+    "timestamp": "2025-07-26T02:24:48.308672",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 113.17,
+    "price": 113.17,
+    "qty": null,
+    "timestamp": "2025-07-26T02:25:29.183224",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 113.17,
+    "price": 113.17,
+    "qty": 0.294542,
+    "timestamp": "2025-07-26T02:25:29.183224",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.68,
+    "price": 112.68,
+    "qty": null,
+    "timestamp": "2025-07-26T02:41:07.783752",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.69,
+    "price": 112.69,
+    "qty": 1.478984,
+    "timestamp": "2025-07-26T02:41:07.783752",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.93,
+    "price": 112.93,
+    "qty": null,
+    "timestamp": "2025-07-26T03:22:46.684868",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.94,
+    "price": 112.94,
+    "qty": null,
+    "timestamp": "2025-07-26T03:22:46.684868",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.79,
+    "price": 112.79,
+    "qty": null,
+    "timestamp": "2025-07-26T03:25:31.700793",
+    "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 112.78,
+    "price": 112.78,
+    "qty": null,
+    "timestamp": "2025-07-26T03:25:31.700793",
+    "source": "mother_ai_decision"
   }
 ]

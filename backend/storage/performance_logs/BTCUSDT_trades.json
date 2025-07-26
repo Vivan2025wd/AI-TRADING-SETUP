@@ -141,5 +141,16 @@
     "qty": 0.000286,
     "timestamp": "2025-07-25T12:07:17.668885",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 117307.57,
+    "price": 117307.57,
+    "qty": null,
+    "timestamp": "2025-07-26T02:14:37.793782",
+    "source": "mother_ai_decision"
   }
 ]
