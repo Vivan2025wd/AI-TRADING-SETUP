@@ -3,6 +3,7 @@ import { ArrowUpRight, AlertCircle, Clock, RefreshCw, Loader2 } from "lucide-rea
 
 const CACHE_KEY = "mother_ai_decision_cache";
 const CACHE_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
+const POLL_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
 
 export default function MotherAIDecisionCard({ isLive }) {
   const [decisionData, setDecisionData] = useState(null);
@@ -67,6 +68,7 @@ export default function MotherAIDecisionCard({ isLive }) {
   }
 
   useEffect(() => {
+    // Try to load from cache first
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
@@ -76,14 +78,23 @@ export default function MotherAIDecisionCard({ isLive }) {
         if (age < CACHE_DURATION_MS) {
           setDecisionData(cachedDecision);
           setLoading(false);
-          return;
+        } else {
+          fetchDecision();
         }
       } catch {
-        // Ignore broken cache
+        fetchDecision();
       }
+    } else {
+      fetchDecision();
     }
 
-    fetchDecision();
+    // Set interval to fetch decision every 10 minutes
+    const interval = setInterval(() => {
+      fetchDecision();
+    }, POLL_INTERVAL_MS);
+
+    // Clean up interval on unmount or when isLive changes
+    return () => clearInterval(interval);
   }, [isLive]);
 
   return (
