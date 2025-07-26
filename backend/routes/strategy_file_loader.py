@@ -121,7 +121,7 @@ async def rate_strategies_for_symbol(symbol: str):
 
         # 🧠 Fetch OHLCV and Predict Live Confidence
         try:
-            ohlcv_data = fetch_ohlcv(f"{symbol}/USDT")
+            ohlcv_data = fetch_ohlcv(f"{symbol}")
             if ohlcv_data is None or ohlcv_data.empty:
                 avg_confidence = 0.0
             else:

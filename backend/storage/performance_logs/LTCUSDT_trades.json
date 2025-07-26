@@ -141,5 +141,16 @@
     "qty": null,
     "timestamp": "2025-07-26T03:25:31.700793",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 113.96,
+    "price": 113.96,
+    "qty": null,
+    "timestamp": "2025-07-26T09:22:35.662695",
+    "source": "mother_ai_decision"
   }
 ]
