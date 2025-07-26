@@ -198,7 +198,7 @@ class GenericAgent:
             return "searching", 0.0
 
     def _get_rule_based_signal(self, ohlcv_data: pd.DataFrame) -> Tuple[str, float]:
-        """Get rule-based signal with proper error handling"""
+        """Get rule-based signal with proper error handling and position validation"""
         try:
             rule_result = self.strategy_logic.evaluate(ohlcv_data)
             
@@ -206,11 +206,19 @@ class GenericAgent:
             if isinstance(rule_result, str):
                 rule_result = json.loads(rule_result)
             
-            action = rule_result.get("action", "searching")
-            confidence = float(rule_result.get("confidence", 0.0))
+            raw_action = rule_result.get("action", "searching")
+            raw_confidence = float(rule_result.get("confidence", 0.0))
             
-            logger.info(f"🧠 Rule-based result: action={action}, confidence={confidence:.3f}")
-            return action, confidence
+            # VALIDATION: Fix invalid rule signals based on position state
+            validated_action, validated_confidence = self._validate_rule_signal(
+                raw_action, raw_confidence
+            )
+            
+            logger.info(f"🧠 Rule-based result: action={validated_action}, confidence={validated_confidence:.3f}")
+            if validated_action != raw_action:
+                logger.info(f"   ⚠️ Corrected from: {raw_action} (invalid for current position state)")
+            
+            return validated_action, validated_confidence
             
         except json.JSONDecodeError as e:
             logger.error(f"❌ Failed to parse rule result JSON: {e}")
@@ -219,16 +227,50 @@ class GenericAgent:
             logger.error(f"❌ Strategy evaluation failed for {self.symbol}: {e}")
             return "searching", 0.0
 
+    def _validate_rule_signal(self, action: str, confidence: float) -> Tuple[str, float]:
+        """Validate rule-based signals against current position state"""
+        # If trying to sell without a position, convert to searching with low confidence
+        if action == "sell" and self.position_state is None:
+            logger.warning(f"Rule wants to SELL {self.symbol} but no position exists - converting to searching")
+            return "searching", 0.0
+        
+        # If trying to buy when already long, convert to hold
+        if action == "buy" and self.position_state == "long":
+            logger.warning(f"Rule wants to BUY {self.symbol} but already long - converting to hold")
+            return "hold", confidence * 0.5  # Reduce confidence for converted signal
+        
+        # Valid signals pass through unchanged
+        return action, confidence
+
     def _fuse_decisions(self, ml_action: str, ml_confidence: float, 
                         rule_action: str, rule_confidence: float) -> Tuple[str, float, str]:
-        """Intelligent decision fusion between ML and rule-based signals"""
+        """FIXED: Intelligent decision fusion with better conflict resolution"""
         
-        # High confidence rule-based takes priority
-        if rule_confidence >= 0.9:
-            logger.info(f"Using high-confidence rule signal: {rule_action} ({rule_confidence:.3f})")
-            return rule_action, rule_confidence, "rule_based"
+        # Case 1: If rule signal is invalid (searching/hold), prioritize ML
+        if rule_action in ["searching", "hold"] and ml_action in ["buy", "sell"]:
+            if ml_confidence >= self.ml_confidence_threshold:
+                logger.info(f"Using ML signal over inactive rule: {ml_action} ({ml_confidence:.3f})")
+                return ml_action, ml_confidence, "ml_primary"
         
-        # If ML is available and confident
+        # Case 2: High confidence rule-based takes priority (but only for valid signals)
+        if rule_confidence >= 0.9 and rule_action in ["buy", "sell"]:
+            # Check for high-confidence conflicts
+            if (ml_confidence >= 0.9 and ml_action in ["buy", "sell"] and 
+                ml_action != rule_action):
+                logger.warning(f"⚠️ HIGH CONFIDENCE CONFLICT: ML={ml_action}({ml_confidence:.3f}) vs Rule={rule_action}({rule_confidence:.3f})")
+                
+                # In high-confidence conflicts, prefer ML if it's more confident
+                if ml_confidence > rule_confidence:
+                    logger.info(f"Resolving conflict: Using ML {ml_action} ({ml_confidence:.3f} > {rule_confidence:.3f})")
+                    return ml_action, ml_confidence, "ml_conflict_resolution"
+                else:
+                    logger.info(f"Resolving conflict: Using Rule {rule_action} ({rule_confidence:.3f} >= {ml_confidence:.3f})")
+                    return rule_action, rule_confidence, "rule_conflict_resolution"
+            else:
+                logger.info(f"Using high-confidence rule signal: {rule_action} ({rule_confidence:.3f})")
+                return rule_action, rule_confidence, "rule_based"
+        
+        # Case 3: If ML is available and confident
         if self.model is not None and ml_confidence >= self.ml_confidence_threshold:
             # If both agree, use higher confidence
             if ml_action == rule_action:
@@ -244,38 +286,14 @@ class GenericAgent:
                 logger.info(f"Using rule signal in disagreement: {rule_action} ({rule_confidence:.3f})")
                 return rule_action, rule_confidence, "rule_based"
         
-        # Fallback to rule-based
-        logger.info(f"Falling back to rule signal: {rule_action} ({rule_confidence:.3f})")
-        return rule_action, rule_confidence, "rule_based"
-
-    def _apply_position_management(self, action: str) -> str:
-        """Apply position management rules to prevent invalid trades"""
-        last_signal = self._load_last_trade_signal()
-        
-        # Prevent consecutive buy signals
-        if last_signal == "buy" and action == "buy":
-            logger.info(f"⛔ Preventing consecutive buy for {self.symbol}")
-            return "hold"
-        
-        # Position state management
-        if self.position_state == "long":
-            if action == "buy":
-                logger.info(f"⛔ Already long, converting buy to hold for {self.symbol}")
-                return "hold"
-            elif action == "sell":
-                logger.info(f"📤 Closing long position for {self.symbol}")
-                self.position_state = None
-                return action
-        elif self.position_state is None:
-            if action == "sell":
-                logger.info(f"⛔ No position to sell, converting to searching for {self.symbol}")
-                return "searching"
-            elif action == "buy":
-                logger.info(f"📥 Opening long position for {self.symbol}")
-                self.position_state = "long"
-                return action
-        
-        return action
+        # Case 4: Fallback to rule-based (but validate it's actionable)
+        if rule_action in ["buy", "sell"]:
+            logger.info(f"Falling back to rule signal: {rule_action} ({rule_confidence:.3f})")
+            return rule_action, rule_confidence, "rule_based"
+        else:
+            # If rule is not actionable and ML is not confident enough, default to searching
+            logger.info(f"No confident signals available - defaulting to searching")
+            return "searching", 0.0, "no_signal"
 
     def _load_last_trade_signal(self) -> Optional[str]:
         """Load the last trade signal from logs"""
@@ -332,10 +350,10 @@ class GenericAgent:
         # Get ML prediction
         ml_action, ml_confidence = self._predict_with_model(features)
         
-        # Get rule-based prediction
+        # Get rule-based prediction (now with validation)
         rule_action, rule_confidence = self._get_rule_based_signal(ohlcv_data)
         
-        # Fuse decisions
+        # Fuse decisions (now with better conflict resolution)
         fused_action, fused_confidence, source = self._fuse_decisions(
             ml_action, ml_confidence, rule_action, rule_confidence
         )
@@ -367,7 +385,8 @@ class GenericAgent:
             },
             "metadata": {
                 "features_extracted": features is not None,
-                "model_classes": list(self.model.classes_) if self.model else None
+                "model_classes": list(self.model.classes_) if self.model else None,
+                "decision_flow": f"{ml_action}({ml_confidence:.2f}) + {rule_action}({rule_confidence:.2f}) -> {fused_action}({fused_confidence:.2f}) -> {final_action}"
             }
         }
 
@@ -421,3 +440,99 @@ class GenericAgent:
             logger.info(f"Updated ML confidence threshold for {self.symbol}: {threshold}")
         else:
             raise ValueError("Confidence threshold must be between 0.0 and 1.0")
+        
+
+    def _apply_position_management(self, action: str) -> str:
+        """Enhanced position management with better logic"""
+    
+        # REMOVED: Overly restrictive consecutive buy prevention
+        # The original logic was preventing valid new positions
+    
+        # Position state management with better validation
+        if self.position_state == "long":
+            if action == "buy":
+                # Instead of always converting to hold, check if this is really a consecutive buy
+                last_signal = self._load_last_trade_signal()
+                if last_signal == "buy":
+                    # Only prevent if we JUST bought (same evaluation cycle)
+                    last_trade_time = self._get_last_trade_time()
+                    if last_trade_time and self._is_recent_trade(last_trade_time, minutes=5):
+                        logger.info(f"⛔ Preventing consecutive buy within 5 minutes for {self.symbol}")
+                        return "hold"
+                    else:
+                        logger.info(f"📥 Allowing buy signal - previous buy was not recent for {self.symbol}")
+                        return action
+                else:
+                    logger.info(f"📥 Opening long position for {self.symbol}")
+                    return action
+            elif action == "sell":
+                logger.info(f"📤 Closing long position for {self.symbol}")
+                self.position_state = None
+                return action
+            
+        elif self.position_state is None:
+            if action == "sell":
+                logger.info(f"⛔ No position to sell, converting to searching for {self.symbol}")
+                return "searching"
+            elif action == "buy":
+                logger.info(f"📥 Opening long position for {self.symbol}")
+                self.position_state = "long"
+                return action
+    
+        return action
+
+    def _get_last_trade_time(self) -> Optional[str]:
+        """Get timestamp of last trade"""
+        path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
+        if not os.path.exists(path):
+            return None
+        
+        try:
+            with open(path, "r") as f:
+                trades = json.load(f)
+                if trades and len(trades) > 0:
+                    return trades[-1].get("timestamp", None)
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to load last trade time for {self.symbol}: {e}")
+    
+        return None
+
+    def _is_recent_trade(self, timestamp_str: str, minutes: int = 5) -> bool:
+        """Check if trade timestamp is within the last N minutes"""
+        try:
+            from datetime import datetime, timedelta
+            import dateutil.parser
+        
+            trade_time = dateutil.parser.parse(timestamp_str)
+            now = datetime.now(trade_time.tzinfo) if trade_time.tzinfo else datetime.now()
+        
+            return (now - trade_time) < timedelta(minutes=minutes)
+        except Exception as e:
+            logger.warning(f"Failed to parse trade time: {e}")
+            return False
+
+# Also add this method to force position state reset if needed
+    def reset_position_state_if_invalid(self):
+        """Reset position state if it doesn't match trade history"""
+        try:
+            path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
+            if not os.path.exists(path):
+                self.position_state = None
+                return
+            
+            with open(path, "r") as f:
+                trades = json.load(f)
+            
+            if not trades:
+                self.position_state = None
+                return
+            
+            last_signal = trades[-1].get("signal", "")
+            correct_state = "long" if last_signal == "buy" else None
+        
+            if self.position_state != correct_state:
+                logger.info(f"🔧 Correcting {self.symbol} position state: {self.position_state} → {correct_state}")
+                self.position_state = correct_state
+            
+        except Exception as e:
+            logger.error(f"Failed to validate position state for {self.symbol}: {e}")

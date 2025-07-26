@@ -3,7 +3,7 @@ import json
 import glob
 import importlib.util
 import time
-from typing import List, Dict
+from typing import List, Dict, Optional, Union
 
 from backend.binance.fetch_live_ohlcv import fetch_ohlcv
 from backend.binance.binance_trader import place_market_order
@@ -19,7 +19,7 @@ PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
 TRADE_COOLDOWN_SECONDS = 600
 MAX_HOLD_SECONDS = 21600  # 6 hours (6 * 60 * 60)
 RISK_PER_TRADE = 0.5  # 1% of capital
-DEFAULT_BALANCE_USD = 10  # for mock position sizing
+DEFAULT_BALANCE_USD = 100  # for mock position sizing
 TP_RATIO = 1.5  # Take Profit: 1.5x Risk
 SL_PERCENT = 0.03  # 3% Stop Loss
 
@@ -98,16 +98,6 @@ class MotherAI:
         
         return agent_class
 
-    def sync_agent_positions(self):
-        """Sync agent position states - called before each decision cycle"""
-        print("🔄 Syncing agent positions...")
-        for symbol, agent in self.loaded_agents.items():
-            if hasattr(agent, 'position_state'):
-                pos_state = agent.position_state
-                print(f"📊 {symbol} agent position: {pos_state}")
-            else:
-                print(f"⚠️ {symbol} agent has no position_state attribute")
-
     def evaluate_agents(self, agents):
         """Evaluate agents using their full decision output"""
         results = []
@@ -139,13 +129,24 @@ class MotherAI:
         return df if not df.empty else None
 
     def _safe_evaluate_agent(self, agent, ohlcv):
-        """Safely evaluate agent and preserve full decision context"""
+        """Enhanced agent evaluation with better error handling and debugging"""
         try:
             # Use the agent's evaluate method which returns full decision dict
             decision = agent.evaluate(ohlcv)
-            
-            # Convert agent's decision format to what MotherAI expects
-            return {
+        
+        # Enhanced debugging information
+            ml_data = decision.get("ml", {})
+            rule_data = decision.get("rule_based", {})
+        
+            print(f"🤖 Agent {agent.symbol} evaluation:")
+            print(f"   Final: {decision.get('action', 'unknown').upper()} ({decision.get('confidence', 0.0):.3f})")
+            print(f"   ML: {ml_data.get('action', 'N/A')} ({ml_data.get('confidence', 0.0):.3f})")
+            print(f"   Rule: {rule_data.get('action', 'N/A')} ({rule_data.get('confidence', 0.0):.3f})")
+            print(f"   Source: {decision.get('source', 'unknown')}")
+            print(f"   Position: {decision.get('position_state', 'None')}")
+        
+        # Convert agent's decision format to what MotherAI expects
+            result = {
                 "symbol": agent.symbol,
                 "signal": decision.get("action", "hold").lower(),
                 "confidence": decision.get("confidence", 0.0),
@@ -157,8 +158,11 @@ class MotherAI:
                 "timestamp": decision.get("timestamp"),
                 "full_decision": decision  # Preserve full agent decision
             }
+        
+            return result
+        
         except Exception as e:
-            print(f"⚠️ Agent evaluation error for {agent.symbol}: {e}")
+            print(f"❌ Agent evaluation error for {agent.symbol}: {e}")
             return {
                 "symbol": agent.symbol,
                 "signal": "hold",
@@ -207,43 +211,6 @@ class MotherAI:
 
     def is_in_cooldown(self, symbol):
         return symbol in self.cooldown_tracker and (time.time() - self.cooldown_tracker[symbol]) < TRADE_COOLDOWN_SECONDS
-
-    def decide_trades(self, top_n=1, min_score=0.5, min_confidence=0.7):
-        """Simplified trade decision - trust agent position management"""
-        agents = self.load_agents()
-        evaluations = self.evaluate_agents(agents)
-
-        filtered = []
-        for e in evaluations:
-            symbol = e["symbol"]
-            
-            # Skip if score too low or in cooldown
-            if e["score"] < min_score:
-                print(f"⏭️ Skipping {symbol}: score too low ({e['score']:.3f} < {min_score})")
-                continue
-                
-            if self.is_in_cooldown(symbol):
-                print(f"⏭️ Skipping {symbol}: in cooldown")
-                continue
-
-            # Skip if confidence too low
-            if e["confidence"] < min_confidence:
-                print(f"⏭️ Skipping {symbol}: confidence too low ({e['confidence']:.3f} < {min_confidence})")
-                continue
-
-            # Trust the agent's decision - it already handled position management
-            signal = e["signal"]
-            if signal in ["buy", "sell"]:
-                print(f"✅ Agent decision approved: {symbol} {signal.upper()} "
-                      f"(confidence: {e['confidence']:.3f}, score: {e['score']:.3f})")
-                print(f"    Agent position state: {e.get('position_state')}")
-                print(f"    Decision source: {e.get('source')}")
-                filtered.append(e)
-            else:
-                print(f"⏭️ Skipping {symbol}: signal is '{signal}' (not buy/sell)")
-
-        print(f"📊 Approved trades: {[f'{t['symbol']}-{t['signal']}' for t in filtered]}")
-        return filtered[:top_n]
 
     def update_agent_position_state(self, symbol: str, signal: str):
         """Update agent's position state after successful trade execution"""
@@ -536,3 +503,157 @@ class MotherAI:
     def check_exit_conditions(self, symbol, current_price):
         """Legacy method - kept for backward compatibility"""
         return None
+    
+
+    def sync_agent_positions(self):
+        """Enhanced position synchronization with validation and correction"""
+        print("🔄 Syncing agent positions...")
+    
+        for symbol, agent in self.loaded_agents.items():
+            if not hasattr(agent, 'position_state'):
+                continue
+            
+        # Get current position state
+        current_state = agent.position_state
+        
+        # Validate against trade history
+        validated_state = self._validate_agent_position(symbol, current_state)
+        
+        if validated_state != current_state:
+            print(f"🔧 Correcting {symbol} position: {current_state} → {validated_state}")
+            agent.position_state = validated_state
+        
+            print(f"📊 {symbol} agent position: {agent.position_state}")
+
+    def _validate_agent_position(self, symbol: str, claimed_state: Union[str, None]) -> Optional[str]:
+        """Validate agent position state against trade history"""
+        try:
+            path = f"backend/storage/performance_logs/{symbol}_trades.json"
+            if not os.path.exists(path):
+                return None  # No trade history, assume flat
+        
+            with open(path, "r") as f:
+                trades = json.load(f)
+        
+            if not trades:
+                return None
+        
+            # Get the last trade signal
+            last_trade = trades[-1]
+            last_signal = last_trade.get("signal", "")
+            last_timestamp = last_trade.get("timestamp", "")
+    
+            # Determine correct position based on last signal
+            if last_signal == "buy":
+                correct_state = "long"
+            elif last_signal == "sell":
+                correct_state = None
+            else:
+                correct_state = None
+        
+            # Additional validation: check if position is too old (safety mechanism)
+            if correct_state == "long" and self._is_position_stale(last_timestamp):
+                print(f"⚠️ {symbol} position appears stale, resetting to flat")
+                correct_state = None
+        
+            return correct_state
+    
+        except Exception as e:
+            print(f"⚠️ Failed to validate position for {symbol}: {e}")
+            return None
+
+    def _is_position_stale(self, timestamp_str: str, max_hours: int = 24) -> bool:
+        """Check if a position is older than max_hours"""
+        try:
+            from datetime import datetime, timedelta
+            import dateutil.parser
+        
+            trade_time = dateutil.parser.parse(timestamp_str)
+            now = datetime.now(trade_time.tzinfo) if trade_time.tzinfo else datetime.now()
+        
+            return (now - trade_time) > timedelta(hours=max_hours)
+        except:
+            return False
+
+    def decide_trades(self, top_n=1, min_score=0.5, min_confidence=0.7):
+        """Enhanced trade decision with better filtering and debugging"""
+        agents = self.load_agents()
+        evaluations = self.evaluate_agents(agents)
+
+        print(f"\n🔍 TRADE DECISION ANALYSIS (min_score={min_score}, min_confidence={min_confidence})")
+        print("=" * 80)
+
+        approved_trades = []
+
+        for e in evaluations:
+            symbol = e["symbol"]
+            signal = e["signal"]
+            confidence = e["confidence"]
+            score = e["score"]
+            position_state = e.get("position_state")
+            source = e.get("source", "unknown")
+
+            print(f"\n📊 {symbol}:")
+            print(f"   Signal: {signal.upper()} | Confidence: {confidence:.3f} | Score: {score:.3f}")
+            print(f"   Position: {position_state} | Source: {source}")
+            print(f"   ML Available: {e.get('ml_available', False)} | ML Conf: {e.get('ml_confidence', 0.0):.3f}")
+            print(f"   Rule Conf: {e.get('rule_confidence', 0.0):.3f}")
+
+            # Enhanced filtering with more permissive logic
+            skip_reason = None
+
+        # Check score threshold
+            if score < min_score:
+                skip_reason = f"score too low ({score:.3f} < {min_score})"
+
+            # Check cooldown
+            elif self.is_in_cooldown(symbol):
+                cooldown_remaining = TRADE_COOLDOWN_SECONDS - (time.time() - self.cooldown_tracker[symbol])
+                skip_reason = f"in cooldown ({cooldown_remaining:.0f}s remaining)"
+
+            # Check confidence threshold
+            elif confidence < min_confidence:
+                skip_reason = f"confidence too low ({confidence:.3f} < {min_confidence})"
+
+            # Check if signal is actionable
+            elif signal not in ["buy", "sell"]:
+                skip_reason = f"signal is '{signal}' (not actionable)"
+
+            # RELAXED POSITION VALIDATION: Only skip if there's a clear conflict
+            elif signal == "buy" and position_state == "long":
+                # Double-check the position state
+                actual_state = self._validate_agent_position(symbol, position_state)
+                if actual_state == "long":
+                    skip_reason = f"already in long position"
+                else:
+                    # Position state was wrong, correct it and allow trade
+                    agent = self.get_agent_by_symbol(symbol)
+                    if agent:
+                        agent.position_state = actual_state
+                        print(f"   🔧 Corrected position state to: {actual_state}")
+
+            elif signal == "sell" and position_state is None:
+                # Double-check the position state  
+                actual_state = self._validate_agent_position(symbol, position_state)
+                if actual_state is None:
+                    skip_reason = f"no position to sell"
+                else:
+                # Position state was wrong, correct it and allow trade
+                    agent = self.get_agent_by_symbol(symbol)
+                    if agent:
+                        agent.position_state = actual_state
+                        print(f"   🔧 Corrected position state to: {actual_state}")
+
+            if skip_reason:
+                print(f"   ⏭️ SKIPPED: {skip_reason}")
+            else: 
+                print(f"   ✅ APPROVED: {signal.upper()} trade")
+                approved_trades.append(e)
+
+        print(f"\n📈 SUMMARY:")
+        print(f"   Total evaluated: {len(evaluations)}")
+        print(f"   Approved trades: {len(approved_trades)}")
+        print(f"   Symbols approved: {[f'{t['symbol']}-{t['signal'].upper()}' for t in approved_trades]}")
+        print("=" * 80)
+
+        return approved_trades[:top_n]

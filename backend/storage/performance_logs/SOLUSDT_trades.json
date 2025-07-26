@@ -20,5 +20,16 @@
     "qty": null,
     "timestamp": "2025-07-24T01:57:45.461004",
     "source": "mother_ai_decision"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 187.67,
+    "price": 187.67,
+    "qty": 8.880837,
+    "timestamp": "2025-07-26T14:11:54.765530",
+    "source": "agent_ml_primary"
   }
 ]
