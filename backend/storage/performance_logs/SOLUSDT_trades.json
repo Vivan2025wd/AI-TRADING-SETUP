@@ -31,5 +31,49 @@
     "qty": 8.880837,
     "timestamp": "2025-07-26T14:11:54.765530",
     "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.97,
+    "score": 0.97,
+    "last_price": 187.0,
+    "price": 187.0,
+    "qty": 8.912656,
+    "timestamp": "2025-07-27T12:22:28.687935",
+    "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 186.17,
+    "price": 186.17,
+    "qty": 0.268572,
+    "timestamp": "2025-07-27T12:49:48.622361",
+    "source": "agent_rule_conflict_resolution"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 186.47,
+    "price": 186.47,
+    "qty": 0.005326,
+    "timestamp": "2025-07-27T13:05:43.468862",
+    "source": "exit_max_hold_time_6.2h"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.96,
+    "score": 0.96,
+    "last_price": 186.34,
+    "price": 186.34,
+    "qty": 0.00533,
+    "timestamp": "2025-07-27T13:21:55.549292",
+    "source": "agent_ml_primary"
   }
 ]

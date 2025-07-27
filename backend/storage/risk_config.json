@@ -1,0 +1,21 @@
+{
+  "trade_cooldown_seconds": 600,
+  "max_hold_seconds": 21600,
+  "risk_per_trade": 0.01,
+  "default_balance_usd": 100,
+  "tp_ratio": 1.5,
+  "sl_percent": 0.03,
+  "max_portfolio_exposure": 0.15,
+  "max_daily_loss": 0.05,
+  "max_drawdown": 0.2,
+  "max_concurrent_positions": 5,
+  "max_correlation_exposure": 0.1,
+  "volatility_lookback": 20,
+  "volatility_multiplier": 2.0,
+  "min_position_size": 0.005,
+  "max_position_size": 0.03,
+  "emergency_stop_loss": 0.1,
+  "max_trades_per_hour": 6,
+  "market_volatility_threshold": 0.05,
+  "symbol_overrides": {}
+}

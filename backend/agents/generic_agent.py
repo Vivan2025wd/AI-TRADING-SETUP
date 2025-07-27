@@ -244,7 +244,7 @@ class GenericAgent:
 
     def _fuse_decisions(self, ml_action: str, ml_confidence: float, 
                         rule_action: str, rule_confidence: float) -> Tuple[str, float, str]:
-        """FIXED: Intelligent decision fusion with better conflict resolution"""
+        """Intelligent decision fusion with better conflict resolution"""
         
         # Case 1: If rule signal is invalid (searching/hold), prioritize ML
         if rule_action in ["searching", "hold"] and ml_action in ["buy", "sell"]:
@@ -335,6 +335,73 @@ class GenericAgent:
         except Exception as e:
             logger.warning(f"⚠️ Failed to determine position state for {self.symbol}: {e}")
             return None
+
+    def _apply_position_management(self, action: str) -> str:
+        """Enhanced position management - EVALUATION ONLY (don't modify state)"""
+        
+        # IMPORTANT: Don't modify position_state here - that's MotherAI's job
+        # This method only validates and filters signals based on current state
+        
+        if self.position_state == "long":
+            if action == "buy":
+                # Check if this is a consecutive buy within same cycle
+                last_signal = self._load_last_trade_signal()
+                if last_signal == "buy":
+                    last_trade_time = self._get_last_trade_time()
+                    if last_trade_time and self._is_recent_trade(last_trade_time, minutes=5):
+                        logger.info(f"⛔ Preventing consecutive buy within 5 minutes for {self.symbol}")
+                        return "hold"
+                    else:
+                        logger.info(f"📥 Allowing buy signal - previous buy was not recent for {self.symbol}")
+                        return action
+                else:
+                    logger.info(f"📥 Buy signal valid for {self.symbol}")
+                    return action
+            elif action == "sell":
+                logger.info(f"📤 Sell signal to close long position for {self.symbol}")
+                # Don't modify position_state here - MotherAI will handle it
+                return action
+            
+        elif self.position_state is None:
+            if action == "sell":
+                logger.info(f"⛔ No position to sell, converting to searching for {self.symbol}")
+                return "searching"
+            elif action == "buy":
+                logger.info(f"📥 Buy signal to open long position for {self.symbol}")
+                # Don't modify position_state here - MotherAI will handle it
+                return action
+
+        return action
+
+    def _get_last_trade_time(self) -> Optional[str]:
+        """Get timestamp of last trade"""
+        path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
+        if not os.path.exists(path):
+            return None
+        
+        try:
+            with open(path, "r") as f:
+                trades = json.load(f)
+                if trades and len(trades) > 0:
+                    return trades[-1].get("timestamp", None)
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to load last trade time for {self.symbol}: {e}")
+    
+        return None
+
+    def _is_recent_trade(self, timestamp_str: str, minutes: int = 5) -> bool:
+        """Check if trade timestamp is within the last N minutes"""
+        try:
+            from datetime import datetime, timedelta
+            import dateutil.parser
+        
+            trade_time = dateutil.parser.parse(timestamp_str)
+            now = datetime.now(trade_time.tzinfo) if trade_time.tzinfo else datetime.now()
+        
+            return (now - trade_time) < timedelta(minutes=minutes)
+        except Exception as e:
+            logger.warning(f"Failed to parse trade time: {e}")
+            return False
 
     def evaluate(self, ohlcv_data: pd.DataFrame) -> Dict:
         """Main evaluation method with improved error handling and logic"""
@@ -440,78 +507,7 @@ class GenericAgent:
             logger.info(f"Updated ML confidence threshold for {self.symbol}: {threshold}")
         else:
             raise ValueError("Confidence threshold must be between 0.0 and 1.0")
-        
 
-    def _apply_position_management(self, action: str) -> str:
-        """Enhanced position management with better logic"""
-    
-        # REMOVED: Overly restrictive consecutive buy prevention
-        # The original logic was preventing valid new positions
-    
-        # Position state management with better validation
-        if self.position_state == "long":
-            if action == "buy":
-                # Instead of always converting to hold, check if this is really a consecutive buy
-                last_signal = self._load_last_trade_signal()
-                if last_signal == "buy":
-                    # Only prevent if we JUST bought (same evaluation cycle)
-                    last_trade_time = self._get_last_trade_time()
-                    if last_trade_time and self._is_recent_trade(last_trade_time, minutes=5):
-                        logger.info(f"⛔ Preventing consecutive buy within 5 minutes for {self.symbol}")
-                        return "hold"
-                    else:
-                        logger.info(f"📥 Allowing buy signal - previous buy was not recent for {self.symbol}")
-                        return action
-                else:
-                    logger.info(f"📥 Opening long position for {self.symbol}")
-                    return action
-            elif action == "sell":
-                logger.info(f"📤 Closing long position for {self.symbol}")
-                self.position_state = None
-                return action
-            
-        elif self.position_state is None:
-            if action == "sell":
-                logger.info(f"⛔ No position to sell, converting to searching for {self.symbol}")
-                return "searching"
-            elif action == "buy":
-                logger.info(f"📥 Opening long position for {self.symbol}")
-                self.position_state = "long"
-                return action
-    
-        return action
-
-    def _get_last_trade_time(self) -> Optional[str]:
-        """Get timestamp of last trade"""
-        path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
-        if not os.path.exists(path):
-            return None
-        
-        try:
-            with open(path, "r") as f:
-                trades = json.load(f)
-                if trades and len(trades) > 0:
-                    return trades[-1].get("timestamp", None)
-        except Exception as e:
-            logger.warning(f"⚠️ Failed to load last trade time for {self.symbol}: {e}")
-    
-        return None
-
-    def _is_recent_trade(self, timestamp_str: str, minutes: int = 5) -> bool:
-        """Check if trade timestamp is within the last N minutes"""
-        try:
-            from datetime import datetime, timedelta
-            import dateutil.parser
-        
-            trade_time = dateutil.parser.parse(timestamp_str)
-            now = datetime.now(trade_time.tzinfo) if trade_time.tzinfo else datetime.now()
-        
-            return (now - trade_time) < timedelta(minutes=minutes)
-        except Exception as e:
-            logger.warning(f"Failed to parse trade time: {e}")
-            return False
-
-# Also add this method to force position state reset if needed
     def reset_position_state_if_invalid(self):
         """Reset position state if it doesn't match trade history"""
         try:
@@ -536,3 +532,13 @@ class GenericAgent:
             
         except Exception as e:
             logger.error(f"Failed to validate position state for {self.symbol}: {e}")
+
+    def emergency_reset(self):
+        """Emergency reset of agent state"""
+        logger.info(f"🚨 Emergency reset for {self.symbol}")
+        self.position_state = None
+        self.feature_cache = None
+        
+        # Reload position state from trade history
+        self.position_state = self._load_position_state()
+        logger.info(f"🔄 Reset {self.symbol} position state to: {self.position_state}")

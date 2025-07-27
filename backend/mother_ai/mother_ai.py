@@ -3,7 +3,11 @@ import json
 import glob
 import importlib.util
 import time
-from typing import List, Dict, Optional, Union
+import numpy as np
+from typing import List, Dict, Optional, Union, Tuple
+from datetime import datetime, timedelta
+import dateutil.parser
+import pandas as pd
 
 from backend.binance.fetch_live_ohlcv import fetch_ohlcv
 from backend.binance.binance_trader import place_market_order
@@ -16,15 +20,203 @@ from backend.storage.auto_cleanup import auto_cleanup_logs
 
 TRADE_HISTORY_DIR = "backend/storage/trade_history"
 PERFORMANCE_LOG_DIR = "backend/storage/performance_logs"
-TRADE_COOLDOWN_SECONDS = 600
-MAX_HOLD_SECONDS = 21600  # 6 hours (6 * 60 * 60)
-RISK_PER_TRADE = 0.5  # 1% of capital
-DEFAULT_BALANCE_USD = 100  # for mock position sizing
-TP_RATIO = 1.5  # Take Profit: 1.5x Risk
-SL_PERCENT = 0.03  # 3% Stop Loss
+RISK_CONFIG_FILE = "backend/storage/risk_config.json"
+
+# Enhanced Risk Configuration
+DEFAULT_RISK_CONFIG = {
+    "trade_cooldown_seconds": 600,
+    "max_hold_seconds": 21600,  # 6 hours
+    "risk_per_trade": 0.01,  # 1% of capital
+    "default_balance_usd": 100,
+    "tp_ratio": 1.5,
+    "sl_percent": 0.03,
+    
+    # Portfolio-level limits
+    "max_portfolio_exposure": 0.15,  # 15% total portfolio exposure
+    "max_daily_loss": 0.05,  # 5% daily loss limit
+    "max_drawdown": 0.20,  # 20% maximum drawdown
+    "max_concurrent_positions": 5,
+    "max_correlation_exposure": 0.10,  # 10% max exposure to correlated assets
+    
+    # Dynamic sizing parameters
+    "volatility_lookback": 20,
+    "volatility_multiplier": 2.0,
+    "min_position_size": 0.005,  # 0.5% minimum
+    "max_position_size": 0.03,   # 3% maximum
+    
+    # Circuit breakers
+    "emergency_stop_loss": 0.10,  # 10% emergency stop
+    "max_trades_per_hour": 6,
+    "market_volatility_threshold": 0.05,  # 5% hourly volatility threshold
+    
+    # Symbol-specific overrides
+    "symbol_overrides": {}
+}
 
 os.makedirs(TRADE_HISTORY_DIR, exist_ok=True)
 os.makedirs(PERFORMANCE_LOG_DIR, exist_ok=True)
+
+
+class RiskManager:
+    """Advanced risk management system"""
+    
+    def __init__(self, config_file=RISK_CONFIG_FILE):
+        self.config_file = config_file
+        self.config = self._load_risk_config()
+        self.daily_pnl = 0.0
+        self.portfolio_value = self.config["default_balance_usd"]
+        self.max_historical_value = self.portfolio_value
+        self.hourly_trade_count = {}
+        self.correlation_matrix = {}
+        self.volatility_cache = {}
+        
+    def _load_risk_config(self):
+        """Load risk configuration from file or create default"""
+        try:
+            if os.path.exists(self.config_file):
+                with open(self.config_file, 'r') as f:
+                    config = json.load(f)
+                # Merge with defaults for any missing keys
+                for key, value in DEFAULT_RISK_CONFIG.items():
+                    if key not in config:
+                        config[key] = value
+                return config
+            else:
+                self._save_risk_config(DEFAULT_RISK_CONFIG)
+                return DEFAULT_RISK_CONFIG.copy()
+        except Exception as e:
+            print(f"⚠️ Error loading risk config: {e}, using defaults")
+            return DEFAULT_RISK_CONFIG.copy()
+    
+    def _save_risk_config(self, config):
+        """Save risk configuration to file"""
+        try:
+            os.makedirs(os.path.dirname(self.config_file), exist_ok=True)
+            with open(self.config_file, 'w') as f:
+                json.dump(config, f, indent=2)
+        except Exception as e:
+            print(f"⚠️ Error saving risk config: {e}")
+    
+    def get_symbol_config(self, symbol: str) -> Dict:
+        """Get risk configuration for specific symbol"""
+        base_config = self.config.copy()
+        symbol_overrides = self.config.get("symbol_overrides", {}).get(symbol, {})
+        base_config.update(symbol_overrides)
+        return base_config
+    
+    def calculate_dynamic_position_size(self, symbol: str, price: float, df: Optional[pd.DataFrame] = None) -> float:
+        """Calculate position size based on volatility and risk parameters"""
+        config = self.get_symbol_config(symbol)
+        base_risk = config["risk_per_trade"]
+        
+        if df is not None and len(df) >= config["volatility_lookback"]:
+            # Calculate volatility-adjusted position size
+            returns = df['close'].pct_change().dropna()
+            volatility = returns.rolling(config["volatility_lookback"]).std().iloc[-1]
+            
+            if not np.isnan(volatility) and volatility > 0:
+                # Inverse relationship: higher volatility = smaller position
+                vol_adjustment = 1.0 / (1.0 + volatility * config["volatility_multiplier"])
+                adjusted_risk = base_risk * vol_adjustment
+                
+                # Apply min/max constraints
+                adjusted_risk = max(config["min_position_size"], 
+                                  min(config["max_position_size"], adjusted_risk))
+                
+                print(f"📊 {symbol} volatility adjustment: {volatility:.4f} -> risk {base_risk:.3f} -> {adjusted_risk:.3f}")
+                return adjusted_risk
+        
+        return base_risk
+    
+    def check_portfolio_limits(self, new_trade_symbol: str, new_trade_size: float, current_positions: Dict) -> Tuple[bool, str]:
+        """Check if new trade violates portfolio-level limits"""
+        
+        # 1. Check maximum concurrent positions
+        active_positions = len([p for p in current_positions.values() if p.get('position_state') == 'long'])
+        if active_positions >= self.config["max_concurrent_positions"]:
+            return False, f"max concurrent positions reached ({active_positions}/{self.config['max_concurrent_positions']})"
+        
+        # 2. Check total portfolio exposure
+        current_exposure = sum(p.get('exposure', 0) for p in current_positions.values())
+        total_exposure = current_exposure + new_trade_size
+        
+        if total_exposure > self.config["max_portfolio_exposure"]:
+            return False, f"portfolio exposure limit ({total_exposure:.3f} > {self.config['max_portfolio_exposure']:.3f})"
+        
+        # 3. Check daily loss limit
+        if self.daily_pnl < -self.config["max_daily_loss"] * self.portfolio_value:
+            return False, f"daily loss limit exceeded ({self.daily_pnl:.2f})"
+        
+        # 4. Check maximum drawdown
+        current_drawdown = (self.max_historical_value - self.portfolio_value) / self.max_historical_value
+        if current_drawdown > self.config["max_drawdown"]:
+            return False, f"maximum drawdown exceeded ({current_drawdown:.3f})"
+        
+        # 5. Check hourly trade limit
+        current_hour = datetime.now().strftime("%Y-%m-%d-%H")
+        hourly_trades = self.hourly_trade_count.get(current_hour, 0)
+        if hourly_trades >= self.config["max_trades_per_hour"]:
+            return False, f"hourly trade limit reached ({hourly_trades}/{self.config['max_trades_per_hour']})"
+        
+        return True, "approved"
+    
+    def check_market_conditions(self, symbol: str, df) -> Tuple[bool, str]:
+        """Check if market conditions are suitable for trading"""
+        if df is None or len(df) < 2:
+            return False, "insufficient market data"
+        
+        # Check market volatility
+        recent_returns = df['close'].pct_change().dropna().tail(6)  # Last 6 hours
+        if len(recent_returns) > 0:
+            hourly_volatility = recent_returns.std()
+            if hourly_volatility > self.config["market_volatility_threshold"]:
+                return False, f"market too volatile ({hourly_volatility:.4f})"
+        
+        # Check for extreme price movements
+        price_change = (df['close'].iloc[-1] - df['close'].iloc[-2]) / df['close'].iloc[-2]
+        if abs(price_change) > self.config["emergency_stop_loss"]:
+            return False, f"extreme price movement detected ({price_change:.4f})"
+        
+        return True, "market conditions acceptable"
+    
+    def update_portfolio_metrics(self, current_positions: Dict):
+        """Update portfolio-level metrics"""
+        # Update portfolio value
+        total_value = self.config["default_balance_usd"]
+        for position in current_positions.values():
+            if position.get('position_state') == 'long':
+                total_value += position.get('unrealized_pnl', 0)
+        
+        self.portfolio_value = total_value
+        self.max_historical_value = max(self.max_historical_value, self.portfolio_value)
+        
+        # Clean up old hourly trade counts
+        current_time = datetime.now()
+        expired_hours = [h for h in self.hourly_trade_count.keys() 
+                        if datetime.strptime(h, "%Y-%m-%d-%H") < current_time - timedelta(hours=24)]
+        for hour in expired_hours:
+            del self.hourly_trade_count[hour]
+    
+    def log_trade_attempt(self):
+        """Log trade attempt for rate limiting"""
+        current_hour = datetime.now().strftime("%Y-%m-%d-%H")
+        self.hourly_trade_count[current_hour] = self.hourly_trade_count.get(current_hour, 0) + 1
+    
+    def get_risk_metrics(self) -> Dict:
+        """Get current risk metrics summary"""
+        current_drawdown = (self.max_historical_value - self.portfolio_value) / self.max_historical_value
+        current_hour = datetime.now().strftime("%Y-%m-%d-%H")
+        
+        return {
+            "portfolio_value": self.portfolio_value,
+            "max_historical_value": self.max_historical_value,
+            "current_drawdown": current_drawdown,
+            "daily_pnl": self.daily_pnl,
+            "hourly_trades": self.hourly_trade_count.get(current_hour, 0),
+            "drawdown_limit": self.config["max_drawdown"],
+            "daily_loss_limit": self.config["max_daily_loss"] * self.portfolio_value,
+            "max_portfolio_exposure": self.config["max_portfolio_exposure"]
+        }
 
 
 class MotherAI:
@@ -36,6 +228,7 @@ class MotherAI:
         self.meta_evaluator = MetaEvaluator()
         self.cooldown_tracker = {}
         self.loaded_agents = {}  # Cache loaded agent instances
+        self.risk_manager = RiskManager()  # Enhanced risk management
         
         # Initialize agents on startup
         self._initialize_agents()
@@ -134,7 +327,7 @@ class MotherAI:
             # Use the agent's evaluate method which returns full decision dict
             decision = agent.evaluate(ohlcv)
         
-        # Enhanced debugging information
+            # Enhanced debugging information
             ml_data = decision.get("ml", {})
             rule_data = decision.get("rule_based", {})
         
@@ -145,7 +338,7 @@ class MotherAI:
             print(f"   Source: {decision.get('source', 'unknown')}")
             print(f"   Position: {decision.get('position_state', 'None')}")
         
-        # Convert agent's decision format to what MotherAI expects
+            # Convert agent's decision format to what MotherAI expects
             result = {
                 "symbol": agent.symbol,
                 "signal": decision.get("action", "hold").lower(),
@@ -210,7 +403,8 @@ class MotherAI:
             json.dump(history, f, indent=2)
 
     def is_in_cooldown(self, symbol):
-        return symbol in self.cooldown_tracker and (time.time() - self.cooldown_tracker[symbol]) < TRADE_COOLDOWN_SECONDS
+        cooldown_seconds = self.risk_manager.get_symbol_config(symbol)["trade_cooldown_seconds"]
+        return symbol in self.cooldown_tracker and (time.time() - self.cooldown_tracker[symbol]) < cooldown_seconds
 
     def update_agent_position_state(self, symbol: str, signal: str):
         """Update agent's position state after successful trade execution"""
@@ -227,16 +421,65 @@ class MotherAI:
         else:
             print(f"⚠️ Could not update position state for {symbol} - agent not found or no position_state")
 
+    def get_current_positions(self) -> Dict:
+        """Get current position states of all agents with exposure estimates"""
+        positions = {}
+        for symbol, agent in self.loaded_agents.items():
+            position_info = {
+                'symbol': symbol,
+                'position_state': getattr(agent, 'position_state', None),
+                'exposure': 0.0,
+                'unrealized_pnl': 0.0
+            }
+            
+            # Estimate exposure if in position
+            if position_info['position_state'] == 'long':
+                # Try to get last trade size or estimate
+                position_info['exposure'] = self.risk_manager.get_symbol_config(symbol)["risk_per_trade"]
+                
+            positions[symbol] = position_info
+        
+        return positions
+
     def execute_trade(self, symbol, signal, price, confidence, live=False):
+        """Enhanced trade execution with comprehensive risk checks"""
         if signal not in ("buy", "sell") or not price:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return None
+
+        # Get market data for risk calculations
+        df = self._fetch_agent_data(symbol)
+        
+        # 1. Check market conditions
+        market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df)
+        if not market_ok:
+            print(f"❌ Market conditions check failed for {symbol}: {market_reason}")
+            return None
+
+        # 2. Calculate dynamic position size
+        position_size = self.risk_manager.calculate_dynamic_position_size(symbol, price, df)
+        
+        # 3. Get current positions for portfolio checks
+        current_positions = self.get_current_positions()
+        
+        # 4. Check portfolio limits (for buy orders)
+        if signal == "buy":
+            portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
+                symbol, position_size, current_positions
+            )
+            if not portfolio_ok:
+                print(f"❌ Portfolio limits check failed for {symbol}: {portfolio_reason}")
+                return None
+
+        # 5. Log trade attempt for rate limiting
+        self.risk_manager.log_trade_attempt()
 
         # Get current trading mode from binance_api.py
         from backend.utils.binance_api import get_trading_mode, get_binance_client
         current_mode = get_trading_mode()
     
         print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f} | Mode: {current_mode.upper()}")
+        print(f"📊 Risk-adjusted position size: {position_size:.3f} (dynamic sizing applied)")
 
         qty = None
 
@@ -254,39 +497,34 @@ class MotherAI:
                         print(f"❌ Insufficient USDT balance for buy order. Need at least $10, have ${usdt_balance:.2f}")
                         return None
                     
-                    # Use actual balance instead of DEFAULT_BALANCE_USD
-                    available_balance = min(usdt_balance * 0.9, 20)  # Use 90% of balance, max $20
-                    print(f"💡 Using ${available_balance:.2f} for this trade")
+                    # Use dynamic position sizing with actual balance
+                    available_balance = min(usdt_balance * 0.9, 50)  # Use 90% of balance, max $50
+                    trade_amount = available_balance * position_size
+                    print(f"💡 Using ${trade_amount:.2f} for this trade (dynamic sizing)")
                     
                 except Exception as balance_err:
                     print(f"⚠️ Could not check balance: {balance_err}")
-                    available_balance = DEFAULT_BALANCE_USD
+                    trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
             else:
-                available_balance = DEFAULT_BALANCE_USD
+                trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
 
             # Format symbol for Binance API
             binance_symbol = symbol if "/" in symbol else symbol.replace("USDT", "/USDT")
 
             if signal == "buy":
-                sl = price * (1 - SL_PERCENT)
-                tp = price + ((price - sl) * TP_RATIO)
+                config = self.risk_manager.get_symbol_config(symbol)
+                sl = price * (1 - config["sl_percent"])
+                tp = price + ((price - sl) * config["tp_ratio"])
             
-                # Calculate quantity based on available balance
-                if current_mode == "live":
-                    # For live trading, use smaller position size
-                    risk_amount = available_balance * 0.5  # Use 50% of available
-                    qty = risk_amount / price  # Simple calculation based on price
-                else:
-                    # Mock trading uses original calculation
-                    risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
-                    qty = risk_amount / (price - sl)
+                # Calculate quantity based on trade amount
+                qty = trade_amount / price
 
                 if qty <= 0:
                     print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}, skipping.")
                     return None
 
                 print(f"📊 Buying {symbol} | Entry: {price:.4f}, SL: {sl:.4f}, TP: {tp:.4f}, Qty: {qty:.6f}")
-                print(f"📊 Risk amount: ${risk_amount:.2f}, Total cost: ${qty * price:.2f}")
+                print(f"📊 Risk amount: ${trade_amount:.2f}, Total cost: ${qty * price:.2f}")
 
                 # Use the updated place_market_order function
                 order = place_market_order(binance_symbol, signal, qty)
@@ -327,9 +565,8 @@ class MotherAI:
                         print(f"⚠️ Could not check holdings: {e}")
                         return None
                 else:
-                    # For mock, use default calculation
-                    risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE
-                    qty = risk_amount / price
+                    # For mock, use trade amount calculation
+                    qty = trade_amount / price
 
                 if qty <= 0:
                     print(f"⚠️ Computed qty is zero or negative for SELL on {symbol}, skipping.")
@@ -359,8 +596,26 @@ class MotherAI:
         return qty
 
     def check_exit_conditions_for_agents(self):
-        """Check exit conditions using agent position states"""
+        """Enhanced exit conditions with dynamic stop losses and portfolio protection"""
         print("🔍 Checking exit conditions using agent states...")
+        
+        # Update portfolio metrics first
+        current_positions = self.get_current_positions()
+        self.risk_manager.update_portfolio_metrics(current_positions)
+        
+        # Get risk metrics
+        risk_metrics = self.risk_manager.get_risk_metrics()
+        
+        # Emergency portfolio protection
+        if risk_metrics["current_drawdown"] > risk_metrics["drawdown_limit"]:
+            print(f"🚨 EMERGENCY: Maximum drawdown exceeded ({risk_metrics['current_drawdown']:.3f})")
+            self._emergency_close_all_positions()
+            return
+        
+        if risk_metrics["daily_pnl"] < -risk_metrics["daily_loss_limit"]:
+            print(f"🚨 EMERGENCY: Daily loss limit exceeded (${risk_metrics['daily_pnl']:.2f})")
+            self._emergency_close_all_positions()
+            return
         
         for symbol, agent in self.loaded_agents.items():
             if not hasattr(agent, 'position_state') or agent.position_state != "long":
@@ -373,8 +628,8 @@ class MotherAI:
                 
             current_price = df["close"].iloc[-1]
             
-            # Get position info from agent's trade history if available
-            exit_reason = self._check_agent_exit_conditions(agent, current_price)
+            # Enhanced exit condition checking
+            exit_reason = self._check_enhanced_exit_conditions(agent, symbol, current_price, df)
             
             if exit_reason:
                 print(f"💡 Agent {symbol} exit condition met: {exit_reason}")
@@ -398,22 +653,139 @@ class MotherAI:
                 # Calculate profits
                 compute_trade_profits(symbol)
 
-    def _check_agent_exit_conditions(self, agent, current_price):
-        """Check if agent position should be closed based on SL/TP/Time"""
-        # This is a simplified version - you might want to get more sophisticated
-        # position data from the agent's trade history or internal state
+    def _emergency_close_all_positions(self):
+        """Emergency close all open positions"""
+        print("🚨 EMERGENCY CLOSE: Closing all positions immediately")
         
-        # For now, we'll use a basic time-based exit as an example
-        # In a full implementation, you'd want to track entry prices and times
+        for symbol, agent in self.loaded_agents.items():
+            if hasattr(agent, 'position_state') and agent.position_state == "long":
+                df = self._fetch_agent_data(symbol)
+                if df is not None and not df.empty:
+                    current_price = df["close"].iloc[-1]
+                    print(f"🚨 Emergency closing {symbol} at ${current_price:.4f}")
+                    
+                    # Force execute sell order
+                    executed_qty = self.execute_trade(symbol, "sell", current_price, confidence=1.0)
+                    
+                    # Log emergency exit
+                    timestamp = self.performance_tracker.current_time()
+                    self._log_trade_execution(
+                        symbol=symbol,
+                        signal="sell",
+                        price=current_price,
+                        confidence=1.0,
+                        score=0.0,
+                        timestamp=timestamp,
+                        qty=executed_qty,
+                        source="emergency_exit"
+                    )
+
+    def _check_enhanced_exit_conditions(self, agent, symbol: str, current_price: float, df) -> Optional[str]:
+        """Enhanced exit conditions with dynamic stops and time limits"""
+        config = self.risk_manager.get_symbol_config(symbol)
         
-        # You could extend GenericAgent to provide position entry details
-        # or read from the trade logs to determine entry price/time
+        # Get last buy trade to determine entry price and time
+        try:
+            path = f"backend/storage/performance_logs/{symbol}_trades.json"
+            if os.path.exists(path):
+                with open(path, "r") as f:
+                    trades = json.load(f)
+                
+                # Find last buy trade
+                last_buy = None
+                for trade in reversed(trades):
+                    if trade.get("signal") == "buy":
+                        last_buy = trade
+                        break
+                
+                if last_buy:
+                    entry_price = last_buy.get("price", current_price)
+                    entry_time_str = last_buy.get("timestamp", "")
+                    
+                    # 1. Stop Loss Check (enhanced with volatility)
+                    if len(df) >= 20:
+                        # Dynamic stop loss based on ATR
+                        high_low = df['high'] - df['low']
+                        atr = high_low.rolling(14).mean().iloc[-1]
+                        dynamic_sl_percent = max(config["sl_percent"], atr / current_price * 2)
+                    else:
+                        dynamic_sl_percent = config["sl_percent"]
+                    
+                    stop_loss = entry_price * (1 - dynamic_sl_percent)
+                    if current_price <= stop_loss:
+                        loss_percent = (entry_price - current_price) / entry_price
+                        return f"stop_loss_hit_{loss_percent:.3f}"
+                    
+                    # 2. Take Profit Check
+                    take_profit = entry_price * (1 + dynamic_sl_percent * config["tp_ratio"])
+                    if current_price >= take_profit:
+                        profit_percent = (current_price - entry_price) / entry_price
+                        return f"take_profit_hit_{profit_percent:.3f}"
+                    
+                    # 3. Time-based Exit
+                    if entry_time_str:
+                        try:
+                            entry_time = dateutil.parser.parse(entry_time_str)
+                            now = datetime.now(entry_time.tzinfo) if entry_time.tzinfo else datetime.now()
+                            hold_duration = (now - entry_time).total_seconds()
+                            
+                            if hold_duration > config["max_hold_seconds"]:
+                                return f"max_hold_time_{hold_duration/3600:.1f}h"
+                        except:
+                            pass
+                    
+                    # 4. Trailing Stop (if profitable)
+                    profit_percent = (current_price - entry_price) / entry_price
+                    if profit_percent > 0.02:  # 2% profit threshold for trailing stop
+                        # Check if price dropped more than 1% from recent high
+                        recent_high = df['high'].tail(6).max()  # Last 6 hours
+                        if current_price < recent_high * 0.99:
+                            return f"trailing_stop_{profit_percent:.3f}"
+                    
+                    # 5. Volatility-based Exit
+                    if len(df) >= 6:
+                        recent_volatility = df['close'].pct_change().tail(6).std()
+                        if recent_volatility > config.get("exit_volatility_threshold", 0.08):
+                            return f"high_volatility_{recent_volatility:.4f}"
         
-        return None  # Placeholder - implement based on your specific needs
+        except Exception as e:
+            print(f"⚠️ Error checking exit conditions for {symbol}: {e}")
+        
+        return None
+
+    def _is_position_stale(self, timestamp_str: str, max_hours: int = 24) -> bool:
+        """Check if a position is older than max_hours"""
+        try:
+            trade_time = dateutil.parser.parse(timestamp_str)
+            now = datetime.now(trade_time.tzinfo) if trade_time.tzinfo else datetime.now()
+            return (now - trade_time) > timedelta(hours=max_hours)
+        except:
+            return False
 
     def make_portfolio_decision(self, min_score=0.5):
+        """Enhanced portfolio decision making with comprehensive risk management"""
         auto_cleanup_logs()
-        print(f"🎯 Making portfolio decision with min_score={min_score}")
+        
+        # Update portfolio metrics
+        current_positions = self.get_current_positions()
+        self.risk_manager.update_portfolio_metrics(current_positions)
+        risk_metrics = self.risk_manager.get_risk_metrics()
+        
+        print(f"🎯 Making portfolio decision with enhanced risk management")
+        print(f"📊 Portfolio Metrics:")
+        print(f"   Value: ${risk_metrics['portfolio_value']:.2f}")
+        print(f"   Drawdown: {risk_metrics['current_drawdown']:.3f} (limit: {risk_metrics['drawdown_limit']:.3f})")
+        print(f"   Daily P&L: ${risk_metrics['daily_pnl']:.2f} (limit: ${-risk_metrics['daily_loss_limit']:.2f})")
+        print(f"   Hourly Trades: {risk_metrics['hourly_trades']}")
+
+        # Emergency checks
+        if risk_metrics["current_drawdown"] > risk_metrics["drawdown_limit"]:
+            print("🚨 Portfolio in emergency mode - no new trades allowed")
+            return {"decision": [], "timestamp": self.performance_tracker.current_time(), "status": "emergency_drawdown"}
+        
+        if risk_metrics["daily_pnl"] < -risk_metrics["daily_loss_limit"]:
+            print("🚨 Daily loss limit reached - no new trades allowed")
+            return {"decision": [], "timestamp": self.performance_tracker.current_time(), "status": "daily_loss_limit"}
 
         # Sync agent positions before making decisions
         self.sync_agent_positions()
@@ -423,11 +795,11 @@ class MotherAI:
         # Step 1: Check exit conditions using agent states
         self.check_exit_conditions_for_agents()
 
-        # Step 2: Evaluate new trades (agents handle their own position management)
+        # Step 2: Evaluate new trades with enhanced filtering
         top = self.decide_trades(min_score=min_score)
         if not top:
-            print("📭 No trades meet criteria")
-            return {"decision": [], "timestamp": timestamp}
+            print("📭 No trades meet enhanced criteria")
+            return {"decision": [], "timestamp": timestamp, "risk_metrics": risk_metrics}
 
         decision = top[0]
         df = self._fetch_agent_data(decision["symbol"])
@@ -439,26 +811,32 @@ class MotherAI:
         print(f"    Source: {decision.get('source')}, ML Available: {decision.get('ml_available')}")
 
         if decision["signal"] in ("buy", "sell") and price:
-            # Execute the trade
+            # Execute the trade (enhanced with risk management)
             executed_qty = self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])
             
-            # Log the trade
-            self._log_trade_execution(
-                symbol=decision["symbol"],
-                signal=decision["signal"],
-                price=price,
-                confidence=decision["confidence"],
-                score=decision["score"],
-                timestamp=timestamp,
-                qty=executed_qty,
-                source=f"agent_{decision.get('source', 'unknown')}"
-            )
-            
-            # Calculate profits for sell orders
-            if decision["signal"] == "sell":
-                compute_trade_profits(decision["symbol"])
+            if executed_qty:
+                # Log the trade
+                self._log_trade_execution(
+                    symbol=decision["symbol"],
+                    signal=decision["signal"],
+                    price=price,
+                    confidence=decision["confidence"],
+                    score=decision["score"],
+                    timestamp=timestamp,
+                    qty=executed_qty,
+                    source=f"agent_{decision.get('source', 'unknown')}"
+                )
+                
+                # Calculate profits for sell orders
+                if decision["signal"] == "sell":
+                    compute_trade_profits(decision["symbol"])
 
-        return {"decision": result, "timestamp": timestamp}
+        return {
+            "decision": result, 
+            "timestamp": timestamp, 
+            "risk_metrics": risk_metrics,
+            "portfolio_status": "active"
+        }
 
     def load_all_predictions(self) -> List[Dict]:
         """Load predictions from all agents"""
@@ -474,9 +852,14 @@ class MotherAI:
         return predictions
 
     def get_agent_status_summary(self) -> Dict:
-        """Get summary of all agent states"""
+        """Enhanced agent status summary with risk metrics"""
+        current_positions = self.get_current_positions()
+        self.risk_manager.update_portfolio_metrics(current_positions)
+        risk_metrics = self.risk_manager.get_risk_metrics()
+        
         summary = {
             "total_agents": len(self.loaded_agents),
+            "risk_metrics": risk_metrics,
             "agents": {}
         }
         
@@ -485,7 +868,8 @@ class MotherAI:
                 "symbol": symbol,
                 "position_state": getattr(agent, 'position_state', None),
                 "has_ml_model": getattr(agent, 'model', None) is not None,
-                "in_cooldown": self.is_in_cooldown(symbol)
+                "in_cooldown": self.is_in_cooldown(symbol),
+                "exposure": current_positions.get(symbol, {}).get('exposure', 0.0)
             }
             
             if hasattr(agent, 'get_model_info'):
@@ -503,7 +887,6 @@ class MotherAI:
     def check_exit_conditions(self, symbol, current_price):
         """Legacy method - kept for backward compatibility"""
         return None
-    
 
     def sync_agent_positions(self):
         """Enhanced position synchronization with validation and correction"""
@@ -513,16 +896,16 @@ class MotherAI:
             if not hasattr(agent, 'position_state'):
                 continue
             
-        # Get current position state
-        current_state = agent.position_state
-        
-        # Validate against trade history
-        validated_state = self._validate_agent_position(symbol, current_state)
-        
-        if validated_state != current_state:
-            print(f"🔧 Correcting {symbol} position: {current_state} → {validated_state}")
-            agent.position_state = validated_state
-        
+            # Get current position state
+            current_state = agent.position_state
+            
+            # Validate against trade history
+            validated_state = self._validate_agent_position(symbol, current_state)
+            
+            if validated_state != current_state:
+                print(f"🔧 Correcting {symbol} position: {current_state} → {validated_state}")
+                agent.position_state = validated_state
+            
             print(f"📊 {symbol} agent position: {agent.position_state}")
 
     def _validate_agent_position(self, symbol: str, claimed_state: Union[str, None]) -> Optional[str]:
@@ -562,25 +945,16 @@ class MotherAI:
             print(f"⚠️ Failed to validate position for {symbol}: {e}")
             return None
 
-    def _is_position_stale(self, timestamp_str: str, max_hours: int = 24) -> bool:
-        """Check if a position is older than max_hours"""
-        try:
-            from datetime import datetime, timedelta
-            import dateutil.parser
-        
-            trade_time = dateutil.parser.parse(timestamp_str)
-            now = datetime.now(trade_time.tzinfo) if trade_time.tzinfo else datetime.now()
-        
-            return (now - trade_time) > timedelta(hours=max_hours)
-        except:
-            return False
-
     def decide_trades(self, top_n=1, min_score=0.5, min_confidence=0.7):
-        """Enhanced trade decision with better filtering and debugging"""
+        """Enhanced trade decision with comprehensive risk filtering"""
         agents = self.load_agents()
         evaluations = self.evaluate_agents(agents)
+        
+        # Get current positions for additional filtering
+        current_positions = self.get_current_positions()
 
-        print(f"\n🔍 TRADE DECISION ANALYSIS (min_score={min_score}, min_confidence={min_confidence})")
+        print(f"\n🔍 ENHANCED TRADE DECISION ANALYSIS")
+        print(f"📊 Filters: min_score={min_score}, min_confidence={min_confidence}")
         print("=" * 80)
 
         approved_trades = []
@@ -599,16 +973,17 @@ class MotherAI:
             print(f"   ML Available: {e.get('ml_available', False)} | ML Conf: {e.get('ml_confidence', 0.0):.3f}")
             print(f"   Rule Conf: {e.get('rule_confidence', 0.0):.3f}")
 
-            # Enhanced filtering with more permissive logic
+            # Enhanced filtering with risk management
             skip_reason = None
 
-        # Check score threshold
+            # Check score threshold
             if score < min_score:
                 skip_reason = f"score too low ({score:.3f} < {min_score})"
 
             # Check cooldown
             elif self.is_in_cooldown(symbol):
-                cooldown_remaining = TRADE_COOLDOWN_SECONDS - (time.time() - self.cooldown_tracker[symbol])
+                cooldown_seconds = self.risk_manager.get_symbol_config(symbol)["trade_cooldown_seconds"]
+                cooldown_remaining = cooldown_seconds - (time.time() - self.cooldown_tracker[symbol])
                 skip_reason = f"in cooldown ({cooldown_remaining:.0f}s remaining)"
 
             # Check confidence threshold
@@ -619,18 +994,31 @@ class MotherAI:
             elif signal not in ["buy", "sell"]:
                 skip_reason = f"signal is '{signal}' (not actionable)"
 
-            # RELAXED POSITION VALIDATION: Only skip if there's a clear conflict
-            elif signal == "buy" and position_state == "long":
-                # Double-check the position state
-                actual_state = self._validate_agent_position(symbol, position_state)
-                if actual_state == "long":
-                    skip_reason = f"already in long position"
+            # Enhanced market condition checks
+            elif signal == "buy":
+                df = self._fetch_agent_data(symbol)
+                market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df)
+                if not market_ok:
+                    skip_reason = f"market conditions: {market_reason}"
+                elif position_state == "long":
+                    # Double-check the position state
+                    actual_state = self._validate_agent_position(symbol, position_state)
+                    if actual_state == "long":
+                        skip_reason = f"already in long position"
+                    else:
+                        # Position state was wrong, correct it and allow trade
+                        agent = self.get_agent_by_symbol(symbol)
+                        if agent:
+                            agent.position_state = actual_state
+                            print(f"   🔧 Corrected position state to: {actual_state}")
                 else:
-                    # Position state was wrong, correct it and allow trade
-                    agent = self.get_agent_by_symbol(symbol)
-                    if agent:
-                        agent.position_state = actual_state
-                        print(f"   🔧 Corrected position state to: {actual_state}")
+                    # Portfolio-level checks for new positions
+                    position_size = self.risk_manager.calculate_dynamic_position_size(symbol, 0, df)  # Estimate
+                    portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
+                        symbol, position_size, current_positions
+                    )
+                    if not portfolio_ok:
+                        skip_reason = f"portfolio limit: {portfolio_reason}"
 
             elif signal == "sell" and position_state is None:
                 # Double-check the position state  
@@ -638,7 +1026,7 @@ class MotherAI:
                 if actual_state is None:
                     skip_reason = f"no position to sell"
                 else:
-                # Position state was wrong, correct it and allow trade
+                    # Position state was wrong, correct it and allow trade
                     agent = self.get_agent_by_symbol(symbol)
                     if agent:
                         agent.position_state = actual_state
@@ -650,10 +1038,65 @@ class MotherAI:
                 print(f"   ✅ APPROVED: {signal.upper()} trade")
                 approved_trades.append(e)
 
-        print(f"\n📈 SUMMARY:")
+        print(f"\n📈 ENHANCED SUMMARY:")
         print(f"   Total evaluated: {len(evaluations)}")
         print(f"   Approved trades: {len(approved_trades)}")
         print(f"   Symbols approved: {[f'{t['symbol']}-{t['signal'].upper()}' for t in approved_trades]}")
+        
+        # Display current risk metrics
+        risk_metrics = self.risk_manager.get_risk_metrics()
+        print(f"   Portfolio Status:")
+        print(f"     Value: ${risk_metrics['portfolio_value']:.2f}")
+        print(f"     Drawdown: {risk_metrics['current_drawdown']:.3f}")
+        print(f"     Daily P&L: ${risk_metrics['daily_pnl']:.2f}")
+        print(f"     Hourly Trades: {risk_metrics['hourly_trades']}")
         print("=" * 80)
 
         return approved_trades[:top_n]
+
+    def update_risk_config(self, new_config: Dict):
+        """Update risk management configuration"""
+        self.risk_manager.config.update(new_config)
+        self.risk_manager._save_risk_config(self.risk_manager.config)
+        print(f"✅ Risk configuration updated: {list(new_config.keys())}")
+
+    def get_risk_report(self) -> Dict:
+        """Generate comprehensive risk report"""
+        current_positions = self.get_current_positions()
+        self.risk_manager.update_portfolio_metrics(current_positions)
+        
+        # Calculate additional metrics
+        active_positions = [p for p in current_positions.values() if p['position_state'] == 'long']
+        total_exposure = sum(p['exposure'] for p in active_positions)
+        
+        report = {
+            "timestamp": datetime.now().isoformat(),
+            "portfolio_metrics": self.risk_manager.get_risk_metrics(),
+            "position_summary": {
+                "total_positions": len(active_positions),
+                "total_exposure": total_exposure,
+                "max_allowed_exposure": self.risk_manager.config["max_portfolio_exposure"],
+                "positions": current_positions
+            },
+            "risk_limits": {
+                "max_drawdown": self.risk_manager.config["max_drawdown"],
+                "max_daily_loss": self.risk_manager.config["max_daily_loss"],
+                "max_concurrent_positions": self.risk_manager.config["max_concurrent_positions"],
+                "max_trades_per_hour": self.risk_manager.config["max_trades_per_hour"]
+            },
+            "warnings": []
+        }
+        
+        # Add warnings
+        risk_metrics = report["portfolio_metrics"]
+        if risk_metrics["current_drawdown"] > 0.15:
+            report["warnings"].append("High drawdown detected")
+        if risk_metrics["daily_pnl"] < -risk_metrics["daily_loss_limit"] * 0.8:
+            report["warnings"].append("Approaching daily loss limit")
+        if total_exposure > self.risk_manager.config["max_portfolio_exposure"] * 0.8:
+            report["warnings"].append("High portfolio exposure")
+        
+        return report
+    
+
+    
