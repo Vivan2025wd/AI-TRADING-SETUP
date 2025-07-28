@@ -14,17 +14,17 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class AutoTrainingSystem:
-    """Automated system for generating labels and training models on startup"""
+    """Automated system for fetching live data, generating labels and training models on startup"""
     
     def __init__(self):
         self.base_dir = Path(__file__).resolve().parent
-        self.ohlcv_dir = self.base_dir /"backend"/ "data" / "ohlcv"
-        self.labels_dir = self.base_dir /"backend"/ "data" / "labels"
+        self.ohlcv_dir = self.base_dir / "backend" / "data" / "ohlcv"
+        self.labels_dir = self.base_dir / "backend" / "data" / "labels"
         self.models_dir = self.base_dir / "backend" / "agents" / "models"
         self.logs_dir = self.base_dir / "backend" / "storage" / "training_logs"
         
         # Create directories
-        for dir_path in [self.labels_dir, self.models_dir, self.logs_dir]:
+        for dir_path in [self.ohlcv_dir, self.labels_dir, self.models_dir, self.logs_dir]:
             dir_path.mkdir(parents=True, exist_ok=True)
         
         # Training configuration
@@ -36,25 +36,84 @@ class AutoTrainingSystem:
         self.training_status = {symbol: "pending" for symbol in self.symbols}
         self._training_lock = threading.Lock()
 
-    def check_data_availability(self) -> Dict[str, bool]:
-        """Check which symbols have OHLCV data available"""
+    def fetch_live_ohlcv_for_symbol(self, symbol: str, force_refresh: bool = False) -> bool:
+        """Fetch live OHLCV data for a specific symbol"""
+        try:
+            ohlcv_path = self.ohlcv_dir / f"{symbol}_1h.csv"
+            
+            # Check if we need to fetch new data
+            if not force_refresh and ohlcv_path.exists():
+                # Check if data is recent (less than 1 hour old)
+                data_age_hours = (datetime.now().timestamp() - ohlcv_path.stat().st_mtime) / 3600
+                if data_age_hours < 1:
+                    logger.info(f"📋 {symbol}: Using cached data (age: {data_age_hours:.1f}h)")
+                    return True
+            
+            logger.info(f"📡 Fetching live OHLCV data for {symbol}...")
+            
+            # Import the live OHLCV fetcher
+            from backend.binance.fetch_live_ohlcv import fetch_ohlcv
+            
+            # Fetch data with sufficient history for feature extraction (1000 candles = ~41 days)
+            df = fetch_ohlcv(symbol, interval="1h", limit=1000)
+            
+            if df.empty:
+                logger.error(f"❌ {symbol}: No OHLCV data received")
+                return False
+            
+            # Validate data quality
+            required_cols = ['open', 'high', 'low', 'close', 'volume']
+            if not all(col in df.columns for col in required_cols):
+                logger.error(f"❌ {symbol}: Invalid OHLCV format - missing columns")
+                return False
+            
+            # Check for sufficient data
+            if len(df) < 100:
+                logger.error(f"❌ {symbol}: Insufficient data - only {len(df)} candles")
+                return False
+            
+            # Save to CSV
+            df.to_csv(ohlcv_path)
+            logger.info(f"✅ {symbol}: Saved {len(df)} candles to {ohlcv_path}")
+            
+            return True
+            
+        except ImportError as e:
+            logger.error(f"❌ {symbol}: Could not import live OHLCV fetcher - {e}")
+            logger.info("💡 Make sure backend.binance.fetch_live_ohlcv module exists")
+            return False
+        except Exception as e:
+            logger.error(f"❌ {symbol}: Failed to fetch live OHLCV - {e}")
+            return False
+
+    def check_data_availability(self, force_refresh: bool = False) -> Dict[str, bool]:
+        """Check which symbols have OHLCV data available, fetch if needed"""
         available_data = {}
         
+        logger.info("🔍 Checking data availability and fetching live OHLCV...")
+        
         for symbol in self.symbols:
-            ohlcv_path = self.ohlcv_dir / f"{symbol}_1h.csv"
-            available_data[symbol] = ohlcv_path.exists()
+            # Try to fetch/update live data first
+            fetch_success = self.fetch_live_ohlcv_for_symbol(symbol, force_refresh)
             
-            if available_data[symbol]:
+            if fetch_success:
+                # Verify the saved data
+                ohlcv_path = self.ohlcv_dir / f"{symbol}_1h.csv"
                 try:
-                    # Quick validation
                     df = pd.read_csv(ohlcv_path, nrows=5)
                     required_cols = ['open', 'high', 'low', 'close', 'volume']
-                    if not all(col in df.columns for col in required_cols):
-                        available_data[symbol] = False
-                        logger.warning(f"❌ {symbol}: Invalid OHLCV format")
+                    available_data[symbol] = all(col in df.columns for col in required_cols)
+                    
+                    if available_data[symbol]:
+                        logger.info(f"✅ {symbol}: Data ready for training")
+                    else:
+                        logger.warning(f"❌ {symbol}: Invalid data format after fetch")
+                        
                 except Exception as e:
                     available_data[symbol] = False
-                    logger.error(f"❌ {symbol}: Failed to read OHLCV - {e}")
+                    logger.error(f"❌ {symbol}: Failed to validate fetched data - {e}")
+            else:
+                available_data[symbol] = False
         
         return available_data
 
@@ -108,17 +167,17 @@ class AutoTrainingSystem:
         try:
             logger.info(f"🏷️ Generating labels for {symbol}...")
         
-        # Import the correct label generator class
+            # Import the correct label generator class
             from backend.ml_engine.generate_labels import TradingLabelGenerator
         
             generator = TradingLabelGenerator(
                 forward_window=24,
                 min_return_threshold=0.025,
                 stop_loss_threshold=-0.04,
-                hold_threshold=0.008  # Added hold_threshold to match your class constructor
+                hold_threshold=0.008
             )
         
-        # Your class method is named 'generate_labels' not 'generate_training_labels'
+            # Generate labels using the outcome method
             labels_df, stats = generator.generate_labels(symbol, method='outcome')
         
             logger.info(f"✅ {symbol}: Generated {stats['total_samples']} labels, "
@@ -295,18 +354,19 @@ class AutoTrainingSystem:
         with self._training_lock:
             return self.training_status.copy()
 
-    async def initialize_system(self, force_retrain: bool = False):
+    async def initialize_system(self, force_retrain: bool = False, force_refresh_data: bool = False):
         """Main initialization method"""
-        logger.info("🎯 Initializing automated training system...")
+        logger.info("🎯 Initializing automated training system with live OHLCV fetching...")
         
-        # Check data availability
-        available_data = self.check_data_availability()
+        # Check data availability and fetch live data
+        available_data = self.check_data_availability(force_refresh=force_refresh_data)
         available_symbols = [symbol for symbol, available in available_data.items() if available]
         
-        logger.info(f"📊 Available data for {len(available_symbols)}/{len(self.symbols)} symbols")
+        logger.info(f"📊 Successfully fetched data for {len(available_symbols)}/{len(self.symbols)} symbols")
         
         if not available_symbols:
             logger.error("❌ No OHLCV data available for training")
+            logger.info("💡 Check your internet connection and Binance API access")
             return
         
         # Determine which symbols need training
@@ -354,21 +414,75 @@ class AutoTrainingSystem:
         
         logger.info("=" * 60)
 
+    async def refresh_data_only(self):
+        """Refresh OHLCV data for all symbols without training"""
+        logger.info("🔄 Refreshing live OHLCV data for all symbols...")
+        
+        available_data = self.check_data_availability(force_refresh=True)
+        successful = sum(1 for available in available_data.values() if available)
+        
+        logger.info(f"📊 Data refresh completed: {successful}/{len(self.symbols)} symbols updated")
+        return available_data
+
 
 # Global instance
 auto_trainer = AutoTrainingSystem()
 
 
-async def run_startup_training(force_retrain: bool = False):
+async def run_startup_training(force_retrain: bool = False, force_refresh_data: bool = False):
     """Main function to run on startup"""
     try:
-        await auto_trainer.initialize_system(force_retrain=force_retrain)
+        await auto_trainer.initialize_system(
+            force_retrain=force_retrain, 
+            force_refresh_data=force_refresh_data
+        )
         logger.info("🎉 Startup training completed successfully")
     except Exception as e:
         logger.error(f"💥 Startup training failed: {e}")
         raise
 
 
+async def refresh_ohlcv_data():
+    """Standalone function to refresh OHLCV data only"""
+    try:
+        return await auto_trainer.refresh_data_only()
+    except Exception as e:
+        logger.error(f"💥 Data refresh failed: {e}")
+        raise
+
+
 def get_training_status():
     """Get current training status (for API endpoints)"""
     return auto_trainer.get_training_status()
+
+
+# Additional utility functions for manual control
+async def train_specific_symbols(symbols: List[str]):
+    """Train models for specific symbols only"""
+    try:
+        logger.info(f"🎯 Training specific symbols: {', '.join(symbols)}")
+        
+        # Filter to valid symbols
+        valid_symbols = [s for s in symbols if s in auto_trainer.symbols]
+        if not valid_symbols:
+            logger.error("❌ No valid symbols provided")
+            return
+        
+        # Fetch data for these symbols
+        available_data = {}
+        for symbol in valid_symbols:
+            available_data[symbol] = auto_trainer.fetch_live_ohlcv_for_symbol(symbol, force_refresh=True)
+        
+        available_symbols = [s for s, available in available_data.items() if available]
+        
+        if not available_symbols:
+            logger.error("❌ No data available for requested symbols")
+            return
+        
+        # Run training
+        successful, failed = await auto_trainer.run_parallel_training(available_symbols)
+        logger.info(f"🎉 Specific training completed: {successful} successful, {failed} failed")
+        
+    except Exception as e:
+        logger.error(f"💥 Specific training failed: {e}")
+        raise

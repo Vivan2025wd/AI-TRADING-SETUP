@@ -291,31 +291,6 @@ class MotherAI:
         
         return agent_class
 
-    def evaluate_agents(self, agents):
-        """Evaluate agents using their full decision output"""
-        results = []
-        trade_tracker = PerformanceTracker("trade_history")
-        
-        for agent in agents:
-            ohlcv = self._fetch_agent_data(agent.symbol)
-            if ohlcv is None:
-                continue
-                
-            # Use the agent's full evaluation result
-            prediction = self._safe_evaluate_agent(agent, ohlcv)
-            health = StrategyHealth(trade_tracker.get_agent_log(agent.symbol)).summary()
-            score = self._calculate_score(prediction, health)
-            
-            # Preserve all agent decision data
-            result = {
-                **prediction,
-                "score": round(score, 3),
-                "health": health
-            }
-            results.append(result)
-            
-        return sorted(results, key=lambda x: x["score"], reverse=True)
-
     def _fetch_agent_data(self, symbol: str):
         symbol = symbol if symbol.endswith("/USDT") else symbol.replace("USDT", "") + "/USDT"
         df = fetch_ohlcv(symbol, "1h", 100)
@@ -367,6 +342,31 @@ class MotherAI:
                 "rule_confidence": 0.0,
                 "full_decision": {}
             }
+
+    def evaluate_agents(self, agents):
+        """Evaluate agents using their full decision output"""
+        results = []
+        trade_tracker = PerformanceTracker("trade_history")
+        
+        for agent in agents:
+            ohlcv = self._fetch_agent_data(agent.symbol)
+            if ohlcv is None:
+                continue
+                
+            # Use the agent's full evaluation result
+            prediction = self._safe_evaluate_agent(agent, ohlcv)
+            health = StrategyHealth(trade_tracker.get_agent_log(agent.symbol)).summary()
+            score = self._calculate_score(prediction, health)
+            
+            # Preserve all agent decision data
+            result = {
+                **prediction,
+                "score": round(score, 3),
+                "health": health
+            }
+            results.append(result)
+            
+        return sorted(results, key=lambda x: x["score"], reverse=True)
 
     def _calculate_score(self, prediction, health):
         return self.meta_evaluator.predict_refined_score({
@@ -883,11 +883,6 @@ class MotherAI:
             
         return summary
 
-    # Legacy method for backward compatibility
-    def check_exit_conditions(self, symbol, current_price):
-        """Legacy method - kept for backward compatibility"""
-        return None
-
     def sync_agent_positions(self):
         """Enhanced position synchronization with validation and correction"""
         print("🔄 Syncing agent positions...")
@@ -1097,6 +1092,56 @@ class MotherAI:
             report["warnings"].append("High portfolio exposure")
         
         return report
-    
 
+
+# Example usage functions
+def enhanced_trading_loop_example():
+    """Example of how to use the enhanced system in your trading loop"""
+    from backend.utils.binance_api import get_trading_mode
     
+    # Initialize MotherAI
+    mother_ai = MotherAI(agent_symbols=["BTCUSDT", "ETHUSDT", "ADAUSDT"])
+    
+    # Main trading loop
+    import time
+    
+    while True:
+        try:
+            # Make trading decision
+            decision_result = mother_ai.make_portfolio_decision(min_score=0.6)
+            print(f"📊 Decision result: {decision_result}")
+            
+            # Wait before next iteration
+            time.sleep(300)  # 5 minutes
+            
+        except KeyboardInterrupt:
+            print("🛑 Trading loop stopped by user")
+            break
+        except Exception as e:
+            print(f"❌ Error in trading loop: {e}")
+            time.sleep(60)  # Wait 1 minute before retrying
+
+
+def get_risk_report_cli():
+    """CLI command to get risk report"""
+    mother_ai = MotherAI()
+    report = mother_ai.get_risk_report()
+    
+    print("\n📊 RISK REPORT")
+    print("=" * 50)
+    print(f"Timestamp: {report['timestamp']}")
+    print(f"Portfolio Value: ${report['portfolio_metrics']['portfolio_value']:.2f}")
+    print(f"Current Drawdown: {report['portfolio_metrics']['current_drawdown']:.3f}")
+    print(f"Daily P&L: ${report['portfolio_metrics']['daily_pnl']:.2f}")
+    
+    print(f"\nActive Positions: {report['position_summary']['total_positions']}")
+    print(f"Total Exposure: {report['position_summary']['total_exposure']:.3f}")
+    
+    if report['warnings']:
+        print(f"\n⚠️ Warnings:")
+        for warning in report['warnings']:
+            print(f"   - {warning}")
+    else:
+        print(f"\n✅ No warnings")
+    
+    return report

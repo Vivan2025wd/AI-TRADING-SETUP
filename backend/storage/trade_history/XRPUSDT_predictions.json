@@ -1904,5 +1904,41 @@
     "source": "GenericAgent/rule_conflict_resolution",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-07-27T13:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.752,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-27T13:00:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.752,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-27T13:54:00",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_conflict_resolution",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-27T13:54:00",
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_conflict_resolution",
+    "ml_available": true,
+    "position_state": null
   }
 ]

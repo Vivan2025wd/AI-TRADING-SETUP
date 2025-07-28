@@ -98,7 +98,7 @@ class BacktestRunner:
 def run_backtest(
     symbol: str,
     strategy_json: str,
-    initial_balance: float = 1000.0,
+    initial_balance: float = 100.0,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None
 ):

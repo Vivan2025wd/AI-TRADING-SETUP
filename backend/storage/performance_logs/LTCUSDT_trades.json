@@ -229,5 +229,16 @@
     "qty": 0.00869,
     "timestamp": "2025-07-27T13:12:06.524865",
     "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 113.44,
+    "price": 113.44,
+    "qty": 0.008722,
+    "timestamp": "2025-07-27T13:48:08.148755",
+    "source": "exit_max_hold_time_6.1h"
   }
 ]
