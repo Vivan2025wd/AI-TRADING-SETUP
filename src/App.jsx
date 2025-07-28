@@ -23,34 +23,46 @@ const SuspenseWrapper = ({ children }) => (
   </Suspense>
 );
 
+// Logo Component
+const Logo = () => (
+  <div className="mr-8">
+    <div className="text-white font-bold text-2xl tracking-wide">
+      TRADE<span className="text-cyan-400">HIVE</span><span className="text-yellow-400">.AI</span>
+    </div>
+  </div>
+);
+
 export default function App() {
   const [isLive, setIsLive] = useState(false);
 
   return (
     <BrowserRouter>
       <header className="bg-gray-900 text-white shadow-sm sticky top-0 z-50">
-        <nav className="flex items-center space-x-6 px-6 py-4 text-sm font-medium overflow-x-auto whitespace-nowrap">
-          <NavLink to="/agent-predictions" className={getNavClass}>
-            Binance API Setup
-          </NavLink>
-          <NavLink to="/backtest-results" className={getNavClass}>
-            Backtest Results
-          </NavLink>
-          <NavLink to="/binance-api-setup" className={getNavClass}>
-            Agent Predictions
-          </NavLink>
-          <NavLink to="/chart-display" className={getNavClass}>
-            Chart Display
-          </NavLink>
-          <NavLink to="/mother-ai-decision" className={getNavClass}>
-            Mother AI Decision
-          </NavLink>
-          <NavLink to="/strategy-builder" className={getNavClass}>
-            Strategy Builder
-          </NavLink>
-          <NavLink to="/strategy-performance" className={getNavClass}>
-            Strategy Performance
-          </NavLink>
+        <nav className="flex items-center px-6 py-4 text-sm font-medium overflow-x-auto">
+          <Logo />
+          <div className="flex items-center space-x-6 whitespace-nowrap">
+            <NavLink to="/binance-api-setup" className={getNavClass}>
+              Binance API Setup
+            </NavLink>
+            <NavLink to="/backtest-results" className={getNavClass}>
+              Backtest Results
+            </NavLink>
+            <NavLink to="/agent-predictions" className={getNavClass}>
+              Agent Predictions
+            </NavLink>
+            <NavLink to="/chart-display" className={getNavClass}>
+              Chart Display
+            </NavLink>
+            <NavLink to="/mother-ai-decision" className={getNavClass}>
+              Mother AI Decision
+            </NavLink>
+            <NavLink to="/strategy-builder" className={getNavClass}>
+              Strategy Builder
+            </NavLink>
+            <NavLink to="/strategy-performance" className={getNavClass}>
+              Strategy Performance
+            </NavLink>
+          </div>
         </nav>
       </header>
 
@@ -58,7 +70,7 @@ export default function App() {
         <ErrorBoundary>
           <Routes>
             <Route
-              path="/agent-predictions"
+              path="/binance-api-setup"
               element={
                 <SuspenseWrapper>
                   <BinanceAPISetup />
@@ -74,7 +86,7 @@ export default function App() {
               }
             />
             <Route
-              path="/binance-api-setup"
+              path="/agent-predictions"
               element={
                 <SuspenseWrapper>
                   <AgentPredictionCard />
@@ -114,15 +126,16 @@ export default function App() {
               }
             />
 
-            {/* Optional: Redirect root or fallback 
+            {/* Default route */}
             <Route
               path="/"
               element={
                 <div className="text-center text-gray-400 mt-20">
-                  <h2>Welcome! Please select a page from the navigation.</h2>
+                  <h2 className="text-2xl mb-4">Welcome to TradeHive.AI</h2>
+                  <p>Please select a page from the navigation above to get started.</p>
                 </div>
               }
-            />*/}
+            />
           </Routes>
         </ErrorBoundary>
       </main>
