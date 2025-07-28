@@ -3,7 +3,7 @@ import { ArrowUpRight, AlertCircle, Clock, RefreshCw, Loader2 } from "lucide-rea
 
 const CACHE_KEY = "mother_ai_decision_cache";
 const CACHE_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
-const POLL_INTERVAL_MS = 15 * 60 * 1000; // 15 minutes
+const POLL_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
 
 export default function MotherAIDecisionCard({ isLive }) {
   const [decisionData, setDecisionData] = useState(null);

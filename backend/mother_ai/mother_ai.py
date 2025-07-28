@@ -24,32 +24,28 @@ RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 
 # Enhanced Risk Configuration
 DEFAULT_RISK_CONFIG = {
-    "trade_cooldown_seconds": 600,
+    "trade_cooldown_seconds": 120,
     "max_hold_seconds": 21600,  # 6 hours
-    "risk_per_trade": 0.01,  # 1% of capital
+    "risk_per_trade": 0.02,  # 2% of capital
     "default_balance_usd": 100,
-    "tp_ratio": 1.5,
-    "sl_percent": 0.03,
+    "tp_ratio": 1.3,
+    "sl_percent": 0.05,  # Allowing for more volatile stop-loss
     
-    # Portfolio-level limits
-    "max_portfolio_exposure": 0.15,  # 15% total portfolio exposure
-    "max_daily_loss": 0.05,  # 5% daily loss limit
-    "max_drawdown": 0.20,  # 20% maximum drawdown
-    "max_concurrent_positions": 5,
-    "max_correlation_exposure": 0.10,  # 10% max exposure to correlated assets
+    "max_portfolio_exposure": 0.40,  # 40% total exposure
+    "max_daily_loss": 0.10,  # 10% daily loss limit
+    "max_drawdown": 0.30,  # 30% maximum drawdown
+    "max_concurrent_positions": 10,
+    "max_correlation_exposure": 0.30,  # 30% correlated exposure
     
-    # Dynamic sizing parameters
     "volatility_lookback": 20,
     "volatility_multiplier": 2.0,
-    "min_position_size": 0.005,  # 0.5% minimum
-    "max_position_size": 0.03,   # 3% maximum
+    "min_position_size": 0.0025,  # 0.25%
+    "max_position_size": 0.15,   # 15%
     
-    # Circuit breakers
-    "emergency_stop_loss": 0.10,  # 10% emergency stop
-    "max_trades_per_hour": 6,
-    "market_volatility_threshold": 0.05,  # 5% hourly volatility threshold
+    "emergency_stop_loss": 0.15,  # 15% emergency stop
+    "max_trades_per_hour": 12,
+    "market_volatility_threshold": 0.10,
     
-    # Symbol-specific overrides
     "symbol_overrides": {}
 }
 

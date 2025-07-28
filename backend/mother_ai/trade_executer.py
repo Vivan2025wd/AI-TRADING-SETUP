@@ -221,15 +221,15 @@ def execute_mother_ai_decision(decision_data: Dict) -> List[Dict]:
             logger.warning(f"Invalid trade decision skipped: {d}")
             continue
 
-        # --- Symbol Cooldown Check (5 minutes) ---
+        # --- Symbol Cooldown Check (60 minutes) ---
         last_exec = get_symbol_last_execution_time(symbol)
         now = datetime.utcnow()
-        if last_exec and (now - last_exec) < timedelta(minutes=30):
-            logger.info(f"⏳ Skipping {symbol}: Cooldown active (30 min). Last executed at {last_exec.isoformat()}")
+        if last_exec and (now - last_exec) < timedelta(minutes=60):
+            logger.info(f"⏳ Skipping {symbol}: Cooldown active (60 min). Last executed at {last_exec.isoformat()}")
             trade_results.append({
                 "status": "SKIPPED",
                 "symbol": symbol,
-                "reason": "Symbol cooldown active (30 min)",
+                "reason": "Symbol cooldown active (60 min)",
                 "last_executed": last_exec.isoformat()
             })
             continue
