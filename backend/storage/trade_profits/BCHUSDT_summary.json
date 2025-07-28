@@ -1,11 +1,11 @@
 {
   "symbol": "BCHUSDT",
-  "total_profit_dollars": 6.8926,
-  "avg_profit_per_trade": 3.4463,
-  "total_trades": 2,
-  "wins": 2,
-  "losses": 0,
-  "win_rate": 100.0,
+  "total_profit_dollars": 6.8818,
+  "avg_profit_per_trade": 1.147,
+  "total_trades": 6,
+  "wins": 4,
+  "losses": 2,
+  "win_rate": 66.67,
   "trades": [
     {
       "entry_time": "2025-07-24T01:56:48.565453",
@@ -28,6 +28,50 @@
       "exit_value": 340.1618,
       "pnl_dollars": 6.8287,
       "pnl_percentage": 2.05
+    },
+    {
+      "entry_time": "2025-07-28T02:03:03.982083",
+      "entry_price": 593.0,
+      "exit_time": "2025-07-28T09:40:15.442108",
+      "exit_price": 583.8,
+      "qty": 0.001689,
+      "entry_value": 1.0016,
+      "exit_value": 0.986,
+      "pnl_dollars": -0.0155,
+      "pnl_percentage": -1.55
+    },
+    {
+      "entry_time": "2025-07-28T09:41:10.933499",
+      "entry_price": 583.2,
+      "exit_time": "2025-07-28T09:56:06.848636",
+      "exit_price": 583.1,
+      "qty": 0.001691,
+      "entry_value": 0.9862,
+      "exit_value": 0.986,
+      "pnl_dollars": -0.0002,
+      "pnl_percentage": -0.02
+    },
+    {
+      "entry_time": "2025-07-28T10:03:36.266290",
+      "entry_price": 583.4,
+      "exit_time": "2025-07-28T10:23:25.266930",
+      "exit_price": 584.3,
+      "qty": 0.001688,
+      "entry_value": 0.9848,
+      "exit_value": 0.9863,
+      "pnl_dollars": 0.0015,
+      "pnl_percentage": 0.15
+    },
+    {
+      "entry_time": "2025-07-28T10:45:22.648802",
+      "entry_price": 584.6,
+      "exit_time": "2025-07-28T11:50:29.846681",
+      "exit_price": 586.6,
+      "qty": 0.001681,
+      "entry_value": 0.9827,
+      "exit_value": 0.9861,
+      "pnl_dollars": 0.0034,
+      "pnl_percentage": 0.34
     }
   ]
 }

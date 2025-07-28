@@ -1,7 +1,7 @@
 import os
 import json
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from backend.utils.logger import logger
 from backend.utils.binance_api import get_trading_mode, get_binance_client
@@ -12,7 +12,7 @@ STORAGE_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'storage'))
 MOCK_BALANCE_FILE = os.path.join(STORAGE_DIR, 'mock_balance.json')
 PERFORMANCE_LOG_DIR = os.path.join(STORAGE_DIR, 'performance_logs')
 TRADE_PROFITS_DIR = os.path.join(STORAGE_DIR, 'trade_profits')
-LAST_EXECUTION_FILE = os.path.join(STORAGE_DIR, 'last_execution_time.json')
+SYMBOL_EXECUTION_FILE = os.path.join(STORAGE_DIR, 'symbol_last_execution.json')
 MOCK_PROFIT_FILE = os.path.join(TRADE_PROFITS_DIR, 'mock_profit.json')
 
 # --- Ensure directories exist ---
@@ -30,20 +30,29 @@ DEFAULT_PROFIT_TRACKER = {
     "total_trades": 0
 }
 
-# --- Cooldown Logic ---
-def get_last_execution_time():
-    if os.path.exists(LAST_EXECUTION_FILE):
-        with open(LAST_EXECUTION_FILE, 'r') as f:
+# --- Symbol Cooldown Logic ---
+def load_symbol_execution_times() -> Dict[str, str]:
+    if os.path.exists(SYMBOL_EXECUTION_FILE):
+        with open(SYMBOL_EXECUTION_FILE, 'r') as f:
             try:
-                data = json.load(f)
-                return datetime.fromisoformat(data.get("last_executed"))
-            except Exception:
-                return None
-    return None
+                return json.load(f)
+            except json.JSONDecodeError:
+                return {}
+    return {}
 
-def set_last_execution_time():
-    with open(LAST_EXECUTION_FILE, 'w') as f:
-        json.dump({"last_executed": datetime.utcnow().isoformat()}, f, indent=4)
+def save_symbol_execution_times(data: Dict[str, str]):
+    with open(SYMBOL_EXECUTION_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+def get_symbol_last_execution_time(symbol: str) -> Optional[datetime]:
+    data = load_symbol_execution_times()
+    ts = data.get(symbol.upper())
+    return datetime.fromisoformat(ts) if ts else None
+
+def set_symbol_last_execution_time(symbol: str):
+    data = load_symbol_execution_times()
+    data[symbol.upper()] = datetime.utcnow().isoformat()
+    save_symbol_execution_times(data)
 
 # --- Helpers ---
 def load_mock_balance() -> Dict:
@@ -190,18 +199,8 @@ def execute_trade(symbol: str, action: str, price: float, confidence: float) -> 
     else:
         return execute_mock_trade(symbol, action, price, confidence)
 
-# --- Execute Mother AI Trades (every 15 min) ---
+# --- Execute Mother AI Trades (Symbol-specific Cooldown) ---
 def execute_mother_ai_decision(decision_data: Dict) -> List[Dict]:
-    last_exec = get_last_execution_time()
-    now = datetime.utcnow()
-    if last_exec and (now - last_exec) < timedelta(minutes=15):
-        logger.info("⏳ Skipping execution: Last trade was within 15 minutes.")
-        return [{
-            "status": "SKIPPED",
-            "reason": "Cooldown active (15 min)",
-            "last_executed": last_exec.isoformat()
-        }]
-
     decisions = decision_data.get("decision", [])
     if not decisions:
         logger.warning("Mother AI returned no decision.")
@@ -218,13 +217,28 @@ def execute_mother_ai_decision(decision_data: Dict) -> List[Dict]:
         price = d.get("last_price") or d.get("price")
         confidence = d.get("confidence", 0.0)
 
-        if symbol and action and price:
-            res = execute_trade(symbol, action, price, confidence)
-            trade_results.append(res)
-        else:
+        if not (symbol and action and price):
             logger.warning(f"Invalid trade decision skipped: {d}")
+            continue
 
-    set_last_execution_time()
+        # --- Symbol Cooldown Check (5 minutes) ---
+        last_exec = get_symbol_last_execution_time(symbol)
+        now = datetime.utcnow()
+        if last_exec and (now - last_exec) < timedelta(minutes=30):
+            logger.info(f"⏳ Skipping {symbol}: Cooldown active (30 min). Last executed at {last_exec.isoformat()}")
+            trade_results.append({
+                "status": "SKIPPED",
+                "symbol": symbol,
+                "reason": "Symbol cooldown active (30 min)",
+                "last_executed": last_exec.isoformat()
+            })
+            continue
+
+        # --- Execute Trade ---
+        res = execute_trade(symbol, action, price, confidence)
+        trade_results.append(res)
+        set_symbol_last_execution_time(symbol)
+
     return trade_results
 
 # --- Get Portfolio State ---

@@ -18,10 +18,10 @@ class AutoTrainingSystem:
     
     def __init__(self):
         self.base_dir = Path(__file__).resolve().parent
-        self.ohlcv_dir = self.base_dir / "backend" / "data" / "ohlcv"
-        self.labels_dir = self.base_dir / "backend" / "data" / "labels"
-        self.models_dir = self.base_dir / "backend" / "agents" / "models"
-        self.logs_dir = self.base_dir / "backend" / "storage" / "training_logs"
+        self.ohlcv_dir = self.base_dir / "data" / "ohlcv"
+        self.labels_dir = self.base_dir / "data" / "labels"
+        self.models_dir = self.base_dir / "agents" / "models"
+        self.logs_dir = self.base_dir / "storage" / "training_logs"
         
         # Create directories
         for dir_path in [self.ohlcv_dir, self.labels_dir, self.models_dir, self.logs_dir]:

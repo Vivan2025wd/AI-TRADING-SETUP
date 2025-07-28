@@ -1,0 +1,13 @@
+{
+  "cooldown_tracker": {
+    "ADAUSDT": 1753695869.7283723,
+    "BCHUSDT": 1753696215.8458593
+  },
+  "global_cooldown_end": 1753695675.8458593,
+  "symbol_cooldowns": {},
+  "hourly_symbol_trades": {
+    "2025-07-28-15_ADAUSDT": 1,
+    "2025-07-28-15_BCHUSDT": 1
+  },
+  "last_updated": "2025-07-28T15:10:15.846103"
+}

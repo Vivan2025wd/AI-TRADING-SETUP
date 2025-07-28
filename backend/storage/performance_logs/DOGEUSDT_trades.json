@@ -130,5 +130,38 @@
     "qty": 4.130381,
     "timestamp": "2025-07-28T01:32:59.618017",
     "source": "exit_max_hold_time_17.3h"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.2409,
+    "price": 0.2409,
+    "qty": 4.088013,
+    "timestamp": "2025-07-28T09:42:56.895525",
+    "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.242,
+    "price": 0.242,
+    "qty": 4.06947,
+    "timestamp": "2025-07-28T09:51:06.803320",
+    "source": "agent_rule_conflict_resolution"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.2415,
+    "price": 0.2415,
+    "qty": 4.078053,
+    "timestamp": "2025-07-28T11:50:29.494836",
+    "source": "agent_ml_primary"
   }
 ]

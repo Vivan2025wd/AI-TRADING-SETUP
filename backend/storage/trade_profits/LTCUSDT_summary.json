@@ -1,11 +1,11 @@
 {
   "symbol": "LTCUSDT",
-  "total_profit_dollars": 3.5203,
-  "avg_profit_per_trade": 0.352,
-  "total_trades": 10,
-  "wins": 7,
-  "losses": 3,
-  "win_rate": 70.0,
+  "total_profit_dollars": 3.517,
+  "avg_profit_per_trade": 0.2931,
+  "total_trades": 12,
+  "wins": 8,
+  "losses": 4,
+  "win_rate": 66.67,
   "trades": [
     {
       "entry_time": "2025-07-24T01:57:17.700932",
@@ -116,6 +116,28 @@
       "exit_value": 0.9894,
       "pnl_dollars": -0.0037,
       "pnl_percentage": -0.37
+    },
+    {
+      "entry_time": "2025-07-28T09:43:06.424394",
+      "entry_price": 114.17,
+      "exit_time": "2025-07-28T10:13:29.082820",
+      "exit_price": 114.33,
+      "qty": 0.008657,
+      "entry_value": 0.9884,
+      "exit_value": 0.9898,
+      "pnl_dollars": 0.0014,
+      "pnl_percentage": 0.14
+    },
+    {
+      "entry_time": "2025-07-28T10:49:04.486822",
+      "entry_price": 113.93,
+      "exit_time": "2025-07-28T11:50:31.340119",
+      "exit_price": 113.4,
+      "qty": 0.008723,
+      "entry_value": 0.9938,
+      "exit_value": 0.9892,
+      "pnl_dollars": -0.0046,
+      "pnl_percentage": -0.47
     }
   ]
 }
