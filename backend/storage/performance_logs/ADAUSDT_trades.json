@@ -9,5 +9,16 @@
     "qty": 12.249568,
     "timestamp": "2025-07-28T14:59:07.007389",
     "source": "agent_rule_based"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.8105,
+    "price": 0.8105,
+    "qty": 12.145487,
+    "timestamp": "2025-07-28T15:31:29.961033",
+    "source": "exit_max_hold_time_6.0h"
   }
 ]

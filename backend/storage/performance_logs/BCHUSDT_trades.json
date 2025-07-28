@@ -1,0 +1,13 @@
+[
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 582.6,
+    "price": 582.6,
+    "qty": 0.016932,
+    "timestamp": "2025-07-28T15:31:29.572488",
+    "source": "agent_rule_conflict_resolution"
+  }
+]
