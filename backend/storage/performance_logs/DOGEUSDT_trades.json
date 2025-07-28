@@ -119,5 +119,16 @@
     "qty": 4.162575,
     "timestamp": "2025-07-27T13:47:52.284458",
     "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.239,
+    "price": 0.239,
+    "qty": 4.130381,
+    "timestamp": "2025-07-28T01:32:59.618017",
+    "source": "exit_max_hold_time_17.3h"
   }
 ]

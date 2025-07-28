@@ -51,14 +51,6 @@ export default function App() {
           <NavLink to="/strategy-performance" className={getNavClass}>
             Strategy Performance
           </NavLink>
-          <div className="flex items-center space-x-2">
-            <span>Mock Trading</span>
-            <label className="switch">
-              <input type="checkbox" checked={isLive} onChange={() => setIsLive(!isLive)} />
-              <span className="slider round"></span>
-            </label>
-            <span>Live Trading</span>
-          </div>
         </nav>
       </header>
 
