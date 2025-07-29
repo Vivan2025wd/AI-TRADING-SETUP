@@ -12,15 +12,15 @@ RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 DEFAULT_RISK_CONFIG = {
     "trade_cooldown_seconds": 15,        # Faster trading (was 60s)
     "max_hold_seconds": 43200,           # 12 hours hold (was 6h)
-    "risk_per_trade": 0.10,              # 10% per trade (was 5%)
+    "risk_per_trade": 10,              # 10% per trade (was 5%)
     "default_balance_usd": 100,          
-    "tp_ratio": 1.5,                     # Bigger profit target (was 1.25x)
-    "sl_percent": 0.10,                  # Wider Stop Loss (was 6%)
-    "max_portfolio_exposure": 0.90,      # Allow 90% of balance in positions (was 60%)
-    "max_daily_loss": 0.30,              # Can lose up to 30% daily (was 15%)
-    "max_drawdown": 0.50,                # Tolerate 50% drawdown (was 35%)
+    "tp_ratio": 15,                     # Bigger profit target (was 1.25x)
+    "sl_percent": 10,                  # Wider Stop Loss (was 6%)
+    "max_portfolio_exposure": 90,      # Allow 90% of balance in positions (was 60%)
+    "max_daily_loss": 30,              # Can lose up to 30% daily (was 15%)
+    "max_drawdown": 50,                # Tolerate 50% drawdown (was 35%)
     "max_concurrent_positions": 25,      # Can hold up to 25 positions at once (was 15)
-    "max_correlation_exposure": 0.80,    # Loosen sector correlation limits (was 50%)
+    "max_correlation_exposure": 80,    # Loosen sector correlation limits (was 50%)
     "volatility_lookback": 20,           
     "volatility_multiplier": 2.5,        # Accept more volatile moves (was 2.0)
     "min_position_size": 0.01,           # Increase minimum position size (was 0.005)
