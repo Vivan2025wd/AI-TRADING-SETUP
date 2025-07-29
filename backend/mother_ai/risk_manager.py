@@ -10,24 +10,24 @@ RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 
 # Enhanced Risk Configuration
 DEFAULT_RISK_CONFIG = {
-    "trade_cooldown_seconds": 60,
-    "max_hold_seconds": 21600,
-    "risk_per_trade": 0.10,
-    "default_balance_usd": 100,
-    "tp_ratio": 1.3,
-    "sl_percent": 0.05,
-    "max_portfolio_exposure": 0.70,
-    "max_daily_loss": 0.50,
-    "max_drawdown": 0.40,
-    "max_concurrent_positions": 20,
-    "max_correlation_exposure": 0.50,
-    "volatility_lookback": 20,
-    "volatility_multiplier": 2.0,
-    "min_position_size": 0.25,
-    "max_position_size": 0.50,
-    "emergency_stop_loss": 0.20,
-    "max_trades_per_hour": 20,
-    "market_volatility_threshold": 0.15,
+    "trade_cooldown_seconds": 10,         # Faster re-entry allowed (was 60)
+    "max_hold_seconds": 43200,            # Can hold up to 12 hours (was 6 hours)
+    "risk_per_trade": 20,               # 20% risk per trade (was 10%)
+    "default_balance_usd": 100,           # Keep same
+    "tp_ratio": 2.0,                      # Go for higher TP (was 1.3)
+    "sl_percent": 10,                   # Allow bigger SL (was 5%)
+    "max_portfolio_exposure": 90,       # Can expose up to 90% of portfolio (was 70%)
+    "max_daily_loss": 70,               # Allow bigger daily loss tolerance (was 50%)
+    "max_drawdown": 60,                 # Higher drawdown limit (was 40%)
+    "max_concurrent_positions": 50,       # Allow more positions at once (was 20)
+    "max_correlation_exposure": 80,     # Allow correlated positions (was 50%)
+    "volatility_lookback": 10,            # Shorter lookback, reacts faster (was 20)
+    "volatility_multiplier": 30,         # Higher threshold for volatility (was 2.0)
+    "min_position_size": 10,            # Smaller min position allowed (was 0.25)
+    "max_position_size": 100,            # Can go up to 100% of account per trade (was 50%)
+    "emergency_stop_loss": 30,          # Emergency SL at 30% (was 20%)
+    "max_trades_per_hour": 50,            # Higher trade frequency allowed (was 20)
+    "market_volatility_threshold": 25,  # Tolerates higher market volatility (was 0.15)
     "symbol_overrides": {}
 }
 

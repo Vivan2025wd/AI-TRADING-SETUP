@@ -1,0 +1,35 @@
+[
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.94,
+    "score": 0.94,
+    "last_price": 109.33,
+    "price": 109.33,
+    "qty": 0.002287,
+    "timestamp": "2025-07-29T04:01:44.487830",
+    "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 109.47,
+    "price": 109.47,
+    "qty": 0.002284,
+    "timestamp": "2025-07-29T04:31:48.011950",
+    "source": "exit_max_hold_time_6.0h"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.98,
+    "score": 0.98,
+    "last_price": 109.23,
+    "price": 109.23,
+    "qty": 0.002289,
+    "timestamp": "2025-07-29T04:41:43.844949",
+    "source": "agent_ml_primary"
+  }
+]

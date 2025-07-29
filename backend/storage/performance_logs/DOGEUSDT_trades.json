@@ -1,0 +1,24 @@
+[
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.93,
+    "score": 0.93,
+    "last_price": 0.2279,
+    "price": 0.2279,
+    "qty": 1.097165,
+    "timestamp": "2025-07-29T04:11:44.487235",
+    "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.2268,
+    "price": 0.2268,
+    "qty": 1.102487,
+    "timestamp": "2025-07-29T04:41:45.834441",
+    "source": "exit_max_hold_time_6.0h"
+  }
+]

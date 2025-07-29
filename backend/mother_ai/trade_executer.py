@@ -88,11 +88,44 @@ def save_profit_tracker(data: Dict):
         json.dump(data, f, indent=4)
 
 # --- Trade Execution ---
+def calculate_trade_amount(symbol: str, price: float, usd_balance: float, config: Dict) -> float:
+    """
+    Calculate trade amount dynamically based on risk settings, asset price, and balance.
+    """
+
+    # Fetch risk percentage per trade from config (default 10%)
+    risk_percent = config.get("risk_per_trade", 0.10)
+    min_position_usd = config.get("min_position_usd", 10)  # Ensure minimum $10 position
+    max_position_usd = config.get("max_position_usd", usd_balance * risk_percent)
+
+    # Calculate position size based on risk %
+    allocated_usd = usd_balance * risk_percent
+
+    # Enforce min/max bounds
+    if allocated_usd < min_position_usd:
+        allocated_usd = min_position_usd
+    elif allocated_usd > max_position_usd:
+        allocated_usd = max_position_usd
+
+    # Final amount in asset units
+    amount = round(allocated_usd / price, 6)
+
+    # Asset specific rounding rules (BTC needs smaller decimals, DOGE larger)
+    if price > 1000:
+        amount = round(amount, 6)  # BTC, ETH, etc.
+    elif price > 1:
+        amount = round(amount, 2)  # Medium priced coins like ADA, SOL
+    else:
+        amount = round(amount, 0)  # Penny coins like DOGE, SHIBA
+
+    return amount
+
+
+
 def execute_mock_trade(symbol: str, action: str, price: float, confidence: float) -> Dict:
     balance = load_mock_balance()
     profit_tracker = load_profit_tracker()
 
-    amount = 0.0
     result = {}
     timestamp = datetime.utcnow().isoformat()
     usd_balance = balance.get("USD", 0)
@@ -100,30 +133,40 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
     symbol = symbol.upper()
     perf_path = os.path.join(PERFORMANCE_LOG_DIR, f"{symbol}_trades.json")
 
+    RISK_CONFIG = {
+        "risk_per_trade": 0.10,
+        "min_position_usd": 10,
+        "max_position_usd": usd_balance * 0.5
+    }
+
     if action.lower() == "buy":
-        amount = round((usd_balance * 0.1) / price, 6)
+        amount = calculate_trade_amount(symbol, price, usd_balance, RISK_CONFIG)
         cost = amount * price
+
         if cost <= usd_balance and amount > 0:
             balance["USD"] -= cost
             holding = balance["holdings"].get(symbol, {"amount": 0, "entry_price": 0})
             total_amount = holding["amount"] + amount
             new_entry_price = ((holding["entry_price"] * holding["amount"]) + (price * amount)) / total_amount if holding["amount"] > 0 else price
+
             balance["holdings"][symbol] = {
                 "amount": round(total_amount, 6),
                 "entry_price": round(new_entry_price, 2)
             }
+
             result = {
                 "timestamp": timestamp,
                 "balance": round(balance["USD"], 2),
                 "price": price,
                 "type": "BUY",
+                "amount": amount,
                 "profit_percent": 0.0,
                 "symbol": symbol
             }
-            logger.info(f"BUY {amount} {symbol} at {price}")
+            logger.info(f"BUY {amount} {symbol} at {price} (Cost: {cost})")
         else:
             result = {"status": "INSUFFICIENT_FUNDS"}
-            logger.warning(f"Not enough USD to execute buy trade for {symbol}.")
+            logger.warning(f"Not enough USD to execute buy trade for {symbol}. Needed: {cost}, Available: {usd_balance}")
             return result
 
     elif action.lower() == "sell":
@@ -147,12 +190,13 @@ def execute_mock_trade(symbol: str, action: str, price: float, confidence: float
                 "balance": round(balance["USD"], 2),
                 "price": price,
                 "type": "SELL",
+                "amount": amount,
                 "profit_percent": round(profit_percent, 2),
                 "profit_usd": round(profit_usd, 2),
                 "symbol": symbol,
                 "cumulative_profit": profit_tracker["total_profit_usd"]
             }
-            logger.info(f"SELL {amount} {symbol} at {price}, profit: {profit_usd:.2f} USD")
+            logger.info(f"SELL {amount} {symbol} at {price}, Profit: {profit_usd:.2f} USD")
         else:
             result = {"status": "NO_HOLDINGS"}
             logger.warning(f"No holdings for {symbol} to sell.")
@@ -240,6 +284,8 @@ def execute_mother_ai_decision(decision_data: Dict) -> List[Dict]:
         set_symbol_last_execution_time(symbol)
 
     return trade_results
+
+
 
 # --- Get Portfolio State ---
 def get_mock_portfolio():
