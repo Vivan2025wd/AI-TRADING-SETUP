@@ -1,92 +1,9 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React from "react";
 import { ArrowUpRight, AlertCircle, Clock, RefreshCw, Loader2 } from "lucide-react";
 
-const CACHE_KEY = "mother_ai_decision_cache";
-const CACHE_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
 const POLL_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
 
-export default function MotherAIDecisionCard({ isLive }) {
-  const [decisionData, setDecisionData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const intervalRef = useRef(null);
-
-  const fetchDecision = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const url = `http://localhost:8000/api/mother-ai/decision?is_live=${isLive}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch Mother AI decision");
-
-      const data = await res.json();
-
-      let final = {};
-
-      if (!data || typeof data !== "object") {
-        final = {
-          status: "Unknown",
-          tradePick: "No signal",
-          lastUpdated: null,
-          rationale: "Invalid or empty response from Mother AI backend.",
-          confidence: 0,
-        };
-      } else if (!data.decision || Object.keys(data.decision).length === 0) {
-        final = {
-          status: "Inactive",
-          tradePick: "No signal",
-          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
-          rationale: data.message || "No qualified trades met the confidence threshold.",
-          confidence: 0,
-        };
-      } else {
-        const d = data.decision;
-        final = {
-          status: "Active",
-          tradePick: `${d.symbol} - ${d.signal?.toUpperCase() || "N/A"}`,
-          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
-          rationale: `Confidence: ${(d.confidence * 100).toFixed(2)}%, Win Rate: ${(d.win_rate * 100).toFixed(2)}%, Score: ${d.score}`,
-          confidence: (d.confidence * 100).toFixed(2),
-        };
-      }
-
-      setDecisionData(final);
-
-      // Cache the result in memory (localStorage not available in artifacts)
-      console.log("Decision updated:", final);
-    } catch (err) {
-      console.error("Mother AI Fetch Error:", err);
-      setError(err.message || "An unexpected error occurred.");
-    } finally {
-      setLoading(false);
-    }
-  }, [isLive]);
-
-  useEffect(() => {
-    // Clear any existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
-    // Initial fetch on startup
-    fetchDecision();
-
-    // Set up interval to fetch every 10 minutes
-    intervalRef.current = setInterval(() => {
-      console.log("Polling Mother AI decision...");
-      fetchDecision();
-    }, POLL_INTERVAL_MS);
-
-    // Cleanup function
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [fetchDecision]); // Depend on fetchDecision which includes isLive
-
+export default function MotherAIDecisionCard({ isLive, decisionData, loading, error, refreshDecision }) {
   return (
     <div className="bg-gray-900 text-white shadow-md rounded-xl p-6 max-w-xl mx-auto space-y-6 border border-gray-700">
       <div className="flex items-center justify-between">
@@ -154,7 +71,7 @@ export default function MotherAIDecisionCard({ isLive }) {
       )}
 
       <button
-        onClick={fetchDecision}
+        onClick={refreshDecision}
         className="mt-4 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 flex items-center gap-2 mx-auto disabled:opacity-50"
         disabled={loading}
       >

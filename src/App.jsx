@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState } from "react";
+import React, { Suspense, lazy, useState, useEffect, useCallback } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -16,14 +16,12 @@ const getNavClass = ({ isActive }) =>
     ? "text-blue-400 border-b-2 border-blue-400 pb-1"
     : "text-gray-400 hover:text-blue-300 transition";
 
-// Simple Suspense wrapper with fallback
 const SuspenseWrapper = ({ children }) => (
   <Suspense fallback={<div className="text-gray-300 text-center p-6">Loading...</div>}>
     {children}
   </Suspense>
 );
 
-// Logo Component
 const Logo = () => (
   <div className="mr-8">
     <div className="text-white font-bold text-2xl tracking-wide">
@@ -34,6 +32,67 @@ const Logo = () => (
 
 export default function App() {
   const [isLive, setIsLive] = useState(false);
+
+  // ===== Mother AI Global State =====
+  const [motherAIDecisionData, setMotherAIDecisionData] = useState(null);
+  const [motherAILoading, setMotherAILoading] = useState(false);
+  const [motherAIError, setMotherAIError] = useState(null);
+
+  const fetchMotherAIDecision = useCallback(async () => {
+    setMotherAILoading(true);
+    setMotherAIError(null);
+
+    try {
+      const url = `http://localhost:8000/api/mother-ai/decision?is_live=${isLive}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch Mother AI decision");
+
+      const data = await res.json();
+
+      let final = {};
+
+      if (!data || typeof data !== "object") {
+        final = {
+          status: "Unknown",
+          tradePick: "No signal",
+          lastUpdated: null,
+          rationale: "Invalid or empty response from Mother AI backend.",
+          confidence: 0,
+        };
+      } else if (!data.decision || Object.keys(data.decision).length === 0) {
+        final = {
+          status: "Inactive",
+          tradePick: "No signal",
+          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
+          rationale: data.message || "No qualified trades met the confidence threshold.",
+          confidence: 0,
+        };
+      } else {
+        const d = data.decision;
+        final = {
+          status: "Active",
+          tradePick: `${d.symbol} - ${d.signal?.toUpperCase() || "N/A"}`,
+          lastUpdated: data.timestamp ? new Date(data.timestamp).toLocaleString() : new Date().toLocaleString(),
+          rationale: `Confidence: ${(d.confidence * 100).toFixed(2)}%, Win Rate: ${(d.win_rate * 100).toFixed(2)}%, Score: ${d.score}`,
+          confidence: (d.confidence * 100).toFixed(2),
+        };
+      }
+
+      setMotherAIDecisionData(final);
+      console.log("Decision updated (Global):", final);
+    } catch (err) {
+      console.error("Mother AI Fetch Error:", err);
+      setMotherAIError(err.message || "An unexpected error occurred.");
+    } finally {
+      setMotherAILoading(false);
+    }
+  }, [isLive]);
+
+  useEffect(() => {
+    fetchMotherAIDecision();
+    const interval = setInterval(fetchMotherAIDecision, 10 * 60 * 1000); // 10 min polling
+    return () => clearInterval(interval);
+  }, [fetchMotherAIDecision]);
 
   return (
     <BrowserRouter>
@@ -105,7 +164,13 @@ export default function App() {
               path="/mother-ai-decision"
               element={
                 <SuspenseWrapper>
-                  <MotherAIDecisionCard isLive={isLive} />
+                  <MotherAIDecisionCard
+                    isLive={isLive}
+                    decisionData={motherAIDecisionData}
+                    loading={motherAILoading}
+                    error={motherAIError}
+                    refreshDecision={fetchMotherAIDecision}
+                  />
                 </SuspenseWrapper>
               }
             />

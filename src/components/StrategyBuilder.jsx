@@ -2,26 +2,13 @@ import React, { useState, useEffect } from "react";
 import { PlusCircle, Save, Trash2 } from "lucide-react";
 
 const INDICATORS = ["rsi", "macd", "sma", "ema"];
-
 const ACTIONS = ["BUY", "SELL"];
 
 const CONDITIONS = {
-  rsi: {
-    BUY: ["buy_below", "buy_equals"],
-    SELL: ["sell_above", "sell_equals"],
-  },
-  ema: {
-    BUY: ["buy_crosses_above", "buy_equals"],
-    SELL: ["sell_crosses_below", "sell_equals"],
-  },
-  sma: {
-    BUY: ["buy_crosses_above", "buy_equals"],
-    SELL: ["sell_crosses_below", "sell_equals"],
-  },
-  macd: {
-    BUY: ["buy_below", "buy_equals"],
-    SELL: ["sell_above", "sell_equals"],
-  },
+  rsi: { BUY: ["buy_below", "buy_equals"], SELL: ["sell_above", "sell_equals"] },
+  ema: { BUY: ["buy_crosses_above", "buy_equals"], SELL: ["sell_crosses_below", "sell_equals"] },
+  sma: { BUY: ["buy_crosses_above", "buy_equals"], SELL: ["sell_crosses_below", "sell_equals"] },
+  macd: { BUY: ["buy_below", "buy_equals"], SELL: ["sell_above", "sell_equals"] },
 };
 
 export default function StrategyBuilder() {
@@ -29,13 +16,7 @@ export default function StrategyBuilder() {
   const [selectedAgent, setSelectedAgent] = useState("");
   const [strategyName, setStrategyName] = useState("");
   const [rules, setRules] = useState([
-    {
-      indicator: "rsi",
-      period: 14,
-      condition: "buy_below",
-      value: 30,
-      action: "BUY",
-    },
+    { indicator: "rsi", period: 14, condition: "buy_below", value: 30, action: "BUY" },
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -56,40 +37,33 @@ export default function StrategyBuilder() {
         setSelectedAgent(fallback[0]);
       }
     };
-
     fetchAgents();
   }, []);
 
   const addRule = () => {
-    setRules([
-      ...rules,
-      {
-        indicator: "rsi",
-        period: 14,
-        condition: "buy_below",
-        value: 30,
-        action: "BUY",
-      },
+    setRules((prev) => [
+      ...prev,
+      { indicator: "rsi", period: 14, condition: "buy_below", value: 30, action: "BUY" },
     ]);
   };
 
   const updateRule = (index, field, value) => {
     setRules((prev) => {
       const newRules = [...prev];
-      newRules[index] = { ...newRules[index], [field]: value };
-      // Reset condition if indicator or action changed and condition is invalid now
+      const currentRule = { ...newRules[index], [field]: value };
+
       if (field === "indicator" || field === "action") {
-        const conds = CONDITIONS[
-          newRules[index].indicator.toLowerCase()
-        ]?.[newRules[index].action];
-        if (!conds || !conds.includes(newRules[index].condition)) {
-          newRules[index].condition = conds ? conds[0] : "";
+        const conds = CONDITIONS[currentRule.indicator.toLowerCase()]?.[currentRule.action] || [];
+        if (!conds.includes(currentRule.condition)) {
+          currentRule.condition = conds[0] || "";
         }
       }
-      // Reset period to default if indicator changed and no period specified
-      if (field === "indicator" && !newRules[index].period) {
-        newRules[index].period = 14;
+
+      if (field === "indicator" && !currentRule.period) {
+        currentRule.period = 14;
       }
+
+      newRules[index] = currentRule;
       return newRules;
     });
   };
@@ -105,10 +79,12 @@ export default function StrategyBuilder() {
       if (!indicatorsObj[key]) indicatorsObj[key] = {};
       indicatorsObj[key]["period"] = parseInt(period) || 14;
 
-      if (typeof value === "string" && (value === "true" || value === "false")) {
-        indicatorsObj[key][condition] = value === "true";
-      } else if (typeof value === "number" || !isNaN(parseFloat(value))) {
+      if (typeof value === "boolean") {
+        indicatorsObj[key][condition] = value;
+      } else if (!isNaN(value)) {
         indicatorsObj[key][condition] = parseFloat(value);
+      } else if (value === "true" || value === "false") {
+        indicatorsObj[key][condition] = value === "true";
       } else {
         indicatorsObj[key][condition] = value;
       }
@@ -117,18 +93,9 @@ export default function StrategyBuilder() {
   };
 
   const convertToJSON = async () => {
-    if (!strategyName.trim()) {
-      alert("Please enter a strategy name.");
-      return;
-    }
-    if (!selectedAgent) {
-      alert("Please select an agent.");
-      return;
-    }
-    if (rules.length === 0) {
-      alert("Add at least one rule.");
-      return;
-    }
+    if (!strategyName.trim()) return alert("Please enter a strategy name.");
+    if (!selectedAgent) return alert("Please select an agent.");
+    if (rules.length === 0) return alert("Add at least one rule.");
 
     const payload = {
       strategy_id: strategyName.trim(),
@@ -137,30 +104,18 @@ export default function StrategyBuilder() {
     };
 
     try {
-      setError(null);
       setLoading(true);
+      setError(null);
       const res = await fetch("/api/strategy/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || "Failed to save");
-      }
+      if (!res.ok) throw new Error((await res.json()).detail || "Failed to save");
 
       alert(`✅ Saved strategy "${strategyName}"`);
       setStrategyName("");
-      setRules([
-        {
-          indicator: "rsi",
-          period: 14,
-          condition: "buy_below",
-          value: 30,
-          action: "BUY",
-        },
-      ]);
+      setRules([{ indicator: "rsi", period: 14, condition: "buy_below", value: 30, action: "BUY" }]);
     } catch (err) {
       setError("Error saving strategy: " + err.message);
     } finally {
@@ -168,7 +123,6 @@ export default function StrategyBuilder() {
     }
   };
 
-  // Generate current JSON preview of strategy
   const currentStrategyJSON = {
     symbol: selectedAgent,
     indicators: convertRulesToIndicators(),
@@ -178,13 +132,8 @@ export default function StrategyBuilder() {
     <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-xl shadow-lg space-y-6 border border-gray-700 text-white">
       <h2 className="text-2xl font-bold flex items-center gap-2">Strategy Builder</h2>
 
-      {error && (
-        <div className="bg-red-800 text-red-100 p-3 rounded border border-red-500">
-          ⚠️ {error}
-        </div>
-      )}
+      {error && <div className="bg-red-800 text-red-100 p-3 rounded border border-red-500">⚠️ {error}</div>}
 
-      {/* Strategy Name */}
       <div>
         <label className="block text-sm text-gray-300 mb-1">Strategy Name</label>
         <input
@@ -197,7 +146,6 @@ export default function StrategyBuilder() {
         />
       </div>
 
-      {/* Agent Selector */}
       <div>
         <label className="block text-sm text-gray-300 mb-1">Assign to Agent</label>
         <select
@@ -207,24 +155,17 @@ export default function StrategyBuilder() {
           disabled={loading}
         >
           {agents.map((agent) => (
-            <option key={agent} value={agent}>
-              {agent}
-            </option>
+            <option key={agent} value={agent}>{agent}</option>
           ))}
         </select>
       </div>
 
-      {/* Rule Builder */}
       {rules.map((rule, index) => {
-        const condOptions =
-          CONDITIONS[rule.indicator.toLowerCase()]?.[rule.action] || [];
+        const condOptions = CONDITIONS[rule.indicator.toLowerCase()]?.[rule.action] || [];
+        const isCrossCondition = rule.condition.toLowerCase().includes("crosses");
 
         return (
-          <div
-            key={index}
-            className="flex flex-wrap items-center gap-4 p-4 bg-gray-800 rounded border border-gray-700"
-          >
-            {/* Indicator */}
+          <div key={index} className="flex flex-wrap items-center gap-4 p-4 bg-gray-800 rounded border border-gray-700">
             <div>
               <label className="block text-sm text-gray-300">Indicator</label>
               <select
@@ -234,14 +175,11 @@ export default function StrategyBuilder() {
                 disabled={loading}
               >
                 {INDICATORS.map((ind) => (
-                  <option key={ind} value={ind}>
-                    {ind.toUpperCase()}
-                  </option>
+                  <option key={ind} value={ind}>{ind.toUpperCase()}</option>
                 ))}
               </select>
             </div>
 
-            {/* Period */}
             <div>
               <label className="block text-sm text-gray-300">Period</label>
               <input
@@ -254,28 +192,20 @@ export default function StrategyBuilder() {
               />
             </div>
 
-            {/* Action */}
             <div>
               <label className="block text-sm text-gray-300">Action</label>
               <select
                 value={rule.action}
                 onChange={(e) => updateRule(index, "action", e.target.value)}
-                className={`px-2 py-1 mt-1 border rounded ${
-                  rule.action === "BUY"
-                    ? "bg-green-700 text-green-300"
-                    : "bg-red-700 text-red-300"
-                }`}
+                className={`px-2 py-1 mt-1 border rounded ${rule.action === "BUY" ? "bg-green-700 text-green-300" : "bg-red-700 text-red-300"}`}
                 disabled={loading}
               >
                 {ACTIONS.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
+                  <option key={a} value={a}>{a}</option>
                 ))}
               </select>
             </div>
 
-            {/* Condition */}
             <div>
               <label className="block text-sm text-gray-300">Condition</label>
               <select
@@ -284,23 +214,18 @@ export default function StrategyBuilder() {
                 className="px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
                 disabled={loading}
               >
-                {condOptions.map((cond) => (
-                  <option key={cond} value={cond}>
-                    {cond.replace(/_/g, " ").toUpperCase()}
-                  </option>
-                ))}
+                {condOptions.length ? condOptions.map((cond) => (
+                  <option key={cond} value={cond}>{cond.replace(/_/g, " ").toUpperCase()}</option>
+                )) : <option>No Conditions</option>}
               </select>
             </div>
 
-            {/* Value */}
             <div>
               <label className="block text-sm text-gray-300">Value</label>
-              {rule.condition.includes("crosses") ? (
+              {isCrossCondition ? (
                 <select
                   value={rule.value === true ? "true" : "false"}
-                  onChange={(e) =>
-                    updateRule(index, "value", e.target.value === "true")
-                  }
+                  onChange={(e) => updateRule(index, "value", e.target.value === "true")}
                   className="px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
                   disabled={loading}
                 >
@@ -311,7 +236,7 @@ export default function StrategyBuilder() {
                 <input
                   type="number"
                   value={rule.value}
-                  onChange={(e) => updateRule(index, "value", e.target.value)}
+                  onChange={(e) => updateRule(index, "value", parseFloat(e.target.value))}
                   className="w-20 px-2 py-1 mt-1 bg-gray-700 border border-gray-600 rounded text-white"
                   disabled={loading}
                 />
@@ -330,11 +255,10 @@ export default function StrategyBuilder() {
         );
       })}
 
-      {/* Actions */}
       <div className="flex gap-4">
         <button
           onClick={addRule}
-          className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded"
+          className={`flex items-center gap-2 px-4 py-2 rounded ${loading ? "bg-blue-500 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-800"}`}
           disabled={loading}
         >
           <PlusCircle className="w-5 h-5" />
@@ -342,7 +266,7 @@ export default function StrategyBuilder() {
         </button>
         <button
           onClick={convertToJSON}
-          className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded"
+          className={`flex items-center gap-2 px-4 py-2 rounded ${loading ? "bg-green-500 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"}`}
           disabled={loading}
         >
           <Save className="w-5 h-5" />
@@ -350,7 +274,6 @@ export default function StrategyBuilder() {
         </button>
       </div>
 
-      {/* JSON Preview */}
       <div className="mt-8 bg-gray-800 p-4 rounded border border-gray-700 whitespace-pre-wrap font-mono text-sm text-green-400 overflow-x-auto max-h-72">
         <h3 className="text-lg font-semibold mb-2">Generated Strategy JSON</h3>
         <pre>{JSON.stringify(currentStrategyJSON, null, 2)}</pre>
