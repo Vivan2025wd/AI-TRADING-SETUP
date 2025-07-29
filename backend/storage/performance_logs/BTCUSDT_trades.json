@@ -4,10 +4,10 @@
     "signal": "buy",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 118496.1,
-    "price": 118496.1,
-    "qty": 2e-06,
-    "timestamp": "2025-07-29T03:44:06.540772",
+    "last_price": 118962.98,
+    "price": 118962.98,
+    "qty": 0.015644,
+    "timestamp": "2025-07-29T06:31:43.816586",
     "source": "agent_ml_primary"
   },
   {
@@ -15,21 +15,43 @@
     "signal": "sell",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 118645.01,
-    "price": 118645.01,
-    "qty": 2e-06,
-    "timestamp": "2025-07-29T04:22:00.360529",
-    "source": "exit_max_hold_time_6.1h"
+    "last_price": 118887.21,
+    "price": 118887.21,
+    "qty": 4.2e-05,
+    "timestamp": "2025-07-29T09:23:22.928113",
+    "source": "exit_max_hold_time_8.4h"
   },
   {
     "symbol": "BTCUSDT",
     "signal": "buy",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 118561.33,
-    "price": 118561.33,
-    "qty": 2e-06,
-    "timestamp": "2025-07-29T04:31:43.827577",
+    "last_price": 118702.0,
+    "price": 118702.0,
+    "qty": 4.2e-05,
+    "timestamp": "2025-07-29T10:03:20.696779",
+    "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118770.07,
+    "price": 118770.07,
+    "qty": 4.2e-05,
+    "timestamp": "2025-07-29T10:33:21.104179",
+    "source": "exit_max_hold_time_6.0h"
+  },
+  {
+    "symbol": "BTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 118349.84,
+    "price": 118349.84,
+    "qty": 4.2e-05,
+    "timestamp": "2025-07-29T11:02:44.729005",
     "source": "agent_ml_primary"
   }
 ]

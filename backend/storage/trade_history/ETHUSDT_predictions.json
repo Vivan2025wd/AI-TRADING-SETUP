@@ -1,96 +1,6 @@
 [
   {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T03:00:00",
-    "symbol": "ETHUSDT",
-    "signal": "searching",
-    "confidence": 0.784,
-    "source": "GenericAgent/ml_primary",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T06:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
     "confidence": 0.6480000000000001,
@@ -99,7 +9,7 @@
     "position_state": null
   },
   {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T06:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
     "confidence": 0.6480000000000001,
@@ -108,7 +18,7 @@
     "position_state": null
   },
   {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T06:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
     "confidence": 0.6480000000000001,
@@ -117,7 +27,7 @@
     "position_state": null
   },
   {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T06:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
     "confidence": 0.6480000000000001,
@@ -126,37 +36,325 @@
     "position_state": null
   },
   {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T07:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
-    "confidence": 0.664,
+    "confidence": 0.6480000000000001,
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T07:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
-    "confidence": 0.664,
+    "confidence": 0.6480000000000001,
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T07:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
-    "confidence": 0.6960000000000001,
+    "confidence": 0.6480000000000001,
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-07-29T04:00:00",
+    "timestamp": "2025-07-29T07:00:00",
     "symbol": "ETHUSDT",
     "signal": "searching",
-    "confidence": 0.6960000000000001,
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T09:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T10:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T10:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T10:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T10:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T10:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T10:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T10:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T11:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-07-29T11:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.6480000000000001,
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null

@@ -1,0 +1,24 @@
+[
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "score": 0.95,
+    "last_price": 185.1,
+    "price": 185.1,
+    "qty": 0.026712,
+    "timestamp": "2025-07-29T09:24:36.515806",
+    "source": "agent_ml_primary"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 184.25,
+    "price": 184.25,
+    "qty": 0.026882,
+    "timestamp": "2025-07-29T10:03:23.869572",
+    "source": "exit_max_hold_time_6.1h"
+  }
+]

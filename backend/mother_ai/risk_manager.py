@@ -10,24 +10,24 @@ RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 
 # Enhanced Risk Configuration
 DEFAULT_RISK_CONFIG = {
-    "trade_cooldown_seconds": 10,         # Faster re-entry allowed (was 60)
-    "max_hold_seconds": 43200,            # Can hold up to 12 hours (was 6 hours)
-    "risk_per_trade": 20,               # 20% risk per trade (was 10%)
-    "default_balance_usd": 100,           # Keep same
-    "tp_ratio": 2.0,                      # Go for higher TP (was 1.3)
-    "sl_percent": 10,                   # Allow bigger SL (was 5%)
-    "max_portfolio_exposure": 90,       # Can expose up to 90% of portfolio (was 70%)
-    "max_daily_loss": 70,               # Allow bigger daily loss tolerance (was 50%)
-    "max_drawdown": 60,                 # Higher drawdown limit (was 40%)
-    "max_concurrent_positions": 50,       # Allow more positions at once (was 20)
-    "max_correlation_exposure": 80,     # Allow correlated positions (was 50%)
-    "volatility_lookback": 10,            # Shorter lookback, reacts faster (was 20)
-    "volatility_multiplier": 30,         # Higher threshold for volatility (was 2.0)
-    "min_position_size": 10,            # Smaller min position allowed (was 0.25)
-    "max_position_size": 100,            # Can go up to 100% of account per trade (was 50%)
-    "emergency_stop_loss": 30,          # Emergency SL at 30% (was 20%)
-    "max_trades_per_hour": 50,            # Higher trade frequency allowed (was 20)
-    "market_volatility_threshold": 25,  # Tolerates higher market volatility (was 0.15)
+    "trade_cooldown_seconds": 15,        # Faster trading (was 60s)
+    "max_hold_seconds": 43200,           # 12 hours hold (was 6h)
+    "risk_per_trade": 0.10,              # 10% per trade (was 5%)
+    "default_balance_usd": 100,          
+    "tp_ratio": 1.5,                     # Bigger profit target (was 1.25x)
+    "sl_percent": 0.10,                  # Wider Stop Loss (was 6%)
+    "max_portfolio_exposure": 0.90,      # Allow 90% of balance in positions (was 60%)
+    "max_daily_loss": 0.30,              # Can lose up to 30% daily (was 15%)
+    "max_drawdown": 0.50,                # Tolerate 50% drawdown (was 35%)
+    "max_concurrent_positions": 25,      # Can hold up to 25 positions at once (was 15)
+    "max_correlation_exposure": 0.80,    # Loosen sector correlation limits (was 50%)
+    "volatility_lookback": 20,           
+    "volatility_multiplier": 2.5,        # Accept more volatile moves (was 2.0)
+    "min_position_size": 0.01,           # Increase minimum position size (was 0.005)
+    "max_position_size": 0.50,           # Allow up to 50% of balance in a single trade (was 25%)
+    "emergency_stop_loss": 0.30,         # Hard stop at 30% loss per position (was 20%)
+    "max_trades_per_hour": 50,           # Allow up to 50 trades per hour (was 20)
+    "market_volatility_threshold": 0.20, # Allow trading in higher vol markets (was 0.12)
     "symbol_overrides": {}
 }
 

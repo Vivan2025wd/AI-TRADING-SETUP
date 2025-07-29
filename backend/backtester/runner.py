@@ -10,10 +10,6 @@ class BacktestRunner:
         self.data_dir = data_dir
 
     def load_ohlcv(self, symbol: str) -> pd.DataFrame:
-        """
-        Loads OHLCV data for the given symbol from a CSV file.
-        Assumes files are stored as 'data/ohlcv/{symbol}_1h.csv'.
-        """
         file_path = os.path.join(self.data_dir, f"{symbol}_1h.csv")
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"OHLCV data file not found: {file_path}")
@@ -24,13 +20,14 @@ class BacktestRunner:
         self,
         symbol: str,
         strategy_json: str,
-        initial_balance: float = 1000.0,
+        initial_balance: float = 100.0,
         start_date: Optional[str] = None,
-        end_date: Optional[str] = None
+        end_date: Optional[str] = None,
+        risk_per_trade: float = 0.10,     # Allocate 10% of balance per trade
+        leverage: float = 1.0             # Leverage multiplier (1.0 = no leverage)
     ):
         df = self.load_ohlcv(symbol)
 
-        # Filter by date range if provided
         if start_date:
             df = df[df.index >= pd.to_datetime(start_date)]
         if end_date:
@@ -46,6 +43,8 @@ class BacktestRunner:
         trades = []
         position = None
         entry_price = 0.0
+        allocated_capital = 0.0
+        trade_size = 0.0
         capital_over_time = []
 
         for i in range(50, len(df)):  # skip first 50 rows for indicators
@@ -54,35 +53,46 @@ class BacktestRunner:
             decision = signals[-1] if signals and len(signals) > 0 else None  # last signal for current window
 
             timestamp = row.name
-            try:
-                timestamp_dt = pd.to_datetime(str(timestamp))
-                timestamp_str = timestamp_dt.isoformat() if timestamp_dt is not None else ""
-            except Exception:
-                timestamp_str = ""
+            timestamp_str = pd.to_datetime(str(timestamp)).isoformat()
 
             if decision == "buy" and position is None:
                 entry_price = row["close"]
                 position = "long"
+                allocated_capital = balance * risk_per_trade  # Risked capital per trade
+                trade_size = allocated_capital / entry_price  # Units of asset bought
                 trades.append({
                     "type": "BUY",
                     "timestamp": timestamp_str,
-                    "price": entry_price
+                    "price": entry_price,
+                    "allocated_capital": round(allocated_capital, 2),
+                    "trade_size": round(trade_size, 6)
                 })
 
             elif decision == "sell" and position == "long":
                 exit_price = row["close"]
-                profit = (exit_price - entry_price) / entry_price * 100
-                balance += balance * (profit / 100)
+                raw_profit_pct = (exit_price - entry_price) / entry_price * 100
+                leveraged_profit_pct = raw_profit_pct * leverage  # Apply leverage if any
+                pnl_usd = allocated_capital * (leveraged_profit_pct / 100)
+
+                balance += pnl_usd  # Only add profit/loss, not entire balance
+
                 trades.append({
                     "type": "SELL",
                     "timestamp": timestamp_str,
                     "price": exit_price,
-                    "profit_percent": round(profit, 2),
+                    "raw_profit_percent": round(raw_profit_pct, 2),
+                    "leveraged_profit_percent": round(leveraged_profit_pct, 2),
+                    "profit_usd": round(pnl_usd, 2),
                     "balance": round(balance, 2)
                 })
                 position = None
+                allocated_capital = 0.0
+                trade_size = 0.0
 
-            capital_over_time.append({"timestamp": timestamp_str, "capital": round(balance, 2)})
+            capital_over_time.append({
+                "timestamp": timestamp_str,
+                "capital": round(balance, 2)
+            })
 
         return {
             "final_balance": round(balance, 2),
@@ -100,7 +110,9 @@ def run_backtest(
     strategy_json: str,
     initial_balance: float = 100.0,
     start_date: Optional[str] = None,
-    end_date: Optional[str] = None
+    end_date: Optional[str] = None,
+    risk_per_trade: float = 0.10,
+    leverage: float = 1.0
 ):
     runner = BacktestRunner()
-    return runner.run(symbol, strategy_json, initial_balance, start_date, end_date)
+    return runner.run(symbol, strategy_json, initial_balance, start_date, end_date, risk_per_trade, leverage)

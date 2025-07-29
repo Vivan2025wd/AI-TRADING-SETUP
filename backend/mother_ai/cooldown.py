@@ -5,7 +5,7 @@ from typing import Dict, Optional
 class CooldownManager:
     """Manages trading cooldowns for symbols"""
     
-    def __init__(self, default_cooldown_seconds: int = 120):
+    def __init__(self, default_cooldown_seconds: int = 1800):
         self.cooldown_tracker: Dict[str, float] = {}
         self.default_cooldown_seconds = default_cooldown_seconds
         self.symbol_specific_cooldowns: Dict[str, int] = {}

@@ -1,22 +1,33 @@
 {
   "symbol": "BTCUSDT",
-  "total_profit_dollars": 0.0003,
-  "avg_profit_per_trade": 0.0003,
-  "total_trades": 1,
+  "total_profit_dollars": -0.0003,
+  "avg_profit_per_trade": -0.0002,
+  "total_trades": 2,
   "wins": 1,
-  "losses": 0,
-  "win_rate": 100.0,
+  "losses": 1,
+  "win_rate": 50.0,
   "trades": [
     {
-      "entry_time": "2025-07-29T03:44:06.540772",
-      "entry_price": 118496.1,
-      "exit_time": "2025-07-29T04:22:00.360529",
-      "exit_price": 118645.01,
-      "qty": 2e-06,
-      "entry_value": 0.237,
-      "exit_value": 0.2373,
-      "pnl_dollars": 0.0003,
-      "pnl_percentage": 0.13
+      "entry_time": "2025-07-29T06:31:43.816586",
+      "entry_price": 118962.98,
+      "exit_time": "2025-07-29T09:23:22.928113",
+      "exit_price": 118887.21,
+      "qty": 4.2e-05,
+      "entry_value": 4.9964,
+      "exit_value": 4.9933,
+      "pnl_dollars": -0.0032,
+      "pnl_percentage": -0.06
+    },
+    {
+      "entry_time": "2025-07-29T10:03:20.696779",
+      "entry_price": 118702.0,
+      "exit_time": "2025-07-29T10:33:21.104179",
+      "exit_price": 118770.07,
+      "qty": 4.2e-05,
+      "entry_value": 4.9855,
+      "exit_value": 4.9883,
+      "pnl_dollars": 0.0029,
+      "pnl_percentage": 0.06
     }
   ]
 }
