@@ -20,5 +20,16 @@
     "qty": 0.026882,
     "timestamp": "2025-07-29T10:03:23.869572",
     "source": "exit_max_hold_time_6.1h"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.95,
+    "score": 0.95,
+    "last_price": 182.82,
+    "price": 182.82,
+    "qty": 0.053965,
+    "timestamp": "2025-07-29T11:49:56.794641",
+    "source": "agent_ml_primary"
   }
 ]

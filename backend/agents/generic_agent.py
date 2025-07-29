@@ -200,29 +200,19 @@ class GenericAgent:
     def _get_rule_based_signal(self, ohlcv_data: pd.DataFrame) -> Tuple[str, float]:
         """Get rule-based signal with proper error handling and position validation"""
         try:
+        # StrategyParser.evaluate() returns dict directly
             rule_result = self.strategy_logic.evaluate(ohlcv_data)
-            
-            # Handle string result
-            if isinstance(rule_result, str):
-                rule_result = json.loads(rule_result)
-            
+        
             raw_action = rule_result.get("action", "searching")
             raw_confidence = float(rule_result.get("confidence", 0.0))
-            
-            # VALIDATION: Fix invalid rule signals based on position state
+        
+            # Rest of your validation logic...
             validated_action, validated_confidence = self._validate_rule_signal(
                 raw_action, raw_confidence
             )
-            
-            logger.info(f"🧠 Rule-based result: action={validated_action}, confidence={validated_confidence:.3f}")
-            if validated_action != raw_action:
-                logger.info(f"   ⚠️ Corrected from: {raw_action} (invalid for current position state)")
-            
+        
             return validated_action, validated_confidence
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"❌ Failed to parse rule result JSON: {e}")
-            return "searching", 0.0
+    
         except Exception as e:
             logger.error(f"❌ Strategy evaluation failed for {self.symbol}: {e}")
             return "searching", 0.0
