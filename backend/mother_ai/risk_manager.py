@@ -11,11 +11,11 @@ RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 # Enhanced Risk Configuration
 DEFAULT_RISK_CONFIG = {
     "trade_cooldown_seconds": 3600,      # 1 hour cooldown for 1h timeframes (was 15s)
-    "max_hold_seconds": 43200,           # 12 hours hold (was 6h)
+    "max_hold_seconds": 3600,           # 1 hour hold (was 6h)
     "risk_per_trade": 0.01,              # 1% per trade (was 5%)
     "default_balance_usd": 1000,          
-    "tp_ratio": 2.0,                     # 2:1 reward to risk ratio (profit = 2x stop loss)
-    "sl_percent": 1.0,                   # 1% Stop Loss (was 0.5% which is too tight)
+    "tp_ratio": 1.3,                     # 1.3:1 reward to risk ratio (profit = 1.3x stop loss)
+    "sl_percent": 1.0,                   # 1.0% Stop Loss (was 0.5% which is too tight)
     "max_portfolio_exposure": 20,        # Allow 20% of balance in positions (was 90% - too risky)
     "max_daily_loss": 5,                 # Can lose up to 5% daily (was 30% - too high)
     "max_drawdown": 15,                  # Tolerate 15% drawdown (was 50% - too high)

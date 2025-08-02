@@ -1,5 +1,5 @@
 {
-  "symbol": "ADAUSDT",
+  "symbol": "BTCUSDT",
   "indicators": {
     "rsi": {
       "period": 14,

@@ -3,21 +3,20 @@
   "indicators": {
     "rsi": {
       "period": 14,
-      "buy_below": 45,
-      "sell_above": 55
+      "buy_below": 35,
+      "sell_above": 65
     },
     "ema": {
-      "short_period": 9,
-      "long_period": 21,
-      "buy_crosses_above": true,
-      "sell_crosses_below": true
+      "period": 21,
+      "price_crosses_above": true,
+      "price_crosses_below": true
     },
     "macd": {
-      "fast_period": 12,
-      "slow_period": 26,
-      "signal_period": 9,
-      "buy_signal_above": true,
-      "sell_signal_below": true
+      "fast_period": 5,
+      "slow_period": 13,
+      "signal_period": 4,
+      "macd_crosses_above_signal": true,
+      "macd_crosses_below_signal": true
     }
   }
 }

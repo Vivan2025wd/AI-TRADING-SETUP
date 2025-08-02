@@ -1,0 +1,14 @@
+[
+  {
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.1997,
+    "price": 0.1997,
+    "qty": 50.004215,
+    "timestamp": "2025-08-02T11:53:29.281046",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  }
+]

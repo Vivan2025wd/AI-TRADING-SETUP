@@ -1,8 +1,8 @@
 {
-  "symbol": "ADAUSDT",
+  "symbol": "DOGEUSDT",
   "indicators": {
     "rsi": {
-      "period": 14,
+      "period": 7,
       "buy_below": 35,
       "sell_above": 65
     },

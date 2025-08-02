@@ -1,60 +1,15 @@
 [
   {
-    "timestamp": "2025-08-02T08:00:00",
+    "timestamp": "2025-08-02T10:58:00",
     "symbol": "SOLUSDT",
     "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": false,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T08:00:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": false,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T08:00:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": false,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T08:00:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": false,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T08:00:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": false,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T08:19:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.6827407398438231,
+    "confidence": 0.5014360487343986,
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T08:28:00",
+    "timestamp": "2025-08-02T11:08:00",
     "symbol": "SOLUSDT",
     "signal": "searching",
     "confidence": 0.0,
@@ -63,43 +18,52 @@
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T08:38:00",
+    "timestamp": "2025-08-02T11:18:00",
     "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T08:48:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T08:58:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T09:08:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.5682107007443559,
+    "signal": "buy",
+    "confidence": 0.6295870248507923,
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T09:18:00",
+    "timestamp": "2025-08-02T11:27:00",
+    "symbol": "SOLUSDT",
+    "signal": "searching",
+    "confidence": 0.5046671947917688,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T11:27:00",
+    "symbol": "SOLUSDT",
+    "signal": "searching",
+    "confidence": 0.5046671947917688,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T11:28:00",
+    "symbol": "SOLUSDT",
+    "signal": "searching",
+    "confidence": 0.5220098768537014,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T11:38:00",
+    "symbol": "SOLUSDT",
+    "signal": "searching",
+    "confidence": 0.7001037939876213,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T11:47:00",
     "symbol": "SOLUSDT",
     "signal": "searching",
     "confidence": 0.0,
@@ -108,65 +72,56 @@
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T09:28:00",
+    "timestamp": "2025-08-02T11:48:00",
     "symbol": "SOLUSDT",
     "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
+    "confidence": 0.48529640943117924,
+    "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T09:38:00",
+    "timestamp": "2025-08-02T11:48:00",
     "symbol": "SOLUSDT",
     "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
+    "confidence": 0.48529640943117924,
+    "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T09:48:00",
+    "timestamp": "2025-08-02T11:48:00",
     "symbol": "SOLUSDT",
     "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
+    "confidence": 0.48529640943117924,
+    "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T09:57:00",
+    "timestamp": "2025-08-02T11:48:00",
     "symbol": "SOLUSDT",
     "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
+    "confidence": 0.48529640943117924,
+    "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T09:58:00",
+    "timestamp": "2025-08-02T11:53:00",
     "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
     "ml_available": true,
     "position_state": null
   },
   {
-    "timestamp": "2025-08-02T10:04:00",
+    "timestamp": "2025-08-02T11:53:00",
     "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
-    "ml_available": true,
-    "position_state": null
-  },
-  {
-    "timestamp": "2025-08-02T10:06:00",
-    "symbol": "SOLUSDT",
-    "signal": "searching",
-    "confidence": 0.0,
-    "source": "GenericAgent/no_signal",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
     "ml_available": true,
     "position_state": null
   }
