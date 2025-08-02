@@ -1,4 +1,5 @@
 import os
+import time
 import asyncio
 import logging
 from datetime import datetime
@@ -13,6 +14,7 @@ import threading
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class AutoTrainingSystem:
     """Automated system for fetching live data, generating labels and training models on startup"""
     
@@ -22,7 +24,7 @@ class AutoTrainingSystem:
         self.labels_dir = self.base_dir / "data" / "labels"
         self.models_dir = self.base_dir / "agents" / "models"
         self.logs_dir = self.base_dir / "storage" / "training_logs"
-        
+
         # Create directories
         for dir_path in [self.ohlcv_dir, self.labels_dir, self.models_dir, self.logs_dir]:
             dir_path.mkdir(parents=True, exist_ok=True)
@@ -205,18 +207,48 @@ class AutoTrainingSystem:
             from backend.strategy_engine.strategy_parser import StrategyParser
             from backend.strategy_engine.json_strategy_parser import load_strategy_for_symbol
             
-            # Load labels
-            labels_path = self.labels_dir / f"{symbol}_labels.csv"
-            if not labels_path.exists():
-                raise FileNotFoundError(f"Labels not found for {symbol}")
+            # FIXED: Look for the correct label file names that were actually generated
+            # The generate_labels method saves files as "{symbol}_outcome_labels.csv"
+            labels_path = self.labels_dir / f"{symbol}_outcome_labels.csv"
             
+            if not labels_path.exists():
+                # Fallback to other possible naming conventions
+                alternative_paths = [
+                    self.labels_dir / f"{symbol}_labels.csv",
+                    self.labels_dir / f"{symbol}_outcome_features.csv",
+                    self.labels_dir / f"{symbol}_hybrid_labels.csv",
+                    self.labels_dir / f"{symbol}_trade_labels.csv"
+                ]
+                
+                labels_path = None
+                for alt_path in alternative_paths:
+                    if alt_path.exists():
+                        labels_path = alt_path
+                        break
+                
+                if labels_path is None:
+                    raise FileNotFoundError(f"No label files found for {symbol}. Checked: {[str(p) for p in [self.labels_dir / f'{symbol}_outcome_labels.csv'] + alternative_paths]}")
+            
+            logger.info(f"📋 Loading labels from: {labels_path}")
             labels_df = pd.read_csv(labels_path, index_col=0, parse_dates=True)
+            
+            # FIXED: Check if the labels_df has the correct column name
+            # The generate_labels method saves with 'label' column, but training expects 'action'
+            if 'label' in labels_df.columns and 'action' not in labels_df.columns:
+                labels_df['action'] = labels_df['label']
+                logger.info(f"📝 Renamed 'label' column to 'action' for compatibility")
+            elif 'action' not in labels_df.columns:
+                raise ValueError(f"Labels file must contain either 'action' or 'label' column. Found columns: {list(labels_df.columns)}")
             
             # Load OHLCV data
             ohlcv_path = self.ohlcv_dir / f"{symbol}_1h.csv"
+            if not ohlcv_path.exists():
+                raise FileNotFoundError(f"OHLCV data not found: {ohlcv_path}")
+                
             ohlcv_df = pd.read_csv(ohlcv_path, index_col=0, parse_dates=True)
             
             # Extract features for the labeled timestamps
+            logger.info(f"🔧 Extracting features...")
             features_df = extract_features(ohlcv_df)
             
             # Align features with labels
@@ -224,13 +256,22 @@ class AutoTrainingSystem:
             if len(common_index) == 0:
                 raise ValueError(f"No common timestamps between features and labels for {symbol}")
             
+            logger.info(f"📊 Found {len(common_index)} common timestamps between features and labels")
+            
             # Create training dataset
             training_features = features_df.loc[common_index]
             training_labels = labels_df.loc[common_index, 'action']
             
+            # FIXED: Check for sufficient data
+            if len(training_features) < 50:  # Minimum samples needed for training
+                raise ValueError(f"Insufficient training data: {len(training_features)} samples < 50 minimum")
+            
             # Combine into training dataset
             training_data = training_features.copy()
             training_data['action'] = training_labels
+            
+            logger.info(f"📈 Training dataset: {len(training_data)} samples, {len(training_features.columns)} features")
+            logger.info(f"📊 Label distribution: {training_labels.value_counts().to_dict()}")
             
             # Create and train agent
             try:
@@ -240,12 +281,14 @@ class AutoTrainingSystem:
                     strategy_dict = load_strategy_for_symbol(symbol)
                 except FileNotFoundError:
                     # Create a default strategy if none exists
+                    logger.info(f"🔧 Creating default strategy for {symbol}")
                     strategy_dict = self._create_default_strategy()
             
             strategy_parser = StrategyParser(strategy_dict)
             agent = GenericAgent(symbol=symbol, strategy_logic=strategy_parser)
             
             # Train the model
+            logger.info(f"🎯 Starting model training...")
             agent.train_model(training_data)
             
             # Log training completion
@@ -260,9 +303,16 @@ class AutoTrainingSystem:
             
         except Exception as e:
             logger.error(f"❌ {symbol}: Model training failed - {e}")
+            logger.error(f"🔍 Debug info:")
+            logger.error(f"   Labels dir: {self.labels_dir}")
+            logger.error(f"   Expected file: {self.labels_dir / f'{symbol}_outcome_labels.csv'}")
+            logger.error(f"   Files in labels dir: {list(self.labels_dir.glob('*.csv')) if self.labels_dir.exists() else 'Directory does not exist'}")
+            
             with self._training_lock:
                 self.training_status[symbol] = "training_failed"
             return False
+        # Ensure a boolean is always returned
+        return False
 
     def _create_default_strategy(self) -> Dict:
         """Create a default strategy for symbols without existing strategies"""

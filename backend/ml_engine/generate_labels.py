@@ -9,9 +9,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-OHLCV_DIR = "data/ohlcv"
+OHLCV_DIR = "backend/data/ohlcv"
 TRADES_DIR = "backend/storage/trade_history"
-LABELS_DIR = "data/labels"
+LABELS_DIR = "backend/data/labels"
 
 os.makedirs(LABELS_DIR, exist_ok=True)
 
@@ -315,17 +315,29 @@ class TradingLabelGenerator:
 
     def _save_results(self, df: pd.DataFrame, symbol: str, method: str):
         """Save labeled data and metadata"""
-        # Save main dataset
-        output_path = os.path.join(LABELS_DIR, f"{symbol}_{method}_labels.csv")
-        df.to_csv(output_path)
-        logger.info(f"Saved {len(df)} labeled samples to {output_path}")
-        
-        # Save feature-only version (without price data that could cause leakage)
-        feature_cols = [col for col in df.columns if col not in ['open', 'high', 'low', 'close', 'volume']]
+    # FIXED: Ensure consistent column naming
+        if 'label' in df.columns:
+            df_to_save = df.copy()
+            df_to_save['action'] = df_to_save['label']  # Add action column for training compatibility
+    
+    # Save main dataset with both 'label' and 'action' columns for compatibility
+        output_path = os.path.join(LABELS_DIR, f"{symbol}_{method}_labels.csv") 
+        df_to_save.to_csv(output_path)
+        logger.info(f"Saved {len(df_to_save)} labeled samples to {output_path}")
+    
+    # Save feature-only version (without price data that could cause leakage)
+        feature_cols = [col for col in df_to_save.columns if col not in ['open', 'high', 'low', 'close', 'volume']]
         if feature_cols:
             features_path = os.path.join(LABELS_DIR, f"{symbol}_{method}_features.csv")
-            df[feature_cols].to_csv(features_path)
+            df_to_save[feature_cols].to_csv(features_path)
             logger.info(f"Saved features to {features_path}")
+    
+    # ADDITIONAL: Save a training-ready dataset with just features and action
+        training_cols = [col for col in df_to_save.columns if col not in ['open', 'high', 'low', 'close', 'volume', 'label']]
+        if 'action' in df_to_save.columns and len(training_cols) > 1:
+            training_path = os.path.join(LABELS_DIR, f"{symbol}_{method}_training.csv")
+            df_to_save[training_cols].to_csv(training_path)
+            logger.info(f"Saved training dataset to {training_path}")
 
 def main():
     """Generate labels for all trading pairs"""

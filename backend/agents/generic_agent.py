@@ -9,12 +9,20 @@ from backend.ml_engine.feature_extractor import extract_features
 from backend.mother_ai.performance_tracker import PerformanceTracker
 from typing import Optional, Dict, Tuple
 import logging
+from datetime import datetime, timedelta
+import dateutil.parser
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class GenericAgent:
+    """
+    Generic trading agent that combines ML predictions with rule-based signals.
+    Handles position management and signal validation.
+    """
+    
     def __init__(self, symbol: str, strategy_logic: StrategyParser, model_path: Optional[str] = None):
         self.symbol = symbol
         self.strategy_logic = strategy_logic
@@ -24,79 +32,77 @@ class GenericAgent:
         self.position_state = self._load_position_state()
         self.model_metadata = self._load_model_metadata()
         
-        # ML prediction settings
-        self.ml_confidence_threshold = 0.6  # Minimum confidence for ML predictions
-        self.feature_cache = None  # Cache for feature computation
-        
+        # Configuration
+        self.ml_confidence_threshold = 0.6
+        self.feature_cache = None
+
+    # Model Management Methods
     def _load_model(self):
-        """Load ML model with proper error handling"""
-        if os.path.exists(self.model_path):
-            try:
-                model = joblib.load(self.model_path)
-                logger.info(f"✅ Loading ML model from: {self.model_path}")
-                
-                # Validate model
-                if hasattr(model, 'classes_') and hasattr(model, 'predict_proba'):
-                    valid_classes = set(model.classes_)
-                    expected_classes = {'buy', 'sell'}
-                    
-                    if not expected_classes.issubset(valid_classes):
-                        logger.warning(f"⚠️ Model classes {valid_classes} don't match expected {expected_classes}")
-                        
-                    logger.info(f"🧠 Model loaded with classes: {list(model.classes_)}")
-                    return model
-                else:
-                    logger.error(f"❌ Invalid model format at {self.model_path}")
-                    return None
-                    
-            except Exception as e:
-                logger.error(f"❌ Failed to load model from {self.model_path}: {e}")
-                return None
-        else:
+        """Load ML model with comprehensive validation"""
+        if not os.path.exists(self.model_path):
             logger.info(f"⚠️ No ML model found at {self.model_path}. Using rule-based logic only.")
+            return None
+            
+        try:
+            model = joblib.load(self.model_path)
+            logger.info(f"✅ Loading ML model from: {self.model_path}")
+            
+            if not (hasattr(model, 'classes_') and hasattr(model, 'predict_proba')):
+                logger.error(f"❌ Invalid model format at {self.model_path}")
+                return None
+                
+            valid_classes = set(model.classes_)
+            expected_classes = {'buy', 'sell'}
+            
+            if not expected_classes.issubset(valid_classes):
+                logger.warning(f"⚠️ Model classes {valid_classes} don't match expected {expected_classes}")
+                
+            logger.info(f"🧠 Model loaded with classes: {list(model.classes_)}")
+            return model
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to load model from {self.model_path}: {e}")
             return None
 
     def _load_model_metadata(self) -> Dict:
         """Load model training metadata if available"""
         metadata_path = os.path.join(os.path.dirname(self.model_path), "training_summary.json")
         
-        if os.path.exists(metadata_path):
-            try:
-                with open(metadata_path, 'r') as f:
-                    all_metadata = json.load(f)
-                    return all_metadata.get(self.symbol, {})
-            except Exception as e:
-                logger.warning(f"Failed to load model metadata: {e}")
-        
-        return {}
+        if not os.path.exists(metadata_path):
+            return {}
+            
+        try:
+            with open(metadata_path, 'r') as f:
+                all_metadata = json.load(f)
+                return all_metadata.get(self.symbol, {})
+        except Exception as e:
+            logger.warning(f"Failed to load model metadata: {e}")
+            return {}
 
     def train_model(self, labeled_data: pd.DataFrame):
-        """Train model with improved validation and error handling"""
+        """Train model with validation and error handling"""
         if "action" not in labeled_data.columns:
             raise ValueError("Training data must have an 'action' column")
 
-        # Filter to only buy/sell labels
+        # Filter and validate data
         labeled_data = labeled_data[labeled_data["action"].isin(["buy", "sell"])]
         
         if len(labeled_data) == 0:
             raise ValueError("No valid buy/sell labels found in training data")
         
-        # Check class distribution
         class_counts = labeled_data["action"].value_counts()
         logger.info(f"Training data distribution: {class_counts.to_dict()}")
         
         if len(class_counts) < 2:
             raise ValueError("Need at least 2 classes (buy and sell) for training")
         
-        # Prepare features and labels
+        # Prepare data
         features = labeled_data.drop(columns=["action"])
         labels = labeled_data["action"]
         
-        # Validate features
         if features.empty or features.isnull().all().all():
             raise ValueError("Features are empty or all null")
         
-        # Handle missing values
         features = features.fillna(features.mean())
         
         # Train model
@@ -112,8 +118,6 @@ class GenericAgent:
         
         try:
             model.fit(features, labels)
-            
-            # Validate trained model
             train_score = model.score(features, labels)
             logger.info(f"Training accuracy: {train_score:.4f}")
             
@@ -129,10 +133,11 @@ class GenericAgent:
             logger.error(f"❌ Model training failed: {e}")
             raise
 
+    # Feature Processing Methods
     def _extract_features_safely(self, ohlcv_data: pd.DataFrame) -> Optional[pd.DataFrame]:
-        """Safely extract features with error handling and caching"""
+        """Extract features with caching and error handling"""
         try:
-            # Check if we can use cached features
+            # Check cache validity
             if (self.feature_cache is not None and 
                 len(self.feature_cache) > 0 and
                 self.feature_cache.index[-1] == ohlcv_data.index[-1]):
@@ -145,15 +150,12 @@ class GenericAgent:
                 logger.warning(f"Feature extraction returned empty DataFrame for {self.symbol}")
                 return None
             
-            # Validate features
             if features.isnull().all().all():
                 logger.warning(f"All features are null for {self.symbol}")
                 return None
             
-            # Handle missing values
+            # Handle missing values and cache
             features = features.fillna(features.mean())
-            
-            # Cache features
             self.feature_cache = features
             return features
             
@@ -161,8 +163,9 @@ class GenericAgent:
             logger.error(f"❌ Feature extraction failed for {self.symbol}: {e}")
             return None
 
+    # Prediction Methods
     def _predict_with_model(self, features: Optional[pd.DataFrame]) -> Tuple[str, float]:
-        """Enhanced ML prediction with proper error handling"""
+        """Generate ML prediction with error handling"""
         if self.model is None:
             logger.debug(f"No ML model available for {self.symbol}")
             return "searching", 0.0
@@ -172,10 +175,9 @@ class GenericAgent:
             return "searching", 0.0
 
         try:
-            # Use the latest feature row
+            # Prepare features
             latest_features = features.iloc[[-1]]
             
-            # Check for missing or infinite values
             if latest_features.isnull().any().any() or np.isinf(latest_features).any().any():
                 logger.warning(f"Invalid feature values detected for {self.symbol}")
                 latest_features = latest_features.fillna(0).replace([np.inf, -np.inf], 0)
@@ -198,19 +200,13 @@ class GenericAgent:
             return "searching", 0.0
 
     def _get_rule_based_signal(self, ohlcv_data: pd.DataFrame) -> Tuple[str, float]:
-        """Get rule-based signal with proper error handling and position validation"""
+        """Get rule-based signal with validation"""
         try:
-        # StrategyParser.evaluate() returns dict directly
             rule_result = self.strategy_logic.evaluate(ohlcv_data)
-        
             raw_action = rule_result.get("action", "searching")
             raw_confidence = float(rule_result.get("confidence", 0.0))
-        
-            # Rest of your validation logic...
-            validated_action, validated_confidence = self._validate_rule_signal(
-                raw_action, raw_confidence
-            )
-        
+            
+            validated_action, validated_confidence = self._validate_rule_signal(raw_action, raw_confidence)
             return validated_action, validated_confidence
     
         except Exception as e:
@@ -218,38 +214,33 @@ class GenericAgent:
             return "searching", 0.0
 
     def _validate_rule_signal(self, action: str, confidence: float) -> Tuple[str, float]:
-        """Validate rule-based signals against current position state"""
-        # If trying to sell without a position, convert to searching with low confidence
+        """Validate rule signals against position state"""
         if action == "sell" and self.position_state is None:
             logger.warning(f"Rule wants to SELL {self.symbol} but no position exists - converting to searching")
             return "searching", 0.0
         
-        # If trying to buy when already long, convert to hold
         if action == "buy" and self.position_state == "long":
             logger.warning(f"Rule wants to BUY {self.symbol} but already long - converting to hold")
-            return "hold", confidence * 0.5  # Reduce confidence for converted signal
+            return "hold", confidence * 0.5
         
-        # Valid signals pass through unchanged
         return action, confidence
 
+    # Decision Fusion Methods
     def _fuse_decisions(self, ml_action: str, ml_confidence: float, 
                         rule_action: str, rule_confidence: float) -> Tuple[str, float, str]:
-        """Intelligent decision fusion with better conflict resolution"""
+        """Intelligently fuse ML and rule-based decisions"""
         
-        # Case 1: If rule signal is invalid (searching/hold), prioritize ML
+        # Priority 1: ML over inactive rules
         if rule_action in ["searching", "hold"] and ml_action in ["buy", "sell"]:
             if ml_confidence >= self.ml_confidence_threshold:
                 logger.info(f"Using ML signal over inactive rule: {ml_action} ({ml_confidence:.3f})")
                 return ml_action, ml_confidence, "ml_primary"
         
-        # Case 2: High confidence rule-based takes priority (but only for valid signals)
+        # Priority 2: High confidence rule-based signals
         if rule_confidence >= 0.9 and rule_action in ["buy", "sell"]:
-            # Check for high-confidence conflicts
-            if (ml_confidence >= 0.9 and ml_action in ["buy", "sell"] and 
-                ml_action != rule_action):
+            if (ml_confidence >= 0.9 and ml_action in ["buy", "sell"] and ml_action != rule_action):
                 logger.warning(f"⚠️ HIGH CONFIDENCE CONFLICT: ML={ml_action}({ml_confidence:.3f}) vs Rule={rule_action}({rule_confidence:.3f})")
                 
-                # In high-confidence conflicts, prefer ML if it's more confident
                 if ml_confidence > rule_confidence:
                     logger.info(f"Resolving conflict: Using ML {ml_action} ({ml_confidence:.3f} > {rule_confidence:.3f})")
                     return ml_action, ml_confidence, "ml_conflict_resolution"
@@ -260,15 +251,12 @@ class GenericAgent:
                 logger.info(f"Using high-confidence rule signal: {rule_action} ({rule_confidence:.3f})")
                 return rule_action, rule_confidence, "rule_based"
         
-        # Case 3: If ML is available and confident
+        # Priority 3: Confident ML predictions
         if self.model is not None and ml_confidence >= self.ml_confidence_threshold:
-            # If both agree, use higher confidence
             if ml_action == rule_action:
                 final_confidence = max(ml_confidence, rule_confidence)
                 logger.info(f"ML and rules agree: {ml_action} (confidence: {final_confidence:.3f})")
                 return ml_action, final_confidence, "consensus"
-            
-            # If they disagree, use ML if significantly more confident
             elif ml_confidence > rule_confidence + 0.2:
                 logger.info(f"Using confident ML signal over rule: {ml_action} ({ml_confidence:.3f})")
                 return ml_action, ml_confidence, "ml"
@@ -276,15 +264,73 @@ class GenericAgent:
                 logger.info(f"Using rule signal in disagreement: {rule_action} ({rule_confidence:.3f})")
                 return rule_action, rule_confidence, "rule_based"
         
-        # Case 4: Fallback to rule-based (but validate it's actionable)
+        # Priority 4: Fallback to valid rule signals
         if rule_action in ["buy", "sell"]:
             logger.info(f"Falling back to rule signal: {rule_action} ({rule_confidence:.3f})")
             return rule_action, rule_confidence, "rule_based"
-        else:
-            # If rule is not actionable and ML is not confident enough, default to searching
-            logger.info(f"No confident signals available - defaulting to searching")
-            return "searching", 0.0, "no_signal"
+        
+        # Default: No confident signals
+        logger.info(f"No confident signals available - defaulting to searching")
+        return "searching", 0.0, "no_signal"
 
+    # Position Management Methods
+    def _load_position_state(self) -> Optional[str]:
+        """Load position state from trade history"""
+        path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
+        if not os.path.exists(path):
+            return None
+            
+        try:
+            with open(path, "r") as f:
+                trades = json.load(f)
+                
+            if trades and len(trades) > 0:
+                last_signal = trades[-1].get("signal", None)
+                if last_signal == "buy":
+                    logger.info(f"📦 Loaded position state for {self.symbol}: long")
+                    return "long"
+                elif last_signal == "sell":
+                    logger.info(f"📦 Loaded position state for {self.symbol}: flat")
+                    return None
+            
+            logger.info(f"📦 No previous signals found for {self.symbol}")
+            return None
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to determine position state for {self.symbol}: {e}")
+            return None
+
+    def _apply_position_management(self, action: str) -> str:
+        """Apply position management rules without modifying state"""
+        if self.position_state == "long":
+            if action == "buy":
+                last_signal = self._load_last_trade_signal()
+                if last_signal == "buy":
+                    last_trade_time = self._get_last_trade_time()
+                    if last_trade_time and self._is_recent_trade(last_trade_time, minutes=5):
+                        logger.info(f"⛔ Preventing consecutive buy within 5 minutes for {self.symbol}")
+                        return "hold"
+                    else:
+                        logger.info(f"📥 Allowing buy signal - previous buy was not recent for {self.symbol}")
+                        return action
+                else:
+                    logger.info(f"📥 Buy signal valid for {self.symbol}")
+                    return action
+            elif action == "sell":
+                logger.info(f"📤 Sell signal to close long position for {self.symbol}")
+                return action
+            
+        elif self.position_state is None:
+            if action == "sell":
+                logger.info(f"⛔ No position to sell, converting to searching for {self.symbol}")
+                return "searching"
+            elif action == "buy":
+                logger.info(f"📥 Buy signal to open long position for {self.symbol}")
+                return action
+
+        return action
+
+    # Utility Methods
     def _load_last_trade_signal(self) -> Optional[str]:
         """Load the last trade signal from logs"""
         path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
@@ -300,68 +346,6 @@ class GenericAgent:
             logger.warning(f"⚠️ Failed to load last trade signal for {self.symbol}: {e}")
         
         return None
-
-    def _load_position_state(self) -> Optional[str]:
-        """Load current position state from trade history"""
-        path = f"backend/storage/performance_logs/{self.symbol}_trades.json"
-        if not os.path.exists(path):
-            return None
-            
-        try:
-            with open(path, "r") as f:
-                trades = json.load(f)
-                if trades and len(trades) > 0:
-                    last_signal = trades[-1].get("signal", None)
-                    if last_signal == "buy":
-                        logger.info(f"📦 Loaded position state for {self.symbol}: long")
-                        return "long"
-                    elif last_signal == "sell":
-                        logger.info(f"📦 Loaded position state for {self.symbol}: flat")
-                        return None
-            
-            logger.info(f"📦 No previous signals found for {self.symbol}")
-            return None
-            
-        except Exception as e:
-            logger.warning(f"⚠️ Failed to determine position state for {self.symbol}: {e}")
-            return None
-
-    def _apply_position_management(self, action: str) -> str:
-        """Enhanced position management - EVALUATION ONLY (don't modify state)"""
-        
-        # IMPORTANT: Don't modify position_state here - that's MotherAI's job
-        # This method only validates and filters signals based on current state
-        
-        if self.position_state == "long":
-            if action == "buy":
-                # Check if this is a consecutive buy within same cycle
-                last_signal = self._load_last_trade_signal()
-                if last_signal == "buy":
-                    last_trade_time = self._get_last_trade_time()
-                    if last_trade_time and self._is_recent_trade(last_trade_time, minutes=5):
-                        logger.info(f"⛔ Preventing consecutive buy within 5 minutes for {self.symbol}")
-                        return "hold"
-                    else:
-                        logger.info(f"📥 Allowing buy signal - previous buy was not recent for {self.symbol}")
-                        return action
-                else:
-                    logger.info(f"📥 Buy signal valid for {self.symbol}")
-                    return action
-            elif action == "sell":
-                logger.info(f"📤 Sell signal to close long position for {self.symbol}")
-                # Don't modify position_state here - MotherAI will handle it
-                return action
-            
-        elif self.position_state is None:
-            if action == "sell":
-                logger.info(f"⛔ No position to sell, converting to searching for {self.symbol}")
-                return "searching"
-            elif action == "buy":
-                logger.info(f"📥 Buy signal to open long position for {self.symbol}")
-                # Don't modify position_state here - MotherAI will handle it
-                return action
-
-        return action
 
     def _get_last_trade_time(self) -> Optional[str]:
         """Get timestamp of last trade"""
@@ -382,19 +366,16 @@ class GenericAgent:
     def _is_recent_trade(self, timestamp_str: str, minutes: int = 5) -> bool:
         """Check if trade timestamp is within the last N minutes"""
         try:
-            from datetime import datetime, timedelta
-            import dateutil.parser
-        
             trade_time = dateutil.parser.parse(timestamp_str)
             now = datetime.now(trade_time.tzinfo) if trade_time.tzinfo else datetime.now()
-        
             return (now - trade_time) < timedelta(minutes=minutes)
         except Exception as e:
             logger.warning(f"Failed to parse trade time: {e}")
             return False
 
+    # Main Interface Methods
     def evaluate(self, ohlcv_data: pd.DataFrame) -> Dict:
-        """Main evaluation method with improved error handling and logic"""
+        """Main evaluation method - combines ML and rule-based signals"""
         if ohlcv_data.empty:
             raise ValueError(f"⚠️ OHLCV data for {self.symbol} is empty")
 
@@ -404,24 +385,20 @@ class GenericAgent:
         # Extract features for ML
         features = self._extract_features_safely(ohlcv_data)
         
-        # Get ML prediction
+        # Get predictions
         ml_action, ml_confidence = self._predict_with_model(features)
-        
-        # Get rule-based prediction (now with validation)
         rule_action, rule_confidence = self._get_rule_based_signal(ohlcv_data)
         
-        # Fuse decisions (now with better conflict resolution)
+        # Fuse decisions
         fused_action, fused_confidence, source = self._fuse_decisions(
             ml_action, ml_confidence, rule_action, rule_confidence
         )
         
         # Apply position management
         final_action = self._apply_position_management(fused_action)
-        
-        # Adjust confidence if action was modified by position management
         final_confidence = fused_confidence if final_action == fused_action else fused_confidence * 0.8
         
-        # Create result
+        # Create comprehensive result
         timestamp = pd.to_datetime(ohlcv_data.index[-1]).isoformat()
         
         result = {
@@ -464,8 +441,9 @@ class GenericAgent:
         """Alias for evaluate method"""
         return self.evaluate(ohlcv_data)
 
+    # Information and Management Methods
     def get_model_info(self) -> Dict:
-        """Get information about the loaded model"""
+        """Get comprehensive model information"""
         info = {
             "symbol": self.symbol,
             "model_path": self.model_path,
@@ -486,17 +464,17 @@ class GenericAgent:
         return info
 
     def reset_position_state(self):
-        """Reset position state (useful for testing or recovery)"""
+        """Reset position state for testing or recovery"""
         logger.info(f"🔄 Resetting position state for {self.symbol}")
         self.position_state = None
 
     def set_ml_confidence_threshold(self, threshold: float):
-        """Set the minimum confidence threshold for ML predictions"""
-        if 0.0 <= threshold <= 1.0:
-            self.ml_confidence_threshold = threshold
-            logger.info(f"Updated ML confidence threshold for {self.symbol}: {threshold}")
-        else:
+        """Set minimum confidence threshold for ML predictions"""
+        if not 0.0 <= threshold <= 1.0:
             raise ValueError("Confidence threshold must be between 0.0 and 1.0")
+        
+        self.ml_confidence_threshold = threshold
+        logger.info(f"Updated ML confidence threshold for {self.symbol}: {threshold}")
 
     def reset_position_state_if_invalid(self):
         """Reset position state if it doesn't match trade history"""

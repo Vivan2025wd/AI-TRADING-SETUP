@@ -24,8 +24,8 @@ class EnhancedBatchTrainer:
         self.base_dir = Path(__file__).resolve().parent.parent
         self.ohlcv_dir = self.base_dir / "data" / "ohlcv"
         self.labels_dir = self.base_dir / "data" / "labels"
-        self.models_dir = self.base_dir / "backend" / "agents" / "models"
-        self.logs_dir = self.base_dir / "backend" / "storage" / "training_logs"
+        self.models_dir = self.base_dir / "agents" / "models"
+        self.logs_dir = self.base_dir / "storage" / "training_logs"
         
         # Create directories
         for dir_path in [self.models_dir, self.logs_dir]:

@@ -251,22 +251,22 @@ class MotherAI:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return None
 
-    # Get market data for risk calculations
+        # Get market data for risk calculations
         df = self._fetch_agent_data(symbol)
-    
-    # 1. Check market conditions
+
+        # 1. Check market conditions
         market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df) 
         if not market_ok:
             print(f"❌ Market conditions check failed for {symbol}: {market_reason}")
             return None
 
-    # 2. Calculate dynamic position size
+    # 2. Calculate dynamic position size 
         position_size = self.risk_manager.calculate_dynamic_position_size(symbol, price, df)
-    
-    # 3. Get current positions for portfolio checks
+
+     # 3. Get current positions for portfolio checks
         current_positions = self.get_current_positions()
-    
-    # 4. Check portfolio limits (for buy orders)
+
+        # 4. Check portfolio limits (for buy orders)
         if signal == "buy":
             portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
                 symbol, position_size, current_positions
@@ -278,7 +278,7 @@ class MotherAI:
     # 5. Log trade attempt for rate limiting
         self.risk_manager.log_trade_attempt()
 
-    # Get current trading mode from binance_api.py
+        # Get current trading mode from binance_api.py
         from backend.utils.binance_api import get_trading_mode, get_binance_client
         current_mode = get_trading_mode()
 
@@ -286,6 +286,7 @@ class MotherAI:
         print(f"📊 Risk-adjusted position size: {position_size:.3f} (dynamic sizing applied)")
 
         qty = None
+        executed_qty = None  # Track the actual executed quantity
 
         try:
         # Check actual account balance before placing order
@@ -300,34 +301,34 @@ class MotherAI:
                     if signal == "buy" and usdt_balance < 10:
                         print(f"❌ Insufficient USDT balance for buy order. Need at least $10, have ${usdt_balance:.2f}")
                         return None
-                
+            
                 # Use dynamic position sizing with actual balance
                     available_balance = min(usdt_balance * 0.9, 50)  # Use 90% of balance, max $50
                     trade_amount = available_balance * position_size
                     print(f"💡 Using ${trade_amount:.2f} for this trade (dynamic sizing)")
-                
+            
                 except Exception as balance_err:
                     print(f"⚠️ Could not check balance: {balance_err}")
                     trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
             else:
                 trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
 
-        # Format symbol for Binance API
+            # Format symbol for Binance API
             binance_symbol = symbol if "/" in symbol else symbol.replace("USDT", "/USDT")
 
             if signal == "buy":
                 config = self.risk_manager.get_symbol_config(symbol)
-            
-                # FIXED CALCULATION: Use percentage-based SL/TP
+        
+            # FIXED CALCULATION: Use percentage-based SL/TP
                 sl_percent = config["sl_percent"] / 100.0  # Convert to decimal
                 tp_ratio = config["tp_ratio"]
-            
-            # Calculate stop loss and take profit correctly
+        
+                # Calculate stop loss and take profit correctly
                 sl = price * (1 - sl_percent)  # 1% below entry
                 tp_distance = (price - sl) * tp_ratio  # 2x the risk distance
                 tp = price + tp_distance  # Take profit above entry
-        
-                # Calculate quantity based on trade amount
+    
+            # Calculate quantity based on trade amount
                 qty = trade_amount / price
 
                 if qty <= 0:
@@ -344,26 +345,30 @@ class MotherAI:
                     self.cooldown_manager.set_cooldown(symbol)
                     # Update agent's position state
                     self.update_agent_position_state(symbol, signal)
+                # Extract executed quantity from order response
+                    executed_qty = order.get("executedQty", qty)
                     print(f"✅ BUY order executed for {symbol} in {current_mode.upper()} mode")
                 elif order and order.get("status") == "mock":
                 # Mock order - still update agent position state
                     self.cooldown_manager.set_cooldown(symbol)
                     self.update_agent_position_state(symbol, signal)
+                    executed_qty = qty  # For mock trades, use the calculated qty
                     print(f"✅ MOCK BUY order logged for {symbol}")
                 else:
                     print(f"❌ BUY order failed for {symbol}")
+                    return None
 
             elif signal == "sell":
-                # For sell orders, try to determine quantity
+            # For sell orders, try to determine quantity
                 agent = self.get_agent_by_symbol(symbol)
                 qty = 0
-
-                # First check if we can get quantity from agent or previous trades
+            
+            # First check if we can get quantity from agent or previous trades
                 if current_mode == "live":
                     try:
                         client = get_binance_client()
                         account_info = client.get_account()
-                        balances = {b['asset']: float(b['free']) for b in account_info['balances']}
+                        balances = {b['asset']: float(b['free']) for b in account_info['balances']} 
                         base_asset = symbol.replace("USDT", "")
                         actual_qty = balances.get(base_asset, 0)
                         if actual_qty > 0:
@@ -371,12 +376,12 @@ class MotherAI:
                             print(f"💡 Found {qty:.6f} {base_asset} in account")
                         else:
                             print(f"❌ No {base_asset} holdings found in account")
-                            return None
+                        return None
                     except Exception as e:
                         print(f"⚠️ Could not check holdings: {e}")
-                        return None
+                    return None
                 else:
-                    # For mock, use trade amount calculation
+                # For mock, use trade amount calculation
                     qty = trade_amount / price
 
                 if qty <= 0:
@@ -392,19 +397,25 @@ class MotherAI:
                     self.cooldown_manager.set_cooldown(symbol)
                     # Update agent's position state
                     self.update_agent_position_state(symbol, signal)
+                # Extract executed quantity from order response
+                    executed_qty = order.get("executedQty", qty)
                     print(f"✅ SELL order executed for {symbol} in {current_mode.upper()} mode")
                 elif order and order.get("status") == "mock":
-                    # Mock order - still update agent position state
+                # Mock order - still update agent position state
                     self.cooldown_manager.set_cooldown(symbol)
                     self.update_agent_position_state(symbol, signal)
+                    executed_qty = qty  # For mock trades, use the calculated qty
                     print(f"✅ MOCK SELL order logged for {symbol}")
                 else:
                     print(f"❌ SELL order failed for {symbol}")
+                    return None
+
+            # Return the executed quantity for logging
+            return executed_qty
 
         except Exception as e:
             print(f"❌ Trade execution error for {symbol}: {e}")
-
-        return qty
+            return None
 
 
     def check_exit_conditions_for_agents(self):
