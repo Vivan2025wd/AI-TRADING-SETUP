@@ -10,24 +10,24 @@ RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 
 # Enhanced Risk Configuration
 DEFAULT_RISK_CONFIG = {
-    "trade_cooldown_seconds": 15,        # Faster trading (was 60s)
+    "trade_cooldown_seconds": 3600,      # 1 hour cooldown for 1h timeframes (was 15s)
     "max_hold_seconds": 43200,           # 12 hours hold (was 6h)
-    "risk_per_trade": 10,              # 10% per trade (was 5%)
-    "default_balance_usd": 100,          
-    "tp_ratio": 15,                     # Bigger profit target (was 1.25x)
-    "sl_percent": 10,                  # Wider Stop Loss (was 6%)
-    "max_portfolio_exposure": 90,      # Allow 90% of balance in positions (was 60%)
-    "max_daily_loss": 30,              # Can lose up to 30% daily (was 15%)
-    "max_drawdown": 50,                # Tolerate 50% drawdown (was 35%)
-    "max_concurrent_positions": 25,      # Can hold up to 25 positions at once (was 15)
-    "max_correlation_exposure": 80,    # Loosen sector correlation limits (was 50%)
+    "risk_per_trade": 0.01,              # 1% per trade (was 5%)
+    "default_balance_usd": 1000,          
+    "tp_ratio": 2.0,                     # 2:1 reward to risk ratio (profit = 2x stop loss)
+    "sl_percent": 1.0,                   # 1% Stop Loss (was 0.5% which is too tight)
+    "max_portfolio_exposure": 20,        # Allow 20% of balance in positions (was 90% - too risky)
+    "max_daily_loss": 5,                 # Can lose up to 5% daily (was 30% - too high)
+    "max_drawdown": 15,                  # Tolerate 15% drawdown (was 50% - too high)
+    "max_concurrent_positions": 5,       # Can hold up to 5 positions at once (was 25 - too many)
+    "max_correlation_exposure": 50,      # Sector correlation limits (was 80%)
     "volatility_lookback": 20,           
-    "volatility_multiplier": 2.5,        # Accept more volatile moves (was 2.0)
-    "min_position_size": 0.01,           # Increase minimum position size (was 0.005)
-    "max_position_size": 0.50,           # Allow up to 50% of balance in a single trade (was 25%)
-    "emergency_stop_loss": 0.30,         # Hard stop at 30% loss per position (was 20%)
-    "max_trades_per_hour": 50,           # Allow up to 50 trades per hour (was 20)
-    "market_volatility_threshold": 0.20, # Allow trading in higher vol markets (was 0.12)
+    "volatility_multiplier": 2.0,        # Accept volatile moves (was 2.5)
+    "min_position_size": 0.005,          # Minimum position size (was 0.01)
+    "max_position_size": 0.02,           # Allow up to 2% of balance in a single trade
+    "emergency_stop_loss": 0.05,         # Hard stop at 5% loss per position (was 30% - way too high)
+    "max_trades_per_hour": 5,            # Allow up to 5 trades per hour (was 50 - too many)
+    "market_volatility_threshold": 0.05, # Allow trading in normal vol markets (was 0.20 - too high)
     "symbol_overrides": {}
 }
 
@@ -103,6 +103,94 @@ class RiskManager:
         
         return base_risk
     
+    def calculate_stop_loss_and_take_profit(self, entry_price: float, position_size_percent: float, is_long: bool = True) -> Tuple[float, float]:
+        """Calculate proper stop loss and take profit levels"""
+        config = self.config
+        
+        # Calculate stop loss distance as percentage of entry price
+        sl_distance_percent = config["sl_percent"] / 100.0  # Convert to decimal
+        tp_distance_percent = sl_distance_percent * config["tp_ratio"]  # TP is ratio of SL distance
+        
+        if is_long:
+            # For long positions
+            stop_loss = entry_price * (1 - sl_distance_percent)
+            take_profit = entry_price * (1 + tp_distance_percent)
+        else:
+            # For short positions
+            stop_loss = entry_price * (1 + sl_distance_percent)
+            take_profit = entry_price * (1 - tp_distance_percent)
+        
+        return stop_loss, take_profit
+    
+    def calculate_position_quantity_from_risk(self, entry_price: float, stop_loss: float, risk_amount: float) -> float:
+        """Calculate position quantity based on risk amount and stop loss distance (Kelly/Fixed Risk method)"""
+        # Risk per share = difference between entry and stop loss
+        risk_per_share = abs(entry_price - stop_loss)
+        
+        if risk_per_share <= 0:
+            return 0.0
+        
+        # Quantity = Total risk amount / Risk per share
+        quantity = risk_amount / risk_per_share
+        return quantity
+    
+    def calculate_position_quantity_from_percent(self, entry_price: float, position_size_percent: float, balance: float) -> float:
+        """Calculate position quantity based on percentage of balance (Fixed Fractional method)"""
+        # Total position value = percentage of balance
+        position_value = (position_size_percent / 100.0) * balance
+        
+        # Quantity = Position value / Entry price
+        quantity = position_value / entry_price
+        return quantity
+    
+    def calculate_trade_parameters(self, symbol: str, entry_price: float, balance: float, df: Optional[pd.DataFrame] = None) -> Dict:
+        """Calculate all trade parameters: position size, quantity, SL, TP"""
+        
+        # Get dynamic position size percentage
+        position_size_percent = self.calculate_dynamic_position_size(symbol, entry_price, df)
+        
+        # Calculate stop loss and take profit prices
+        stop_loss, take_profit = self.calculate_stop_loss_and_take_profit(entry_price, position_size_percent)
+        
+        # Method 1: Fixed Fractional (what your system currently uses)
+        # Position size is percentage of total balance
+        quantity_fractional = self.calculate_position_quantity_from_percent(entry_price, position_size_percent, balance)
+        position_value_fractional = quantity_fractional * entry_price
+        
+        # Method 2: Kelly/Fixed Risk (more sophisticated)
+        # Risk amount is percentage of balance, position size varies based on SL distance
+        risk_amount = (position_size_percent / 100.0) * balance
+        quantity_kelly = self.calculate_position_quantity_from_risk(entry_price, stop_loss, risk_amount)
+        position_value_kelly = quantity_kelly * entry_price
+        
+        # Calculate actual risk for each method
+        risk_per_share = abs(entry_price - stop_loss)
+        actual_risk_fractional = quantity_fractional * risk_per_share
+        actual_risk_kelly = quantity_kelly * risk_per_share
+        
+        return {
+            "entry_price": entry_price,
+            "stop_loss": stop_loss,
+            "take_profit": take_profit,
+            "position_size_percent": position_size_percent,
+            
+            # Fixed Fractional Method (Current System)
+            "quantity_fractional": quantity_fractional,
+            "position_value_fractional": position_value_fractional,
+            "actual_risk_fractional": actual_risk_fractional,
+            "risk_percent_fractional": (actual_risk_fractional / balance) * 100,
+            
+            # Kelly/Fixed Risk Method (Better)
+            "quantity_kelly": quantity_kelly,
+            "position_value_kelly": position_value_kelly,
+            "actual_risk_kelly": actual_risk_kelly,
+            "risk_percent_kelly": (actual_risk_kelly / balance) * 100,
+            "target_risk_amount": risk_amount,
+            
+            # Recommendations
+            "recommended_method": "kelly" if position_value_kelly < position_value_fractional * 2 else "fractional",
+            "recommended_quantity": quantity_kelly if position_value_kelly < position_value_fractional * 2 else quantity_fractional
+        }
     def check_portfolio_limits(self, new_trade_symbol: str, new_trade_size: float, current_positions: Dict) -> Tuple[bool, str]:
         """Check if new trade violates portfolio-level limits"""
         
@@ -119,12 +207,13 @@ class RiskManager:
             return False, f"portfolio exposure limit ({total_exposure:.3f} > {self.config['max_portfolio_exposure']:.3f})"
         
         # 3. Check daily loss limit
-        if self.daily_pnl < -self.config["max_daily_loss"] * self.portfolio_value:
+        daily_loss_threshold = -self.config["max_daily_loss"] / 100.0 * self.portfolio_value
+        if self.daily_pnl < daily_loss_threshold:
             return False, f"daily loss limit exceeded ({self.daily_pnl:.2f})"
         
         # 4. Check maximum drawdown
         current_drawdown = (self.max_historical_value - self.portfolio_value) / self.max_historical_value
-        if current_drawdown > self.config["max_drawdown"]:
+        if current_drawdown > self.config["max_drawdown"] / 100.0:
             return False, f"maximum drawdown exceeded ({current_drawdown:.3f})"
         
         # 5. Check hourly trade limit
@@ -149,7 +238,7 @@ class RiskManager:
         
         # Check for extreme price movements
         price_change = (df['close'].iloc[-1] - df['close'].iloc[-2]) / df['close'].iloc[-2]
-        if abs(price_change) > self.config["emergency_stop_loss"]:
+        if abs(price_change) > self.config["emergency_stop_loss"] / 100.0:
             return False, f"extreme price movement detected ({price_change:.4f})"
         
         return True, "market conditions acceptable"
@@ -188,8 +277,8 @@ class RiskManager:
             "current_drawdown": current_drawdown,
             "daily_pnl": self.daily_pnl,
             "hourly_trades": self.hourly_trade_count.get(current_hour, 0),
-            "drawdown_limit": self.config["max_drawdown"],
-            "daily_loss_limit": self.config["max_daily_loss"] * self.portfolio_value,
+            "drawdown_limit": self.config["max_drawdown"] / 100.0,
+            "daily_loss_limit": self.config["max_daily_loss"] / 100.0 * self.portfolio_value,
             "max_portfolio_exposure": self.config["max_portfolio_exposure"]
         }
     
@@ -226,7 +315,7 @@ class RiskManager:
         
         # Add warnings
         risk_metrics = report["portfolio_metrics"]
-        if risk_metrics["current_drawdown"] > 0.15:
+        if risk_metrics["current_drawdown"] > 0.10:  # Warn at 10% drawdown
             report["warnings"].append("High drawdown detected")
         if risk_metrics["daily_pnl"] < -risk_metrics["daily_loss_limit"] * 0.8:
             report["warnings"].append("Approaching daily loss limit")
@@ -234,3 +323,33 @@ class RiskManager:
             report["warnings"].append("High portfolio exposure")
         
         return report
+
+
+# Example Usage:
+def example_usage():
+    """Example of how to use the fixed risk manager"""
+    # Initialize risk manager
+    risk_manager = RiskManager()
+
+    # Calculate trade parameters
+    symbol = "AVAXUSDT"
+    entry_price = 21.73
+    balance = 1000.0
+
+    trade_params = risk_manager.calculate_trade_parameters(symbol, entry_price, balance)
+
+    print(f"Entry: ${trade_params['entry_price']:.4f}")
+    print(f"Stop Loss: ${trade_params['stop_loss']:.4f}")  # Should be ~$21.51
+    print(f"Take Profit: ${trade_params['take_profit']:.4f}")  # Should be ~$22.17
+
+    print(f"\nCurrent System (Fixed Fractional):")
+    print(f"Quantity: {trade_params['quantity_fractional']:.6f}")  # ~0.46 AVAX
+    print(f"Position Value: ${trade_params['position_value_fractional']:.2f}")  # ~$10
+    print(f"Actual Risk: ${trade_params['actual_risk_fractional']:.2f}")  # ~$0.10
+
+    print(f"\nBetter System (Kelly/Fixed Risk):")
+    print(f"Quantity: {trade_params['quantity_kelly']:.6f}")  # ~45 AVAX
+    print(f"Position Value: ${trade_params['position_value_kelly']:.2f}")  # ~$987
+    print(f"Actual Risk: ${trade_params['actual_risk_kelly']:.2f}")  # Exactly $10
+
+    print(f"\nRecommended: {trade_params['recommended_method']} method") 

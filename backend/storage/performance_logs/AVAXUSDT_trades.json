@@ -4,10 +4,10 @@
     "signal": "buy",
     "confidence": 1.0,
     "score": 1.0,
-    "last_price": 24.39,
-    "price": 24.39,
-    "qty": 0.400518,
-    "timestamp": "2025-07-29T15:44:42.049791",
+    "last_price": 21.71,
+    "price": 21.71,
+    "qty": 0.450745,
+    "timestamp": "2025-08-02T02:28:22.971428",
     "source": "agent_rule_based"
   }
 ]

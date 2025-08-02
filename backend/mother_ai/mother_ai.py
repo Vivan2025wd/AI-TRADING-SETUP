@@ -251,22 +251,22 @@ class MotherAI:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return None
 
-        # Get market data for risk calculations
+    # Get market data for risk calculations
         df = self._fetch_agent_data(symbol)
-        
-        # 1. Check market conditions
-        market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df)
+    
+    # 1. Check market conditions
+        market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df) 
         if not market_ok:
             print(f"❌ Market conditions check failed for {symbol}: {market_reason}")
             return None
 
-        # 2. Calculate dynamic position size
+    # 2. Calculate dynamic position size
         position_size = self.risk_manager.calculate_dynamic_position_size(symbol, price, df)
-        
-        # 3. Get current positions for portfolio checks
+    
+    # 3. Get current positions for portfolio checks
         current_positions = self.get_current_positions()
-        
-        # 4. Check portfolio limits (for buy orders)
+    
+    # 4. Check portfolio limits (for buy orders)
         if signal == "buy":
             portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
                 symbol, position_size, current_positions
@@ -275,20 +275,20 @@ class MotherAI:
                 print(f"❌ Portfolio limits check failed for {symbol}: {portfolio_reason}")
                 return None
 
-        # 5. Log trade attempt for rate limiting
+    # 5. Log trade attempt for rate limiting
         self.risk_manager.log_trade_attempt()
 
-        # Get current trading mode from binance_api.py
+    # Get current trading mode from binance_api.py
         from backend.utils.binance_api import get_trading_mode, get_binance_client
         current_mode = get_trading_mode()
-    
+
         print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f} | Mode: {current_mode.upper()}")
         print(f"📊 Risk-adjusted position size: {position_size:.3f} (dynamic sizing applied)")
 
         qty = None
 
         try:
-            # Check actual account balance before placing order
+        # Check actual account balance before placing order
             if current_mode == "live":
                 try:
                     client = get_binance_client()
@@ -296,30 +296,37 @@ class MotherAI:
                     balances = {b['asset']: float(b['free']) for b in account_info['balances']}
                     usdt_balance = balances.get('USDT', 0)
                     print(f"💰 Current USDT balance: ${usdt_balance:.2f}")
-                    
+                
                     if signal == "buy" and usdt_balance < 10:
                         print(f"❌ Insufficient USDT balance for buy order. Need at least $10, have ${usdt_balance:.2f}")
                         return None
-                    
-                    # Use dynamic position sizing with actual balance
+                
+                # Use dynamic position sizing with actual balance
                     available_balance = min(usdt_balance * 0.9, 50)  # Use 90% of balance, max $50
                     trade_amount = available_balance * position_size
                     print(f"💡 Using ${trade_amount:.2f} for this trade (dynamic sizing)")
-                    
+                
                 except Exception as balance_err:
                     print(f"⚠️ Could not check balance: {balance_err}")
                     trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
             else:
                 trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
 
-            # Format symbol for Binance API
+        # Format symbol for Binance API
             binance_symbol = symbol if "/" in symbol else symbol.replace("USDT", "/USDT")
 
             if signal == "buy":
                 config = self.risk_manager.get_symbol_config(symbol)
-                sl = price * (1 - config["sl_percent"])
-                tp = price + ((price - sl) * config["tp_ratio"])
             
+                # FIXED CALCULATION: Use percentage-based SL/TP
+                sl_percent = config["sl_percent"] / 100.0  # Convert to decimal
+                tp_ratio = config["tp_ratio"]
+            
+            # Calculate stop loss and take profit correctly
+                sl = price * (1 - sl_percent)  # 1% below entry
+                tp_distance = (price - sl) * tp_ratio  # 2x the risk distance
+                tp = price + tp_distance  # Take profit above entry
+        
                 # Calculate quantity based on trade amount
                 qty = trade_amount / price
 
@@ -339,7 +346,7 @@ class MotherAI:
                     self.update_agent_position_state(symbol, signal)
                     print(f"✅ BUY order executed for {symbol} in {current_mode.upper()} mode")
                 elif order and order.get("status") == "mock":
-                    # Mock order - still update agent position state
+                # Mock order - still update agent position state
                     self.cooldown_manager.set_cooldown(symbol)
                     self.update_agent_position_state(symbol, signal)
                     print(f"✅ MOCK BUY order logged for {symbol}")
@@ -350,7 +357,7 @@ class MotherAI:
                 # For sell orders, try to determine quantity
                 agent = self.get_agent_by_symbol(symbol)
                 qty = 0
-                
+
                 # First check if we can get quantity from agent or previous trades
                 if current_mode == "live":
                     try:
@@ -398,6 +405,7 @@ class MotherAI:
             print(f"❌ Trade execution error for {symbol}: {e}")
 
         return qty
+
 
     def check_exit_conditions_for_agents(self):
         """Enhanced exit conditions with dynamic stop losses and portfolio protection"""
@@ -487,74 +495,81 @@ class MotherAI:
     def _check_enhanced_exit_conditions(self, agent, symbol: str, current_price: float, df) -> Optional[str]:
         """Enhanced exit conditions with dynamic stops and time limits"""
         config = self.risk_manager.get_symbol_config(symbol)
-        
-        # Get last buy trade to determine entry price and time
+    
+    # Get last buy trade to determine entry price and time
         try:
             path = f"backend/storage/performance_logs/{symbol}_trades.json"
             if os.path.exists(path):
                 with open(path, "r") as f:
                     trades = json.load(f)
-                
-                # Find last buy trade
+            
+            # Find last buy trade
                 last_buy = None
                 for trade in reversed(trades):
                     if trade.get("signal") == "buy":
                         last_buy = trade
                         break
-                
+            
                 if last_buy:
                     entry_price = last_buy.get("price", current_price)
                     entry_time_str = last_buy.get("timestamp", "")
-                    
-                    # 1. Stop Loss Check (enhanced with volatility)
+                
+                # FIXED CALCULATIONS: Use percentage-based SL/TP
+                    sl_percent = config["sl_percent"] / 100.0  # Convert to decimal
+                    tp_ratio = config["tp_ratio"]
+                
+                # 1. Stop Loss Check (enhanced with volatility)
                     if len(df) >= 20:
-                        # Dynamic stop loss based on ATR
+                    # Dynamic stop loss based on ATR
                         high_low = df['high'] - df['low']
                         atr = high_low.rolling(14).mean().iloc[-1]
-                        dynamic_sl_percent = max(config["sl_percent"], atr / current_price * 2)
+                        dynamic_sl_percent = max(sl_percent, atr / current_price * 2)
                     else:
-                        dynamic_sl_percent = config["sl_percent"]
-                    
+                        dynamic_sl_percent = sl_percent
+                
                     stop_loss = entry_price * (1 - dynamic_sl_percent)
                     if current_price <= stop_loss:
                         loss_percent = (entry_price - current_price) / entry_price
                         return f"stop_loss_hit_{loss_percent:.3f}"
-                    
-                    # 2. Take Profit Check
-                    take_profit = entry_price * (1 + dynamic_sl_percent * config["tp_ratio"])
+                
+                # 2. Take Profit Check (FIXED)
+                    sl_distance = entry_price * dynamic_sl_percent  # Distance in dollars
+                    tp_distance = sl_distance * tp_ratio  # 2x the SL distance
+                    take_profit = entry_price + tp_distance  # Add to entry price
+                
                     if current_price >= take_profit:
                         profit_percent = (current_price - entry_price) / entry_price
                         return f"take_profit_hit_{profit_percent:.3f}"
-                    
-                    # 3. Time-based Exit
+                
+                # 3. Time-based Exit
                     if entry_time_str:
                         try:
                             entry_time = dateutil.parser.parse(entry_time_str)
                             now = datetime.now(entry_time.tzinfo) if entry_time.tzinfo else datetime.now()
                             hold_duration = (now - entry_time).total_seconds()
-                            
+                        
                             if hold_duration > config["max_hold_seconds"]:
                                 return f"max_hold_time_{hold_duration/3600:.1f}h"
                         except:
                             pass
-                    
-                    # 4. Trailing Stop (if profitable)
+                
+                # 4. Trailing Stop (if profitable)
                     profit_percent = (current_price - entry_price) / entry_price
                     if profit_percent > 0.02:  # 2% profit threshold for trailing stop
-                        # Check if price dropped more than 1% from recent high
+                    # Check if price dropped more than 1% from recent high
                         recent_high = df['high'].tail(6).max()  # Last 6 hours
                         if current_price < recent_high * 0.99:
                             return f"trailing_stop_{profit_percent:.3f}"
-                    
-                    # 5. Volatility-based Exit
+                
+                # 5. Volatility-based Exit
                     if len(df) >= 6:
                         recent_volatility = df['close'].pct_change().tail(6).std()
                         if recent_volatility > config.get("exit_volatility_threshold", 0.08):
                             return f"high_volatility_{recent_volatility:.4f}"
-        
+    
         except Exception as e:
             print(f"⚠️ Error checking exit conditions for {symbol}: {e}")
-        
+    
         return None
 
     def _is_position_stale(self, timestamp_str: str, max_hours: int = 24) -> bool:

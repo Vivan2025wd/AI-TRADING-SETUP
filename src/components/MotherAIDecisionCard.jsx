@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowUpRight, AlertCircle, Clock, RefreshCw, Loader2 } from "lucide-react";
 
-const POLL_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 export default function MotherAIDecisionCard({ isLive, decisionData, loading, error, refreshDecision }) {
   return (
