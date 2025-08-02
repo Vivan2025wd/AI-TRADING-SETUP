@@ -49,7 +49,7 @@ class BacktestRunner:
 
         for i in range(50, len(df)):  # skip first 50 rows for indicators
             row = df.iloc[i]
-            signals = parser.evaluate_conditions(df.iloc[:i+1])
+            signals = parser.evaluate_conditions_with_confidence(df.iloc[:i+1])
             decision = signals[-1] if signals and len(signals) > 0 else None  # last signal for current window
 
             timestamp = row.name

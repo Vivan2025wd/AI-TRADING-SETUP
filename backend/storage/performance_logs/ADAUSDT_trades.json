@@ -1,0 +1,14 @@
+[
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7179,
+    "price": 0.7179,
+    "qty": 13.891115,
+    "timestamp": "2025-08-02T08:38:41.206304",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  }
+]

@@ -52,5 +52,122 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T08:28:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.6276955404088953,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T08:38:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.6905346163795696,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T08:48:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.6902250606605748,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T08:58:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.7000223514060115,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T09:08:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.0,
+    "source": "GenericAgent/no_signal",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T09:18:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.6464258607686185,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T09:28:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.7103415018548117,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T09:38:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.6955381944493094,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T09:48:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.6612673639895515,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T09:57:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.48511666518025226,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T09:58:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.0,
+    "source": "GenericAgent/no_signal",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T10:04:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.7103415018548117,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T10:06:00",
+    "symbol": "DOTUSDT",
+    "signal": "searching",
+    "confidence": 0.6850517795810752,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
   }
 ]

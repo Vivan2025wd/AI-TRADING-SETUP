@@ -52,5 +52,122 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-08-02T08:28:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T08:38:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.8777983978638185,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T08:48:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T08:58:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.9630841121495328,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T09:08:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T09:18:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T09:28:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.9630841121495328,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T09:38:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T09:48:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T09:57:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T09:58:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T10:04:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.9947142857142858,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-02T10:06:00",
+    "symbol": "ETHUSDT",
+    "signal": "buy",
+    "confidence": 0.9777237654320987,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
   }
 ]
