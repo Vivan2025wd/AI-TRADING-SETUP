@@ -1,11 +1,11 @@
 {
   "symbol": "SOLUSDT",
-  "total_profit_dollars": 0.009,
-  "avg_profit_per_trade": 0.0015,
-  "total_trades": 6,
-  "wins": 4,
+  "total_profit_dollars": 0.0875,
+  "avg_profit_per_trade": 0.0109,
+  "total_trades": 8,
+  "wins": 6,
   "losses": 2,
-  "win_rate": 66.67,
+  "win_rate": 75.0,
   "trades": [
     {
       "entry_time": "2025-08-02T16:03:22.411510",
@@ -72,6 +72,28 @@
       "exit_value": 49.9999,
       "pnl_dollars": 0.1152,
       "pnl_percentage": 0.23
+    },
+    {
+      "entry_time": "2025-08-03T04:17:17.678299",
+      "entry_price": 160.16,
+      "exit_time": "2025-08-03T04:27:42.184350",
+      "exit_price": 160.63,
+      "qty": 0.12451,
+      "entry_value": 19.9415,
+      "exit_value": 20.0,
+      "pnl_dollars": 0.0585,
+      "pnl_percentage": 0.29
+    },
+    {
+      "entry_time": "2025-08-03T05:57:17.463879",
+      "entry_price": 160.27,
+      "exit_time": "2025-08-03T06:07:19.795907",
+      "exit_price": 160.43,
+      "qty": 0.124665,
+      "entry_value": 19.9801,
+      "exit_value": 20.0,
+      "pnl_dollars": 0.0199,
+      "pnl_percentage": 0.1
     }
   ]
 }

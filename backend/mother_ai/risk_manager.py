@@ -9,27 +9,28 @@ import pandas as pd
 RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 
 # Enhanced Risk Configuration
-DEFAULT_RISK_CONFIG = {
-    "trade_cooldown_seconds": 300,      # 5 minutes cooldown for 1h timeframes (was 15s)
-    "max_hold_seconds": 10800,           # 3 hours hold (was 6h)
-    "risk_per_trade": 0.01,              # 1% per trade (was 5%)
-    "default_balance_usd": 1000,          
-    "tp_ratio": 1.5,                     # 1.5:1 reward to risk ratio (profit = 1.5x stop loss)
-    "sl_percent": 1.0,                   # 1.0% Stop Loss (was 0.5% which is too tight)
-    "max_portfolio_exposure": 50,        # Allow 50% of balance in positions (was 90% - too risky)
-    "max_daily_loss": 5,                 # Can lose up to 5% daily (was 30% - too high)
-    "max_drawdown": 15,                  # Tolerate 15% drawdown (was 50% - too high)
-    "max_concurrent_positions": 5,       # Can hold up to 5 positions at once (was 25 - too many)
-    "max_correlation_exposure": 50,      # Sector correlation limits (was 80%)
-    "volatility_lookback": 20,           
-    "volatility_multiplier": 2.0,        # Accept volatile moves (was 2.5)
-    "min_position_size": 0.05,          # Minimum position size (was 0.01)
-    "max_position_size": 0.20,           # Allow up to 20% of balance in a single trade
-    "emergency_stop_loss": 0.05,         # Hard stop at 5% loss per position (was 30% - way too high)
-    "max_trades_per_hour": 10,            # Allow up to 10 trades per hour (was 50 - too many)
-    "market_volatility_threshold": 0.05, # Allow trading in normal vol markets (was 0.20 - too high)
-    "symbol_overrides": {}
+DEFAULT_RISK_CONFIG = { 
+  "trade_cooldown_seconds": 90,
+  "max_hold_seconds": 14400,
+  "risk_per_trade": 0.02,
+  "default_balance_usd": 1000,
+  "tp_ratio": 2.5,
+  "sl_percent": 1.0,
+  "max_portfolio_exposure": 60,
+  "max_daily_loss": 4,
+  "max_drawdown": 12,
+  "max_concurrent_positions": 7,
+  "max_correlation_exposure": 40,
+  "volatility_lookback": 20,
+  "volatility_multiplier": 1.5,
+  "min_position_size": 0.02,
+  "max_position_size": 0.3,
+  "emergency_stop_loss": 0.04,
+  "max_trades_per_hour": 20,
+  "market_volatility_threshold": 0.06,
+  "symbol_overrides": {}
 }
+
 
 
 class RiskManager:

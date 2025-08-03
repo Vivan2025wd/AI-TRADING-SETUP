@@ -46,5 +46,101 @@
     "timestamp": "2025-08-03T02:16:07.602961",
     "source": "exit_max_hold_time_5.7h",
     "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7146,
+    "price": 0.7146,
+    "qty": 27.987685,
+    "timestamp": "2025-08-03T04:07:08.934947",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7146,
+    "price": 0.7146,
+    "qty": 27.987685,
+    "timestamp": "2025-08-03T04:07:17.688286",
+    "source": "exit_max_hold_time_5.5h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7127,
+    "price": 0.7127,
+    "qty": 28.062298,
+    "timestamp": "2025-08-03T04:37:17.679870",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7126,
+    "price": 0.7126,
+    "qty": 28.066236,
+    "timestamp": "2025-08-03T04:47:19.224724",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7129,
+    "price": 0.7129,
+    "qty": 28.054426,
+    "timestamp": "2025-08-03T05:47:17.680845",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7131,
+    "price": 0.7131,
+    "qty": 28.046557,
+    "timestamp": "2025-08-03T05:55:58.590780",
+    "source": "exit_max_hold_time_5.6h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7125,
+    "price": 0.7125,
+    "qty": 28.070175,
+    "timestamp": "2025-08-03T06:17:17.693731",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.7148,
+    "price": 0.7148,
+    "qty": null,
+    "timestamp": "2025-08-03T06:27:18.385148",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
   }
 ]

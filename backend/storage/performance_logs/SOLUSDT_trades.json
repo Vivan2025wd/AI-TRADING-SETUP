@@ -142,5 +142,53 @@
     "timestamp": "2025-08-03T02:46:08.089106",
     "source": "exit_max_hold_time_5.7h",
     "data_interval": "1m"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 160.16,
+    "price": 160.16,
+    "qty": 0.124875,
+    "timestamp": "2025-08-03T04:17:17.678299",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 160.63,
+    "price": 160.63,
+    "qty": 0.12451,
+    "timestamp": "2025-08-03T04:27:42.184350",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "buy",
+    "confidence": 0.9536,
+    "score": 0.954,
+    "last_price": 160.27,
+    "price": 160.27,
+    "qty": 0.124789,
+    "timestamp": "2025-08-03T05:57:17.463879",
+    "source": "agent_consensus",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "SOLUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 160.43,
+    "price": 160.43,
+    "qty": 0.124665,
+    "timestamp": "2025-08-03T06:07:19.795907",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
   }
 ]

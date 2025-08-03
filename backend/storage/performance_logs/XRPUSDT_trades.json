@@ -22,5 +22,53 @@
     "timestamp": "2025-08-02T21:13:22.995250",
     "source": "exit_max_hold_time_5.7h",
     "data_interval": "1m"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 0.9499,
+    "score": 0.95,
+    "last_price": 2.8164,
+    "price": 2.8164,
+    "qty": 7.101264,
+    "timestamp": "2025-08-03T04:47:17.694626",
+    "source": "agent_consensus",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 2.8225,
+    "price": 2.8225,
+    "qty": null,
+    "timestamp": "2025-08-03T04:57:18.082522",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 0.9574,
+    "score": 0.957,
+    "last_price": 2.8397,
+    "price": 2.8397,
+    "qty": 7.042997,
+    "timestamp": "2025-08-03T05:27:17.685236",
+    "source": "agent_ml_primary",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 2.8425,
+    "price": 2.8425,
+    "qty": 7.03606,
+    "timestamp": "2025-08-03T05:37:18.315454",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
   }
 ]
