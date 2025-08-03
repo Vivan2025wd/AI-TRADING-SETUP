@@ -21,7 +21,7 @@ os.makedirs(TRADE_PROFITS_DIR, exist_ok=True)
 
 # --- Defaults ---
 DEFAULT_BALANCE = {
-    "USD": 100.0,
+    "USD": 1000.0,
     "holdings": {}
 }
 

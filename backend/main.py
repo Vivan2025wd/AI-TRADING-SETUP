@@ -29,8 +29,8 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Handle startup and shutdown events"""
     # Startup
-    logger.info("🚀 Starting AI Trading Dashboard...")
-    
+    logger.info("🚀 Starting TRADEHIVE.AI...")
+
     # Check if we should skip training (useful for development)
     skip_training = os.getenv("SKIP_STARTUP_TRAINING", "false").lower() == "true"
     force_retrain = os.getenv("FORCE_RETRAIN", "false").lower() == "true"
@@ -51,12 +51,12 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    logger.info("🛑 Shutting down AI Trading Dashboard...")
+    logger.info("🛑 Shutting down TRADEHIVE.AI...")
 
 
 # --- Initialize FastAPI app with lifespan ---
 app = FastAPI(
-    title="AI Trading Dashboard API",
+    title="TRADEHIVE.AI",
     description="Backend API for AI-driven trading system with multi-agent architecture.",
     version="1.0.0",
     lifespan=lifespan

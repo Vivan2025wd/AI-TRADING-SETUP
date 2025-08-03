@@ -1,0 +1,77 @@
+{
+  "symbol": "SOLUSDT",
+  "total_profit_dollars": 0.009,
+  "avg_profit_per_trade": 0.0015,
+  "total_trades": 6,
+  "wins": 4,
+  "losses": 2,
+  "win_rate": 66.67,
+  "trades": [
+    {
+      "entry_time": "2025-08-02T16:03:22.411510",
+      "entry_price": 161.59,
+      "exit_time": "2025-08-02T16:13:23.053757",
+      "exit_price": 161.77,
+      "qty": 0.123324,
+      "entry_value": 19.9279,
+      "exit_value": 19.9501,
+      "pnl_dollars": 0.0222,
+      "pnl_percentage": 0.11
+    },
+    {
+      "entry_time": "2025-08-02T16:43:22.435989",
+      "entry_price": 161.41,
+      "exit_time": "2025-08-02T16:53:22.983534",
+      "exit_price": 161.06,
+      "qty": 0.12387,
+      "entry_value": 19.9939,
+      "exit_value": 19.9505,
+      "pnl_dollars": -0.0434,
+      "pnl_percentage": -0.22
+    },
+    {
+      "entry_time": "2025-08-02T17:33:22.451552",
+      "entry_price": 161.89,
+      "exit_time": "2025-08-02T17:43:23.113087",
+      "exit_price": 161.17,
+      "qty": 0.123317,
+      "entry_value": 19.9638,
+      "exit_value": 19.875,
+      "pnl_dollars": -0.0888,
+      "pnl_percentage": -0.44
+    },
+    {
+      "entry_time": "2025-08-02T19:53:22.434353",
+      "entry_price": 157.74,
+      "exit_time": "2025-08-02T20:03:23.151412",
+      "exit_price": 157.74,
+      "qty": 0.12652,
+      "entry_value": 19.9573,
+      "exit_value": 19.9573,
+      "pnl_dollars": 0.0,
+      "pnl_percentage": 0.0
+    },
+    {
+      "entry_time": "2025-08-02T21:13:22.439426",
+      "entry_price": 158.51,
+      "exit_time": "2025-08-02T21:23:23.114248",
+      "exit_price": 158.54,
+      "qty": 0.125887,
+      "entry_value": 19.9543,
+      "exit_value": 19.9581,
+      "pnl_dollars": 0.0038,
+      "pnl_percentage": 0.02
+    },
+    {
+      "entry_time": "2025-08-03T02:36:03.726712",
+      "entry_price": 160.26,
+      "exit_time": "2025-08-03T02:46:08.089106",
+      "exit_price": 160.63,
+      "qty": 0.311274,
+      "entry_value": 49.8848,
+      "exit_value": 49.9999,
+      "pnl_dollars": 0.1152,
+      "pnl_percentage": 0.23
+    }
+  ]
+}

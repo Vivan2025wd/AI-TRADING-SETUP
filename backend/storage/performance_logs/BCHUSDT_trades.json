@@ -1,0 +1,98 @@
+[
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 525.9,
+    "price": 525.9,
+    "qty": 0.037988,
+    "timestamp": "2025-08-02T21:53:22.438192",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 526.2,
+    "price": 526.2,
+    "qty": null,
+    "timestamp": "2025-08-02T22:03:23.286220",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 520.9,
+    "price": 520.9,
+    "qty": 0.038344,
+    "timestamp": "2025-08-02T23:13:22.423841",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 521.2,
+    "price": 521.2,
+    "qty": 0.038321,
+    "timestamp": "2025-08-02T23:23:22.983719",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 518.2,
+    "price": 518.2,
+    "qty": 0.03852,
+    "timestamp": "2025-08-03T00:23:22.426345",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 517.0,
+    "price": 517.0,
+    "qty": null,
+    "timestamp": "2025-08-03T00:33:23.323958",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 525.3,
+    "price": 525.3,
+    "qty": 0.095184,
+    "timestamp": "2025-08-03T01:53:55.328178",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 526.7,
+    "price": 526.7,
+    "qty": null,
+    "timestamp": "2025-08-03T02:03:29.900072",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  }
+]

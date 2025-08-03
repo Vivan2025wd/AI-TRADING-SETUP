@@ -708,7 +708,7 @@ class MotherAI:
         except:
             return False
 
-    def make_portfolio_decision(self, min_score=0.5):
+    def make_portfolio_decision(self, min_score=0.7):
         """Enhanced portfolio decision making with comprehensive risk management and data consistency"""
         auto_cleanup_logs()
         
@@ -1109,52 +1109,3 @@ def test_different_intervals():
             print(f"  {symbol}: Data Compatible: {info.get('data_compatible', 'Unknown')}")
         
         print(f"\nCompleted test with {interval} interval")
-
-
-# FIXED DATA CONSISTENCY IMPLEMENTATION NOTES:
-"""
-CHANGES MADE TO FIX DATA CONSISTENCY ISSUE:
-
-1. SOLUTION 1 IMPLEMENTED: Changed MotherAI to use configurable data interval
-   - Added data_interval parameter to __init__ (defaults to "1m")
-   - Modified _fetch_agent_data to use self.data_interval instead of hardcoded "1h"
-   - All MotherAI operations now use consistent data interval
-
-2. SOLUTION 2 IMPLEMENTED: Made interval fully configurable
-   - MotherAI can be initialized with any interval: "1m", "5m", "15m", "1h", etc.
-   - Interval is stored and used consistently throughout the system
-
-3. SOLUTION 3 IMPLEMENTED: Added data validation
-   - Added _validate_data_compatibility method to check data intervals
-   - Enhanced _safe_evaluate_agent to warn about compatibility issues
-   - Added interval conversion utilities
-
-4. SOLUTION 4 IMPLEMENTED: Added debugging capabilities
-   - Added debug_data_intervals method to inspect actual intervals
-   - Enhanced logging to show what interval is being used
-   - Added CLI functions for debugging
-
-5. SOLUTION 5 PARTIALLY IMPLEMENTED: Enhanced confidence handling
-   - Exit conditions now adjust for different intervals
-   - Volatility thresholds adjust based on interval
-   - Time-based exits scale with interval
-
-6. ADDITIONAL ENHANCEMENTS:
-   - All trade logs now include data_interval for tracking
-   - Portfolio decisions track which interval was used
-   - Agent status summary includes data compatibility info
-   - Enhanced error handling and validation
-
-USAGE:
-# Use 1-minute data (recommended for consistency with agent predictions)
-mother_ai = MotherAI(data_interval="1m")
-
-# Use 5-minute data for less frequent trading
-mother_ai = MotherAI(data_interval="5m")
-
-# Debug data intervals
-mother_ai.debug_data_intervals()
-
-# Test different intervals
-test_different_intervals()
-"""

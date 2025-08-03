@@ -10,23 +10,23 @@ RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 
 # Enhanced Risk Configuration
 DEFAULT_RISK_CONFIG = {
-    "trade_cooldown_seconds": 3600,      # 1 hour cooldown for 1h timeframes (was 15s)
-    "max_hold_seconds": 3600,           # 1 hour hold (was 6h)
+    "trade_cooldown_seconds": 300,      # 5 minutes cooldown for 1h timeframes (was 15s)
+    "max_hold_seconds": 10800,           # 3 hours hold (was 6h)
     "risk_per_trade": 0.01,              # 1% per trade (was 5%)
     "default_balance_usd": 1000,          
-    "tp_ratio": 1.3,                     # 1.3:1 reward to risk ratio (profit = 1.3x stop loss)
+    "tp_ratio": 1.5,                     # 1.5:1 reward to risk ratio (profit = 1.5x stop loss)
     "sl_percent": 1.0,                   # 1.0% Stop Loss (was 0.5% which is too tight)
-    "max_portfolio_exposure": 20,        # Allow 20% of balance in positions (was 90% - too risky)
+    "max_portfolio_exposure": 50,        # Allow 50% of balance in positions (was 90% - too risky)
     "max_daily_loss": 5,                 # Can lose up to 5% daily (was 30% - too high)
     "max_drawdown": 15,                  # Tolerate 15% drawdown (was 50% - too high)
     "max_concurrent_positions": 5,       # Can hold up to 5 positions at once (was 25 - too many)
     "max_correlation_exposure": 50,      # Sector correlation limits (was 80%)
     "volatility_lookback": 20,           
     "volatility_multiplier": 2.0,        # Accept volatile moves (was 2.5)
-    "min_position_size": 0.005,          # Minimum position size (was 0.01)
-    "max_position_size": 0.02,           # Allow up to 2% of balance in a single trade
+    "min_position_size": 0.05,          # Minimum position size (was 0.01)
+    "max_position_size": 0.20,           # Allow up to 20% of balance in a single trade
     "emergency_stop_loss": 0.05,         # Hard stop at 5% loss per position (was 30% - way too high)
-    "max_trades_per_hour": 5,            # Allow up to 5 trades per hour (was 50 - too many)
+    "max_trades_per_hour": 10,            # Allow up to 10 trades per hour (was 50 - too many)
     "market_volatility_threshold": 0.05, # Allow trading in normal vol markets (was 0.20 - too high)
     "symbol_overrides": {}
 }
@@ -225,23 +225,43 @@ class RiskManager:
         return True, "approved"
     
     def check_market_conditions(self, symbol: str, df) -> Tuple[bool, str]:
-        """Check if market conditions are suitable for trading"""
-        if df is None or len(df) < 2:
+        """
+        Check if market conditions are suitable for trading with adaptive thresholds.
+        Allows volatility and breakout overrides if trend indicators align.
+        """
+        if df is None or len(df) < 20:  # Ensure enough data for trend calculations
             return False, "insufficient market data"
-        
-        # Check market volatility
-        recent_returns = df['close'].pct_change().dropna().tail(6)  # Last 6 hours
-        if len(recent_returns) > 0:
-            hourly_volatility = recent_returns.std()
-            if hourly_volatility > self.config["market_volatility_threshold"]:
-                return False, f"market too volatile ({hourly_volatility:.4f})"
-        
-        # Check for extreme price movements
+    
+    # Compute recent returns (volatility check)
+        recent_returns = df['close'].pct_change().dropna().tail(6)
+        hourly_volatility = recent_returns.std() if len(recent_returns) > 0 else 0.0
+
+    # Calculate trend strength (simple EMA slope)
+        ema_short = df['close'].ewm(span=10).mean()
+        ema_long = df['close'].ewm(span=20).mean()
+        trend_strength = ema_short.iloc[-1] - ema_long.iloc[-1]
+
+        # Adaptive volatility threshold
+        volatility_threshold = self.config["market_volatility_threshold"]
+        if abs(trend_strength) > df['close'].iloc[-1] * 0.001:  # If trending
+            volatility_threshold *= 1.5  # Loosen threshold by 50% in trending markets
+
+        if hourly_volatility > volatility_threshold:
+            return False, f"market too volatile ({hourly_volatility:.4f}), threshold: {volatility_threshold:.4f}"
+
+        # Extreme price movement detection (breakout check)
         price_change = (df['close'].iloc[-1] - df['close'].iloc[-2]) / df['close'].iloc[-2]
-        if abs(price_change) > self.config["emergency_stop_loss"] / 100.0:
-            return False, f"extreme price movement detected ({price_change:.4f})"
-        
+        emergency_stop_loss = self.config["emergency_stop_loss"] / 100.0
+
+        # Allow breakout if trend supports it
+        if abs(price_change) > emergency_stop_loss:
+            if abs(trend_strength) > df['close'].iloc[-1] * 0.002:  # Strong trend override
+                return True, f"breakout detected but trend strong ({price_change:.4f})"
+            else:
+                return False, f"extreme price movement detected ({price_change:.4f})"
+
         return True, "market conditions acceptable"
+
     
     def update_portfolio_metrics(self, current_positions: Dict):
         """Update portfolio-level metrics"""
@@ -323,33 +343,3 @@ class RiskManager:
             report["warnings"].append("High portfolio exposure")
         
         return report
-
-
-# Example Usage:
-def example_usage():
-    """Example of how to use the fixed risk manager"""
-    # Initialize risk manager
-    risk_manager = RiskManager()
-
-    # Calculate trade parameters
-    symbol = "AVAXUSDT"
-    entry_price = 21.73
-    balance = 1000.0
-
-    trade_params = risk_manager.calculate_trade_parameters(symbol, entry_price, balance)
-
-    print(f"Entry: ${trade_params['entry_price']:.4f}")
-    print(f"Stop Loss: ${trade_params['stop_loss']:.4f}")  # Should be ~$21.51
-    print(f"Take Profit: ${trade_params['take_profit']:.4f}")  # Should be ~$22.17
-
-    print(f"\nCurrent System (Fixed Fractional):")
-    print(f"Quantity: {trade_params['quantity_fractional']:.6f}")  # ~0.46 AVAX
-    print(f"Position Value: ${trade_params['position_value_fractional']:.2f}")  # ~$10
-    print(f"Actual Risk: ${trade_params['actual_risk_fractional']:.2f}")  # ~$0.10
-
-    print(f"\nBetter System (Kelly/Fixed Risk):")
-    print(f"Quantity: {trade_params['quantity_kelly']:.6f}")  # ~45 AVAX
-    print(f"Position Value: ${trade_params['position_value_kelly']:.2f}")  # ~$987
-    print(f"Actual Risk: ${trade_params['actual_risk_kelly']:.2f}")  # Exactly $10
-
-    print(f"\nRecommended: {trade_params['recommended_method']} method") 
