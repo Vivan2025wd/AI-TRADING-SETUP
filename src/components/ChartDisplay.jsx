@@ -20,7 +20,7 @@ export default function MotherAIBalanceChart() {
   const [error, setError] = useState(null);
   const [refreshToggle, setRefreshToggle] = useState(false);
 
-  const initialCapital = 100; // <-- Set your starting capital here
+  const initialCapital = 1000; // <-- Set your starting capital here
 
   // Fetch available symbols
   useEffect(() => {

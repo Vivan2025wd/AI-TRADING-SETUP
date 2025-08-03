@@ -1,11 +1,11 @@
 {
   "symbol": "DOTUSDT",
-  "total_profit_dollars": 0.1603,
-  "avg_profit_per_trade": 0.0321,
-  "total_trades": 5,
+  "total_profit_dollars": -0.142,
+  "avg_profit_per_trade": -0.0203,
+  "total_trades": 7,
   "wins": 4,
-  "losses": 1,
-  "win_rate": 80.0,
+  "losses": 3,
+  "win_rate": 57.14,
   "trades": [
     {
       "entry_time": "2025-08-02T17:53:22.422494",
@@ -61,6 +61,28 @@
       "exit_value": 20.0,
       "pnl_dollars": 0.0,
       "pnl_percentage": 0.0
+    },
+    {
+      "entry_time": "2025-08-03T09:06:46.026682",
+      "entry_price": 3.576,
+      "exit_time": "2025-08-03T09:16:46.193845",
+      "exit_price": 3.572,
+      "qty": 5.592841,
+      "entry_value": 20.0,
+      "exit_value": 19.9776,
+      "pnl_dollars": -0.0224,
+      "pnl_percentage": -0.11
+    },
+    {
+      "entry_time": "2025-08-03T14:19:09.534125",
+      "entry_price": 3.574,
+      "exit_time": "2025-08-03T14:29:10.072791",
+      "exit_price": 3.572,
+      "qty": 139.977604,
+      "entry_value": 500.28,
+      "exit_value": 500.0,
+      "pnl_dollars": -0.28,
+      "pnl_percentage": -0.06
     }
   ]
 }

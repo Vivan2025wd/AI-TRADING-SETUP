@@ -29,7 +29,7 @@ os.makedirs(PERFORMANCE_LOG_DIR, exist_ok=True)
 
 class MotherAI:
     def __init__(self, agents_dir="backend/agents", strategy_dir="backend/storage/strategies", 
-                 agent_symbols=None, data_interval="1m"):
+                 agent_symbols=None, data_interval="30m"):
         """
         Initialize MotherAI with configurable data interval
         

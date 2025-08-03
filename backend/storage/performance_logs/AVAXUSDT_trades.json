@@ -142,5 +142,89 @@
     "timestamp": "2025-08-03T01:53:58.247876",
     "source": "exit_max_hold_time_5.5h",
     "data_interval": "1m"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 21.36,
+    "price": 21.36,
+    "qty": 23.40824,
+    "timestamp": "2025-08-03T11:37:41.511009",
+    "source": "agent_rule_based",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 21.38,
+    "price": 21.38,
+    "qty": null,
+    "timestamp": "2025-08-03T11:46:46.486032",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.8822,
+    "score": 0.882,
+    "last_price": 21.42,
+    "price": 21.42,
+    "qty": 23.34267,
+    "timestamp": "2025-08-03T13:17:45.456143",
+    "source": "agent_ml_primary",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 21.4,
+    "price": 21.4,
+    "qty": 23.364486,
+    "timestamp": "2025-08-03T13:18:12.984105",
+    "source": "exit_max_hold_time_5.5h",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.8502,
+    "score": 0.85,
+    "last_price": 21.37,
+    "price": 21.37,
+    "qty": 23.397286,
+    "timestamp": "2025-08-03T13:59:08.923013",
+    "source": "agent_ml_primary",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 21.41,
+    "price": 21.41,
+    "qty": 23.353573,
+    "timestamp": "2025-08-03T14:09:10.136931",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.9153,
+    "score": 0.915,
+    "last_price": 21.34,
+    "price": 21.34,
+    "qty": 23.430178,
+    "timestamp": "2025-08-03T14:59:41.504780",
+    "source": "agent_ml_primary",
+    "data_interval": "30m"
   }
 ]
