@@ -1,11 +1,11 @@
 {
   "symbol": "ETHUSDT",
-  "total_profit_dollars": 0.1826,
-  "avg_profit_per_trade": 0.0083,
-  "total_trades": 22,
-  "wins": 14,
+  "total_profit_dollars": 0.2072,
+  "avg_profit_per_trade": 0.009,
+  "total_trades": 23,
+  "wins": 15,
   "losses": 8,
-  "win_rate": 63.64,
+  "win_rate": 65.22,
   "trades": [
     {
       "entry_time": "2025-08-02T16:23:22.414836",
@@ -248,6 +248,17 @@
       "exit_value": 19.9994,
       "pnl_dollars": 0.0,
       "pnl_percentage": 0.0
+    },
+    {
+      "entry_time": "2025-08-03T07:07:30.295012",
+      "entry_price": 3446.75,
+      "exit_time": "2025-08-03T07:17:20.445471",
+      "exit_price": 3451.0,
+      "qty": 0.005795,
+      "entry_value": 19.9739,
+      "exit_value": 19.9985,
+      "pnl_dollars": 0.0246,
+      "pnl_percentage": 0.12
     }
   ]
 }

@@ -538,5 +538,17 @@
     "timestamp": "2025-08-03T07:07:30.295012",
     "source": "agent_ml_primary",
     "data_interval": "1m"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 3451.0,
+    "price": 3451.0,
+    "qty": 0.005795,
+    "timestamp": "2025-08-03T07:17:20.445471",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
   }
 ]
