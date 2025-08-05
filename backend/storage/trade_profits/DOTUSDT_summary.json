@@ -1,11 +1,11 @@
 {
   "symbol": "DOTUSDT",
-  "total_profit_dollars": -0.142,
-  "avg_profit_per_trade": -0.0203,
-  "total_trades": 7,
-  "wins": 4,
-  "losses": 3,
-  "win_rate": 57.14,
+  "total_profit_dollars": 0.0459,
+  "avg_profit_per_trade": 0.0038,
+  "total_trades": 12,
+  "wins": 8,
+  "losses": 4,
+  "win_rate": 66.67,
   "trades": [
     {
       "entry_time": "2025-08-02T17:53:22.422494",
@@ -83,6 +83,61 @@
       "exit_value": 500.0,
       "pnl_dollars": -0.28,
       "pnl_percentage": -0.06
+    },
+    {
+      "entry_time": "2025-08-04T04:02:19.370537",
+      "entry_price": 3.627,
+      "exit_time": "2025-08-04T04:04:59.999049",
+      "exit_price": 3.63,
+      "qty": 137.741047,
+      "entry_value": 499.5868,
+      "exit_value": 500.0,
+      "pnl_dollars": 0.4132,
+      "pnl_percentage": 0.08
+    },
+    {
+      "entry_time": "2025-08-04T04:25:23.973003",
+      "entry_price": 3.621,
+      "exit_time": "2025-08-04T04:35:24.335857",
+      "exit_price": 3.618,
+      "qty": 138.083402,
+      "entry_value": 500.0,
+      "exit_value": 499.5857,
+      "pnl_dollars": -0.4143,
+      "pnl_percentage": -0.08
+    },
+    {
+      "entry_time": "2025-08-04T19:39:51.017360",
+      "entry_price": 3.673,
+      "exit_time": "2025-08-04T19:49:52.234366",
+      "exit_price": 3.676,
+      "qty": 27.010955,
+      "entry_value": 99.2112,
+      "exit_value": 99.2923,
+      "pnl_dollars": 0.081,
+      "pnl_percentage": 0.08
+    },
+    {
+      "entry_time": "2025-08-04T20:19:51.013718",
+      "entry_price": 3.678,
+      "exit_time": "2025-08-04T20:29:52.104487",
+      "exit_price": 3.682,
+      "qty": 26.968251,
+      "entry_value": 99.1892,
+      "exit_value": 99.2971,
+      "pnl_dollars": 0.1079,
+      "pnl_percentage": 0.11
+    },
+    {
+      "entry_time": "2025-08-05T04:52:57.750823",
+      "entry_price": 3.654,
+      "exit_time": "2025-08-05T04:53:10.936150",
+      "exit_price": 3.654,
+      "qty": 136.836344,
+      "entry_value": 500.0,
+      "exit_value": 500.0,
+      "pnl_dollars": 0.0,
+      "pnl_percentage": 0.0
     }
   ]
 }
