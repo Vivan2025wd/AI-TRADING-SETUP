@@ -1,11 +1,11 @@
 {
   "symbol": "LTCUSDT",
-  "total_profit_dollars": 1.534,
-  "avg_profit_per_trade": 0.1918,
-  "total_trades": 8,
-  "wins": 5,
-  "losses": 3,
-  "win_rate": 62.5,
+  "total_profit_dollars": 1.5518,
+  "avg_profit_per_trade": 0.0913,
+  "total_trades": 17,
+  "wins": 9,
+  "losses": 8,
+  "win_rate": 52.94,
   "trades": [
     {
       "entry_time": "2025-08-02T16:53:22.433792",
@@ -94,6 +94,105 @@
       "exit_value": 99.3723,
       "pnl_dollars": 0.0176,
       "pnl_percentage": 0.02
+    },
+    {
+      "entry_time": "2025-08-05T12:35:40.271138",
+      "entry_price": 123.75,
+      "exit_time": "2025-08-05T12:45:41.002001",
+      "exit_price": 124.18,
+      "qty": 4.026413,
+      "entry_value": 498.2686,
+      "exit_value": 500.0,
+      "pnl_dollars": 1.7314,
+      "pnl_percentage": 0.35
+    },
+    {
+      "entry_time": "2025-08-05T13:25:40.244301",
+      "entry_price": 123.63,
+      "exit_time": "2025-08-05T13:35:40.777579",
+      "exit_price": 123.32,
+      "qty": 4.054492,
+      "entry_value": 501.2568,
+      "exit_value": 500.0,
+      "pnl_dollars": -1.2569,
+      "pnl_percentage": -0.25
+    },
+    {
+      "entry_time": "2025-08-05T14:06:38.207594",
+      "entry_price": 122.82,
+      "exit_time": "2025-08-05T15:36:58.537004",
+      "exit_price": 122.13,
+      "qty": 4.070998,
+      "entry_value": 500.0,
+      "exit_value": 497.191,
+      "pnl_dollars": -2.809,
+      "pnl_percentage": -0.56
+    },
+    {
+      "entry_time": "2025-08-05T18:16:39.773274",
+      "entry_price": 120.66,
+      "exit_time": "2025-08-05T18:21:20.749816",
+      "exit_price": 120.64,
+      "qty": 4.144562,
+      "entry_value": 500.0829,
+      "exit_value": 500.0,
+      "pnl_dollars": -0.0829,
+      "pnl_percentage": -0.02
+    },
+    {
+      "entry_time": "2025-08-05T18:51:20.224417",
+      "entry_price": 120.15,
+      "exit_time": "2025-08-05T18:56:40.605468",
+      "exit_price": 119.91,
+      "qty": 4.169794,
+      "entry_value": 501.0007,
+      "exit_value": 500.0,
+      "pnl_dollars": -1.0008,
+      "pnl_percentage": -0.2
+    },
+    {
+      "entry_time": "2025-08-05T19:26:39.792944",
+      "entry_price": 119.89,
+      "exit_time": "2025-08-05T19:36:40.376946",
+      "exit_price": 119.95,
+      "qty": 4.168404,
+      "entry_value": 499.75,
+      "exit_value": 500.0001,
+      "pnl_dollars": 0.2501,
+      "pnl_percentage": 0.05
+    },
+    {
+      "entry_time": "2025-08-05T20:21:20.235631",
+      "entry_price": 120.3,
+      "exit_time": "2025-08-05T20:26:40.391649",
+      "exit_price": 120.24,
+      "qty": 4.15835,
+      "entry_value": 500.2495,
+      "exit_value": 500.0,
+      "pnl_dollars": -0.2495,
+      "pnl_percentage": -0.05
+    },
+    {
+      "entry_time": "2025-08-05T20:56:39.786268",
+      "entry_price": 119.79,
+      "exit_time": "2025-08-05T21:06:40.418655",
+      "exit_price": 120.4,
+      "qty": 4.152824,
+      "entry_value": 497.4668,
+      "exit_value": 500.0,
+      "pnl_dollars": 2.5332,
+      "pnl_percentage": 0.51
+    },
+    {
+      "entry_time": "2025-08-06T13:14:26.380520",
+      "entry_price": 115.34,
+      "exit_time": "2025-08-06T13:24:14.027982",
+      "exit_price": 115.76,
+      "qty": 2.147863,
+      "entry_value": 247.7345,
+      "exit_value": 248.6366,
+      "pnl_dollars": 0.9021,
+      "pnl_percentage": 0.36
     }
   ]
 }

@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class EnhancedBatchTrainer:
-    """Enhanced batch trainer with better validation and error handling for 30m data"""
+    """Enhanced batch trainer with better validation and error handling for 1h data"""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.base_dir = Path(__file__).resolve().parent.parent
@@ -44,17 +44,20 @@ class EnhancedBatchTrainer:
         self.training_results = {}
 
     def load_and_validate_data(self, symbol: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """Load and validate 30m OHLCV and labels data"""
-        logger.info(f"📊 Loading 30m data for {symbol}...")
+        """Load and validate 1h OHLCV and labels data"""
+        logger.info(f"📊 Loading 1h data for {symbol}...")
         
-        # Load 30m OHLCV data
-        ohlcv_path = self.ohlcv_dir / f"{symbol}_30m.csv"
+        # Load 1h OHLCV data (prioritize 1h, fallback to older data)
+        ohlcv_path = self.ohlcv_dir / f"{symbol}_1h.csv"
         if not ohlcv_path.exists():
-            # Fallback to 1h data if 30m doesn't exist
-            ohlcv_path = self.ohlcv_dir / f"{symbol}_1h.csv"
+            # Try without timeframe suffix (legacy naming)
+            ohlcv_path = self.ohlcv_dir / f"{symbol}.csv"
             if not ohlcv_path.exists():
-                raise FileNotFoundError(f"OHLCV data not found: {ohlcv_path}")
-            logger.warning(f"Using 1h data instead of 30m for {symbol}")
+                # Try with USDT suffix
+                ohlcv_path = self.ohlcv_dir / f"{symbol}USDT_1h.csv"
+                if not ohlcv_path.exists():
+                    raise FileNotFoundError(f"1h OHLCV data not found for {symbol}")
+            logger.info(f"Using fallback OHLCV file for {symbol}")
         
         ohlcv_df = pd.read_csv(ohlcv_path, index_col=0, parse_dates=True)
         ohlcv_df = ohlcv_df.sort_index()
@@ -72,7 +75,7 @@ class EnhancedBatchTrainer:
         
         # Load labels (try different methods in order of preference)
         labels_df = None
-        label_methods = ['outcome', 'hybrid', 'trade', '']
+        label_methods = ['1h_outcome', 'outcome', '1h_hybrid', 'hybrid', '1h_trade', 'trade', '1h', '']
         
         for method in label_methods:
             suffix = f"_{method}_labels" if method else "_labels"
@@ -88,7 +91,7 @@ class EnhancedBatchTrainer:
                     continue
         
         if labels_df is None:
-            raise FileNotFoundError(f"No valid labels found for {symbol}")
+            raise FileNotFoundError(f"No valid 1h labels found for {symbol}")
         
         # Validate labels - check for both 'action' and 'label' columns
         label_col = None
@@ -110,7 +113,7 @@ class EnhancedBatchTrainer:
         if label_col != 'action':
             labels_df['action'] = labels_df[label_col]
         
-        logger.info(f"✅ {symbol}: Loaded {len(ohlcv_df)} OHLCV rows, {len(labels_df)} labels")
+        logger.info(f"✅ {symbol}: Loaded {len(ohlcv_df)} 1h OHLCV rows, {len(labels_df)} labels")
         
         return ohlcv_df, labels_df
 
@@ -140,7 +143,7 @@ class EnhancedBatchTrainer:
             raise
 
     def prepare_training_data(self, features_df: pd.DataFrame, labels_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
-        """Prepare aligned training data with 30m considerations"""
+        """Prepare aligned training data for 1h timeframe"""
         # Find common timestamps
         common_index = features_df.index.intersection(labels_df.index)
         
@@ -148,17 +151,16 @@ class EnhancedBatchTrainer:
             # Try fuzzy matching for different timeframes
             logger.warning("No exact timestamp matches, attempting fuzzy alignment...")
             
-            # For 30m data, we might need to align with hourly labels
-            # Find the closest timestamps within a reasonable window (30 minutes)
+            # For 1h data, allow matching within 1 hour window
             aligned_features = []
             aligned_labels = []
             
             for label_time in labels_df.index:
-                # Find features within 30 minutes of label time
+                # Find features within 1 hour of label time
                 time_diff = abs(features_df.index - label_time)
                 closest_idx = time_diff.idxmin()
                 
-                if time_diff[closest_idx] <= pd.Timedelta(minutes=30):
+                if time_diff[closest_idx] <= pd.Timedelta(hours=1):
                     aligned_features.append(features_df.loc[closest_idx])
                     aligned_labels.append(labels_df.loc[label_time, 'action'])
             
@@ -200,8 +202,8 @@ class EnhancedBatchTrainer:
         )
 
     def train_and_validate_model(self, X: pd.DataFrame, y: pd.Series, symbol: str) -> Dict[str, Any]:
-        """Train model with comprehensive validation"""
-        logger.info(f"🧠 Training 30m model for {symbol}...")
+        """Train model with comprehensive validation for 1h timeframe"""
+        logger.info(f"🧠 Training 1h model for {symbol}...")
         
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
@@ -239,7 +241,7 @@ class EnhancedBatchTrainer:
             'symbol': symbol,
             'timestamp': datetime.now().isoformat(),
             'model_type': type(model).__name__,
-            'timeframe': '30m',  # Added timeframe indicator
+            'timeframe': '1h',  # Updated timeframe indicator
             'training_samples': len(X_train),
             'test_samples': len(X_test),
             'total_features': len(X.columns),
@@ -260,11 +262,11 @@ class EnhancedBatchTrainer:
         results['validation_passed'] = validation_passed
         
         if validation_passed:
-            # Save model with 30m indicator
-            model_path = self.models_dir / f"{symbol.lower()}_30m_model.pkl"
+            # Save model with standard naming (no timeframe suffix for 1h)
+            model_path = self.models_dir / f"{symbol.lower()}_model.pkl"
             joblib.dump(model, model_path)
             results['model_path'] = str(model_path)
-            logger.info(f"✅ {symbol}: 30m model saved to {model_path}")
+            logger.info(f"✅ {symbol}: 1h model saved to {model_path}")
         else:
             logger.warning(f"⚠️ {symbol}: Model failed validation, not saved")
         
@@ -302,9 +304,9 @@ class EnhancedBatchTrainer:
         return passed
 
     def train_symbol(self, symbol: str) -> Dict[str, Any]:
-        """Train model for a single symbol"""
+        """Train 1h model for a single symbol"""
         try:
-            logger.info(f"🎯 Starting 30m training for {symbol}")
+            logger.info(f"🎯 Starting 1h training for {symbol}")
             
             # Load and validate data
             ohlcv_df, labels_df = self.load_and_validate_data(symbol)
@@ -324,7 +326,7 @@ class EnhancedBatchTrainer:
             # Store results
             self.training_results[symbol] = results
             
-            logger.info(f"✅ {symbol}: 30m training completed successfully")
+            logger.info(f"✅ {symbol}: 1h training completed successfully")
             logger.info(f"   Test Accuracy: {results['test_metrics']['accuracy']:.3f}")
             logger.info(f"   CV Score: {results['cross_validation']['mean_accuracy']:.3f} ± {results['cross_validation']['std_accuracy']:.3f}")
             
@@ -334,31 +336,31 @@ class EnhancedBatchTrainer:
             error_result = {
                 'symbol': symbol,
                 'timestamp': datetime.now().isoformat(),
-                'timeframe': '30m',
+                'timeframe': '1h',
                 'status': 'failed',
                 'error': str(e)
             }
             
             self.training_results[symbol] = error_result
-            logger.error(f"❌ {symbol}: 30m training failed - {e}")
+            logger.error(f"❌ {symbol}: 1h training failed - {e}")
             
             return error_result
 
     def _log_training_results(self, symbol: str, results: Dict[str, Any]):
         """Log detailed training results"""
-        log_path = self.logs_dir / f"{symbol}_30m_training_results.json"
+        log_path = self.logs_dir / f"{symbol}_1h_training_results.json"
         
         try:
             with open(log_path, 'w') as f:
                 json.dump(results, f, indent=2, default=str)
             
-            logger.info(f"📝 30m training log saved to {log_path}")
+            logger.info(f"📝 1h training log saved to {log_path}")
             
         except Exception as e:
             logger.warning(f"Failed to save training log for {symbol}: {e}")
 
     def batch_train(self, symbols: Optional[List[str]] = None) -> Dict[str, Dict[str, Any]]:
-        """Train 30m models for multiple symbols"""
+        """Train 1h models for multiple symbols"""
         if symbols is None:
             symbols = self.system_config.symbols
     
@@ -366,7 +368,7 @@ class EnhancedBatchTrainer:
             logger.error("No symbols provided for batch training.")
             return {}
     
-        logger.info(f"🚀 Starting 30m batch training for {len(symbols)} symbols")
+        logger.info(f"🚀 Starting 1h batch training for {len(symbols)} symbols")
         logger.info(f"Symbols: {', '.join(symbols)}")
 
         results = {}
@@ -387,7 +389,7 @@ class EnhancedBatchTrainer:
                 logger.error(f"❌ {symbol}: Batch training error - {e}")
                 results[symbol] = {
                     'symbol': symbol,
-                    'timeframe': '30m',
+                    'timeframe': '1h',
                     'status': 'failed',
                     'error': str(e)
                 }
@@ -397,7 +399,7 @@ class EnhancedBatchTrainer:
         self._save_batch_summary(results, successful, failed)
         
         logger.info("=" * 60)
-        logger.info("🎯 30M BATCH TRAINING SUMMARY")
+        logger.info("🎯 1H BATCH TRAINING SUMMARY")
         logger.info("=" * 60)
         logger.info(f"✅ Successful: {successful}")
         logger.info(f"❌ Failed: {failed}")
@@ -410,7 +412,7 @@ class EnhancedBatchTrainer:
         """Save batch training summary"""
         summary = {
             'timestamp': datetime.now().isoformat(),
-            'timeframe': '30m',
+            'timeframe': '1h',
             'total_symbols': len(results),
             'successful': successful,
             'failed': failed,
@@ -418,13 +420,13 @@ class EnhancedBatchTrainer:
             'results': results
         }
         
-        # Save training summary
-        summary_path = self.models_dir / "30m_training_summary.json"
+        # Save training summary with standard filename (no timeframe suffix for 1h)
+        summary_path = self.models_dir / "training_summary.json"
         try:
             with open(summary_path, 'w') as f:
                 json.dump(summary, f, indent=2, default=str)
             
-            logger.info(f"📊 30m batch summary saved to {summary_path}")
+            logger.info(f"📊 1h batch summary saved to {summary_path}")
             
         except Exception as e:
             logger.warning(f"Failed to save batch summary: {e}")
@@ -434,20 +436,17 @@ class EnhancedBatchTrainer:
         status = {}
         
         for symbol in self.system_config.symbols:
-            # Check for 30m model first
-            model_path_30m = self.models_dir / f"{symbol.lower()}_30m_model.pkl"
+            # Check for 1h model (standard naming)
             model_path_1h = self.models_dir / f"{symbol.lower()}_model.pkl"
             
-            if model_path_30m.exists():
+            if model_path_1h.exists():
                 # Check if model is recent
-                model_age_days = (datetime.now().timestamp() - model_path_30m.stat().st_mtime) / 86400
+                model_age_days = (datetime.now().timestamp() - model_path_1h.stat().st_mtime) / 86400
                 
                 if model_age_days <= self.system_config.retrain_interval_days:
-                    status[symbol] = "up_to_date_30m"
+                    status[symbol] = "up_to_date_1h"
                 else:
-                    status[symbol] = "needs_retrain_30m"
-            elif model_path_1h.exists():
-                status[symbol] = "has_1h_model_only"
+                    status[symbol] = "needs_retrain_1h"
             else:
                 status[symbol] = "no_model"
         
@@ -469,11 +468,11 @@ def main():
         
         # Print final summary
         successful_models = [s for s, r in results.items() if r.get('validation_passed', False)]
-        print(f"\n🎉 30m training completed!")
-        print(f"✅ Successfully trained 30m models: {', '.join(successful_models)}")
+        print(f"\n🎉 1h training completed!")
+        print(f"✅ Successfully trained 1h models: {', '.join(successful_models)}")
         
     except Exception as e:
-        logger.error(f"💥 30m batch training failed: {e}")
+        logger.error(f"💥 1h batch training failed: {e}")
         raise
 
 

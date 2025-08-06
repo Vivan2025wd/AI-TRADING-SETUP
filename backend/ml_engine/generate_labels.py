@@ -17,12 +17,12 @@ os.makedirs(LABELS_DIR, exist_ok=True)
 
 class TradingLabelGenerator:
     def __init__(self, 
-                 forward_window: int = 48,    # Look 48 periods ahead (24h for 30m data)
+                 forward_window: int = 24,     # Look 24 periods ahead (24h for 1h data)
                  backward_window: int = 0,     # No backward labeling to prevent leakage
-                 min_return_threshold: float = 0.015,  # 1.5% minimum return (adjusted for shorter timeframe)
-                 stop_loss_threshold: float = -0.04,   # -4% stop loss
-                 hold_threshold: float = 0.005,        # 0.5% for hold signals
-                 timeframe: str = "30m"):              # Default to 30m
+                 min_return_threshold: float = 0.015,  # 1.5% minimum return (more lenient for 1h)
+                 stop_loss_threshold: float = -0.03,   # -3% stop loss (more lenient)
+                 hold_threshold: float = 0.008,        # 0.8% for hold signals (more lenient)
+                 timeframe: str = "1h"):               # Default to 1h
         self.forward_window = forward_window
         self.backward_window = backward_window
         self.min_return_threshold = min_return_threshold
@@ -31,11 +31,11 @@ class TradingLabelGenerator:
         self.timeframe = timeframe
 
     def load_ohlcv(self, symbol: str) -> pd.DataFrame:
-        """Load OHLCV data with support for both 30m and 1h timeframes"""
-        # Try 30m first, then fallback to 1h
+        """Load OHLCV data with support for 1h timeframe (prioritize 1h over 30m)"""
+        # Try 1h first, then fallback to 30m
         paths_to_try = [
-            os.path.join(OHLCV_DIR, f"{symbol}_30m.csv"),
-            os.path.join(OHLCV_DIR, f"{symbol}_1h.csv")
+            os.path.join(OHLCV_DIR, f"{symbol}_1h.csv"),
+            os.path.join(OHLCV_DIR, f"{symbol}_30m.csv")
         ]
         
         for path in paths_to_try:
@@ -45,14 +45,14 @@ class TradingLabelGenerator:
                     df = df.sort_index()  # Ensure chronological order
                     
                     # Determine actual timeframe from filename
-                    if "30m" in path:
+                    if "1h" in path:
+                        self.actual_timeframe = "1h"
+                        # Use 24 periods for 1h data (24 periods = 24 hours)
+                        self.forward_window = 24
+                    else:
                         self.actual_timeframe = "30m"
                         # Adjust forward window for 30m data (48 periods = 24 hours)
                         self.forward_window = 48
-                    else:
-                        self.actual_timeframe = "1h"
-                        # Keep original forward window for 1h data (24 periods = 24 hours)
-                        self.forward_window = 24
                     
                     logger.info(f"Loaded {self.actual_timeframe} data for {symbol} ({len(df)} candles)")
                     
@@ -69,18 +69,18 @@ class TradingLabelGenerator:
     def _add_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         """Add technical indicators to help with labeling context (adjusted for timeframe)"""
         # Adjust periods based on timeframe
-        if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "30m":
+        if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "1h":
+            # For 1h data, use standard periods
+            sma_short = 20   # 20 hours
+            sma_long = 50    # 50 hours
+            volatility_window = 24  # 24 hours
+            momentum_period = 6     # 6 hours
+        else:
             # For 30m data, use longer periods to get similar time coverage
             sma_short = 40   # 20 hours
             sma_long = 100   # 50 hours
             volatility_window = 48  # 24 hours
             momentum_period = 12    # 6 hours
-        else:
-            # For 1h data, use original periods
-            sma_short = 20   # 20 hours
-            sma_long = 50    # 50 hours
-            volatility_window = 24  # 24 hours
-            momentum_period = 6     # 6 hours
         
         # Simple moving averages
         df['sma_short'] = df['close'].rolling(sma_short).mean()
@@ -118,12 +118,12 @@ class TradingLabelGenerator:
         returns_df = ohlcv[['close']].copy()
         
         # Adjust horizons based on timeframe
-        if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "30m":
-            # For 30m data: 12, 24, 48, 96 periods = 6h, 12h, 24h, 48h
-            horizons = [(12, '6h'), (24, '12h'), (48, '24h'), (96, '48h')]
-        else:
+        if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "1h":
             # For 1h data: 6, 12, 24, 48 periods = 6h, 12h, 24h, 48h
             horizons = [(6, '6h'), (12, '12h'), (24, '24h'), (48, '48h')]
+        else:
+            # For 30m data: 12, 24, 48, 96 periods = 6h, 12h, 24h, 48h
+            horizons = [(12, '6h'), (24, '12h'), (48, '24h'), (96, '48h')]
         
         # Calculate returns at multiple horizons
         for horizon_periods, horizon_name in horizons:
@@ -144,7 +144,7 @@ class TradingLabelGenerator:
         return returns_df
 
     def generate_outcome_based_labels(self, ohlcv: pd.DataFrame) -> pd.Series:
-        """Generate labels based on future price movements (adjusted for 30m timeframe)"""
+        """Generate labels based on future price movements (adjusted for 1h timeframe)"""
         returns_df = self.calculate_future_returns(ohlcv)
         labels = pd.Series('hold', index=ohlcv.index)
         
@@ -158,19 +158,19 @@ class TradingLabelGenerator:
                 continue
                 
             # Use volatility-adjusted thresholds
-            vol = ohlcv['volatility'].iloc[i] if not pd.isna(ohlcv['volatility'].iloc[i]) else 0.015
+            vol = ohlcv['volatility'].iloc[i] if not pd.isna(ohlcv['volatility'].iloc[i]) else 0.02
             
             # Dynamic thresholds based on volatility and timeframe
-            if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "30m":
-                # Slightly lower thresholds for 30m data due to more frequent signals
-                buy_threshold = max(self.min_return_threshold * 0.8, vol * 1.5)
-                sell_threshold = min(self.stop_loss_threshold * 0.8, -vol * 2.5)
-                hold_threshold = min(self.hold_threshold, vol * 0.8)
+            if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "1h":
+                # More lenient thresholds for 1h data to get more samples
+                buy_threshold = max(self.min_return_threshold * 0.8, vol * 1.5)  # More lenient
+                sell_threshold = min(self.stop_loss_threshold * 0.8, -vol * 2)   # More lenient
+                hold_threshold = min(self.hold_threshold * 1.2, vol * 1.5)       # More lenient
             else:
-                # Original thresholds for 1h data
-                buy_threshold = max(self.min_return_threshold, vol * 2)
-                sell_threshold = min(self.stop_loss_threshold, -vol * 3)
-                hold_threshold = min(self.hold_threshold, vol)
+                # Standard thresholds for 30m data
+                buy_threshold = max(self.min_return_threshold, vol * 1.5)
+                sell_threshold = min(self.stop_loss_threshold, -vol * 2.5)
+                hold_threshold = min(self.hold_threshold, vol * 0.8)
             
             # Check forward return
             future_return = returns_df[return_col].iloc[i]
@@ -217,7 +217,7 @@ class TradingLabelGenerator:
                     actual_return = (exit_price / entry_price - 1)
                     
                     # Adjust validation criteria for timeframe
-                    min_profitable_return = 0.008 if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "30m" else 0.01
+                    min_profitable_return = 0.01 if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "1h" else 0.008
                     
                     # Validate trade quality
                     if trade['signal'] == 'buy' and actual_return > min_profitable_return:  # Profitable buy
@@ -244,16 +244,27 @@ class TradingLabelGenerator:
         """Balance the dataset to prevent class imbalance"""
         # Count each class
         value_counts = labels.value_counts()
+        
+        if len(value_counts) == 0:
+            logger.warning("No labels found to balance")
+            return labels
+            
         min_count = value_counts.min()
         
         logger.info(f"Original distribution: {value_counts.to_dict()}")
         
-        # For 30m data, we might have more samples, so we can be more selective
-        if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "30m":
-            # Use a higher minimum to ensure quality
-            target_count = max(min_count, min(value_counts) * 1.2)
+        # For 1h data, be more conservative with balancing to preserve samples
+        if hasattr(self, 'actual_timeframe') and self.actual_timeframe == "1h":
+            # Use 80% of minimum count to get more balanced but still sufficient data
+            target_count = max(min_count, int(min(value_counts) * 0.8))
         else:
-            target_count = min_count
+            # Use higher minimum for 30m data
+            target_count = max(min_count, int(min(value_counts) * 1.2))
+        
+        # Don't balance if we have very few samples - just use all available
+        if min_count < 50:
+            logger.info(f"Very few samples ({min_count}), skipping balancing to preserve data")
+            return labels
         
         # Sample each class to match the target count
         balanced_indices = []
@@ -418,25 +429,25 @@ class TradingLabelGenerator:
             logger.info(f"Saved training dataset to {training_path}")
             
         # BACKWARD COMPATIBILITY: Also save with original naming for existing code
-        if timeframe_info == "30m":
+        if timeframe_info == "1h":
             legacy_path = os.path.join(LABELS_DIR, f"{symbol}_{method}_labels.csv")
             df_to_save.to_csv(legacy_path)
             logger.info(f"Saved legacy-compatible labels to {legacy_path}")
 
 def main():
-    """Generate labels for all trading pairs with 30m timeframe preference"""
+    """Generate labels for all trading pairs with 1h timeframe preference"""
     symbols = [
         "DOGEUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT",
         "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"
     ]
     
-    # Create generator with 30m-optimized parameters
+    # Create generator with 1h-optimized parameters (more lenient for better sample count)
     generator = TradingLabelGenerator(
-        forward_window=48,           # 24 hours for 30m data
-        min_return_threshold=0.015,  # 1.5% minimum return (adjusted for shorter timeframe)
-        stop_loss_threshold=-0.035,  # -3.5% stop loss
-        hold_threshold=0.006,        # 0.6% for hold signals
-        timeframe="30m"
+        forward_window=24,           # 24 hours for 1h data
+        min_return_threshold=0.015,  # 1.5% minimum return (more lenient)
+        stop_loss_threshold=-0.03,   # -3% stop loss (more lenient)
+        hold_threshold=0.008,        # 0.8% for hold signals (more lenient)
+        timeframe="1h"
     )
     
     all_stats = []
@@ -447,7 +458,7 @@ def main():
             df, stats = generator.generate_labels(symbol, method='outcome')
             all_stats.append(stats)
             
-            logger.info(f"✅ {symbol} ({stats.get('timeframe', '30m')}): {stats['total_samples']} samples, balance ratio: {stats['balance_ratio']:.2f}")
+            logger.info(f"✅ {symbol} ({stats.get('timeframe', '1h')}): {stats['total_samples']} samples, balance ratio: {stats['balance_ratio']:.2f}")
             
         except Exception as e:
             logger.error(f"❌ Failed to process {symbol}: {e}")
@@ -455,9 +466,9 @@ def main():
     # Save summary statistics
     if all_stats:
         summary_df = pd.DataFrame(all_stats)
-        summary_path = os.path.join(LABELS_DIR, "30m_labeling_summary.csv")
+        summary_path = os.path.join(LABELS_DIR, "1h_labeling_summary.csv")
         summary_df.to_csv(summary_path, index=False)
-        logger.info(f"📊 Saved 30m summary statistics to {summary_path}")
+        logger.info(f"📊 Saved 1h summary statistics to {summary_path}")
         
         # Print overall statistics
         total_samples = summary_df['total_samples'].sum()

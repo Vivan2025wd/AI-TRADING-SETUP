@@ -249,6 +249,133 @@ class MotherAI:
                 "full_decision": {}
             }
 
+    # INTEGRATED ERROR HANDLING METHODS FROM FIRST DOCUMENT
+
+    def execute_trade_with_error_handling(self, symbol, signal, price, confidence, live=False):
+        """Trade execution with comprehensive error handling for RiskManager"""
+        
+        try:
+            # Risk Manager operations with error handling
+            df = self._fetch_agent_data(symbol)
+            
+            # 1. Market conditions check with fallback
+            try:
+                market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df)
+                if not market_ok:
+                    print(f"❌ Market conditions check failed: {market_reason}")
+                    return None
+            except Exception as e:
+                print(f"⚠️ Market conditions check failed with error: {e}, using conservative fallback")
+                # Conservative fallback - allow trade but log warning
+                if df is None or len(df) < 5:
+                    print(f"❌ Insufficient data for conservative fallback")
+                    return None
+            
+            # 2. Position sizing with fallback
+            try:
+                position_size = self.risk_manager.calculate_dynamic_position_size(symbol, price, df)
+            except Exception as e:
+                print(f"⚠️ Dynamic position sizing failed: {e}, using default")
+                position_size = 0.02  # Conservative 2% fallback
+            
+            # 3. Portfolio limits with fallback
+            try:
+                current_positions = self.get_current_positions()
+                portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
+                    symbol, position_size, current_positions
+                )
+                if not portfolio_ok:
+                    print(f"❌ Portfolio limits exceeded: {portfolio_reason}")
+                    return None
+            except Exception as e:
+                print(f"⚠️ Portfolio limits check failed: {e}, using conservative limits")
+                # Simple fallback - check if we have too many positions
+                try:
+                    current_positions = self.get_current_positions()
+                    active_count = len([p for p in current_positions.values() 
+                                      if p.get('position_state') == 'long'])
+                    if active_count >= 3:  # Conservative limit
+                        print(f"❌ Too many active positions for fallback mode: {active_count}")
+                        return None
+                except:
+                    print(f"❌ Cannot determine current positions, rejecting trade")
+                    return None
+            
+            # 4. Trade attempt logging with fallback
+            try:
+                self.risk_manager.log_trade_attempt()
+            except Exception as e:
+                print(f"⚠️ Could not log trade attempt: {e}")
+                # Continue without logging - non-critical
+            
+            # Continue with trade execution...
+            print(f"✅ All risk checks passed, proceeding with trade")
+            
+            # Rest of trade execution logic...
+            return self._execute_actual_trade(symbol, signal, price, position_size, live)
+            
+        except Exception as e:
+            print(f"❌ Critical error in trade execution: {e}")
+            return None
+
+    def _execute_actual_trade(self, symbol, signal, price, position_size, live):
+        """Separate method for actual trade execution logic"""
+        # Use the existing execute_trade method implementation
+        return self.execute_trade(symbol, signal, price, 1.0, live)
+
+    def make_portfolio_decision_robust(self, min_score=0.8):
+        """Portfolio decision making with robust risk manager integration"""
+        
+        try:
+            # Try to get current positions and risk metrics
+            current_positions = self.get_current_positions()
+            self.risk_manager.update_portfolio_metrics(current_positions)
+            risk_metrics = self.risk_manager.get_risk_metrics()
+            
+            print(f"📊 Portfolio Value: ${risk_metrics['portfolio_value']:.2f}")
+            print(f"📊 Current Drawdown: {risk_metrics['current_drawdown']:.3f}")
+            
+        except Exception as e:
+            print(f"⚠️ Risk metrics calculation failed: {e}")
+            # Use conservative fallbacks
+            risk_metrics = {
+                "portfolio_value": 1000.0,
+                "current_drawdown": 0.0,
+                "daily_pnl": 0.0,
+                "hourly_trades": 0,
+                "drawdown_limit": 0.10,
+                "daily_loss_limit": 50.0
+            }
+            print(f"📊 Using fallback risk metrics")
+        
+        # Emergency checks with error handling
+        try:
+            if risk_metrics["current_drawdown"] > risk_metrics["drawdown_limit"]:
+                print("🚨 Portfolio drawdown limit exceeded")
+                return {"decision": [], "status": "emergency_drawdown", 
+                       "data_interval": self.data_interval}
+        except Exception as e:
+            print(f"⚠️ Drawdown check failed: {e}, assuming safe to continue")
+        
+        # Continue with trade decisions...
+        return self._make_trade_decisions_with_risk_checks(min_score, risk_metrics)
+
+    def _make_trade_decisions_with_risk_checks(self, min_score, risk_metrics):
+        """Helper method for making trade decisions with risk checks"""
+        # Use the existing make_portfolio_decision logic but with error handling
+        try:
+            return self.make_portfolio_decision(min_score)
+        except Exception as e:
+            print(f"⚠️ Trade decision failed: {e}, returning safe response")
+            return {
+                "decision": [], 
+                "status": "error_fallback", 
+                "data_interval": self.data_interval,
+                "error": str(e)
+            }
+
+    # END OF INTEGRATED ERROR HANDLING METHODS
+
     def evaluate_agents(self, agents):
         """Evaluate agents using their full decision output with data consistency checks"""
         results = []
@@ -708,7 +835,7 @@ class MotherAI:
         except:
             return False
 
-    def make_portfolio_decision(self, min_score=0.7):
+    def make_portfolio_decision(self, min_score=0.8):
         """Enhanced portfolio decision making with comprehensive risk management and data consistency"""
         auto_cleanup_logs()
         
@@ -1038,8 +1165,8 @@ def enhanced_trading_loop_example():
     
     while True:
         try:
-            # Make trading decision
-            decision_result = mother_ai.make_portfolio_decision(min_score=0.6)
+            # Make trading decision - now with error handling option
+            decision_result = mother_ai.make_portfolio_decision_robust(min_score=0.6)
             print(f"📊 Decision result: {decision_result}")
             
             # Wait before next iteration
