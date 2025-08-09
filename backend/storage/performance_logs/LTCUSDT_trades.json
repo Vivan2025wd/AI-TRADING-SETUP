@@ -406,5 +406,41 @@
     "timestamp": "2025-08-06T13:24:14.027982",
     "source": "exit_max_hold_time_5.7h",
     "data_interval": "30m"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 123.41,
+    "price": 123.41,
+    "qty": 0.810307,
+    "timestamp": "2025-08-09T01:58:20.340396",
+    "source": "agent_rule_based",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 123.42,
+    "price": 123.42,
+    "qty": 0.810241,
+    "timestamp": "2025-08-09T01:58:28.541377",
+    "source": "exit_max_hold_time_5.5h",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 123.15,
+    "price": 123.15,
+    "qty": 0.80988,
+    "timestamp": "2025-08-09T03:04:53.441605",
+    "source": "agent_rule_based",
+    "data_interval": "30m"
   }
 ]

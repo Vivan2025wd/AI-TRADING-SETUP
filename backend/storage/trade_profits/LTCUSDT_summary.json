@@ -1,11 +1,11 @@
 {
   "symbol": "LTCUSDT",
-  "total_profit_dollars": 1.5518,
-  "avg_profit_per_trade": 0.0913,
-  "total_trades": 17,
-  "wins": 9,
+  "total_profit_dollars": 1.5599,
+  "avg_profit_per_trade": 0.0867,
+  "total_trades": 18,
+  "wins": 10,
   "losses": 8,
-  "win_rate": 52.94,
+  "win_rate": 55.56,
   "trades": [
     {
       "entry_time": "2025-08-02T16:53:22.433792",

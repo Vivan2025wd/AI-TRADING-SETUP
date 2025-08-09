@@ -4233,5 +4233,316 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7247269175208966,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7345858516901757,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:58:19.830501",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7346,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7247269175208966,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7247269175208965,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7247269175208966,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7247269175208966,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7247269175208965,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8262883565809903,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8262883565809902,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7217269175208966,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7852091121378737,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7217269175208963,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7217269175208966,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.7192982456140328,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.6363636363636417,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 0.6785714285714477,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8513069510223942,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.851306951022394,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8513069510223942,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8384140250301881,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8384140250301881,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.851306951022394,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574608,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574609,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574608,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574608,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574609,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574608,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8513069510223942,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T03:08:30.114843",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8513,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574608,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574608,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8311412977574608,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
   }
 ]

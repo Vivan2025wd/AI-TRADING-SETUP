@@ -718,5 +718,77 @@
     "timestamp": "2025-08-06T13:35:21.207661",
     "source": "exit_max_hold_time_5.5h",
     "data_interval": "30m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 584.9,
+    "price": 584.9,
+    "qty": 0.170969,
+    "timestamp": "2025-08-09T01:59:47.884160",
+    "source": "agent_rule_conflict_resolution",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 584.9,
+    "price": 584.9,
+    "qty": 0.170969,
+    "timestamp": "2025-08-09T01:59:54.179054",
+    "source": "exit_max_hold_time_5.5h",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 584.9,
+    "price": 584.9,
+    "qty": 0.170969,
+    "timestamp": "2025-08-09T02:19:35.766888",
+    "source": "agent_rule_conflict_resolution",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 584.9,
+    "price": 584.9,
+    "qty": 0.170969,
+    "timestamp": "2025-08-09T02:21:52.882718",
+    "source": "exit_trailing_stop_0.000",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 584.9,
+    "price": 584.9,
+    "qty": 0.170969,
+    "timestamp": "2025-08-09T02:23:39.336868",
+    "source": "agent_rule_conflict_resolution",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 0.9759,
+    "score": 0.976,
+    "last_price": 584.9,
+    "price": 584.9,
+    "qty": 0.170733,
+    "timestamp": "2025-08-09T03:05:06.069218",
+    "source": "agent_ml_primary",
+    "data_interval": "30m"
   }
 ]

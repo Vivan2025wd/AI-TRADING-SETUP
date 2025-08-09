@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   ArrowUpRight, 
   AlertCircle, 
@@ -19,43 +19,34 @@ import {
   CheckCircle,
   XCircle,
   Pause,
-  Play
+  Play,
+  Shield
 } from "lucide-react";
 
-const POLL_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+const DECISION_REFRESH_INTERVAL = 10 * 60 * 1000; // 15 minutes
 
-export default function MotherAIDecisionCard({ isLive, decisionData, loading, error, refreshDecision }) {
+export default function MotherAIDecisionCard({ 
+  isLive, 
+  decisionData, 
+  loading, 
+  error, 
+  refreshDecision,
+  // New props from App.jsx
+  persistedDecision,
+  decisionTimestamp,
+  timeUntilNextFetch,
+  backgroundTimer,
+  setBackgroundTimer,
+  refreshHistory,
+  connectionStatus
+}) {
   const [isTabVisible, setIsTabVisible] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [timeUntilRefresh, setTimeUntilRefresh] = useState(0);
-  const [lastRefreshTime, setLastRefreshTime] = useState(null);
-  const [connectionStatus, setConnectionStatus] = useState('online');
-  const [refreshHistory, setRefreshHistory] = useState([]);
   const [expandedRationale, setExpandedRationale] = useState(false);
-  
-  const intervalRef = useRef(null);
-  const countdownRef = useRef(null);
 
   // Handle tab visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
-      const isVisible = !document.hidden;
-      setIsTabVisible(isVisible);
-      
-      if (!isVisible && autoRefresh) {
-        // Pause auto-refresh when tab is hidden
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-        if (countdownRef.current) {
-          clearInterval(countdownRef.current);
-          countdownRef.current = null;
-        }
-      } else if (isVisible && autoRefresh) {
-        // Resume auto-refresh when tab becomes visible
-        startAutoRefresh();
-      }
+      setIsTabVisible(!document.hidden);
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -63,89 +54,8 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (countdownRef.current) clearInterval(countdownRef.current);
-    };
-  }, [autoRefresh]);
-
-  // Monitor connection status
-  useEffect(() => {
-    const handleOnline = () => setConnectionStatus('online');
-    const handleOffline = () => setConnectionStatus('offline');
-    
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    
-    setConnectionStatus(navigator.onLine ? 'online' : 'offline');
-    
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
     };
   }, []);
-
-  // Start auto-refresh functionality
-  const startAutoRefresh = () => {
-    if (!isTabVisible || connectionStatus === 'offline') return;
-    
-    // Clear existing intervals
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    if (countdownRef.current) clearInterval(countdownRef.current);
-    
-    setTimeUntilRefresh(POLL_INTERVAL_MS / 1000);
-    
-    // Countdown timer
-    countdownRef.current = setInterval(() => {
-      setTimeUntilRefresh(prev => {
-        if (prev <= 1) {
-          return POLL_INTERVAL_MS / 1000;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    // Auto-refresh interval
-    intervalRef.current = setInterval(() => {
-      if (isTabVisible && connectionStatus === 'online') {
-        handleRefresh();
-      }
-    }, POLL_INTERVAL_MS);
-  };
-
-  // Enhanced refresh handler
-  const handleRefresh = () => {
-    const refreshTime = new Date();
-    setLastRefreshTime(refreshTime);
-    
-    // Add to refresh history
-    setRefreshHistory(prev => [
-      {
-        time: refreshTime,
-        success: !error,
-        status: decisionData?.status || 'Unknown'
-      },
-      ...prev.slice(0, 4) // Keep last 5 entries
-    ]);
-    
-    refreshDecision();
-  };
-
-  // Auto-refresh effect
-  useEffect(() => {
-    if (autoRefresh && isTabVisible && connectionStatus === 'online') {
-      startAutoRefresh();
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (countdownRef.current) clearInterval(countdownRef.current);
-      intervalRef.current = null;
-      countdownRef.current = null;
-    }
-    
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (countdownRef.current) clearInterval(countdownRef.current);
-    };
-  }, [autoRefresh, isTabVisible, connectionStatus]);
 
   // Format countdown time
   const formatCountdown = (seconds) => {
@@ -187,7 +97,9 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
     }
   };
 
-  const confidenceGlow = decisionData?.confidence >= 90 ? "text-green-400 animate-pulse" : "text-green-300";
+  const currentDecision = persistedDecision || decisionData;
+  const confidenceGlow = currentDecision?.confidence >= 90 ? "text-green-400 animate-pulse" : "text-green-300";
+  const isTimerActive = decisionTimestamp && timeUntilNextFetch > 0;
 
   return (
     <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white shadow-lg rounded-2xl p-6 max-w-xl mx-auto space-y-6 border border-gray-700 transition-all duration-300 relative overflow-hidden">
@@ -228,27 +140,27 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
         </div>
         
         <div className="flex items-center gap-2">
-          {/* Auto-refresh toggle */}
+          {/* Background Timer Toggle */}
           <div className="flex items-center gap-2 bg-gray-800/50 px-2 py-1 rounded-lg backdrop-blur-sm">
             <Clock className="w-3 h-3 text-gray-400" />
             <button
-              onClick={() => setAutoRefresh(!autoRefresh)}
+              onClick={() => setBackgroundTimer(!backgroundTimer)}
               className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${
-                autoRefresh ? 'bg-blue-600' : 'bg-gray-600'
+                backgroundTimer ? 'bg-green-600' : 'bg-gray-600'
               }`}
-              title={`Auto-refresh: ${autoRefresh ? 'ON' : 'OFF'}`}
+              title={`30m Timer: ${backgroundTimer ? 'ON' : 'OFF'}`}
             >
               <span
                 className={`inline-block h-2 w-2 transform rounded-full bg-white transition-transform ${
-                  autoRefresh ? 'translate-x-4' : 'translate-x-1'
+                  backgroundTimer ? 'translate-x-4' : 'translate-x-1'
                 }`}
               />
             </button>
           </div>
 
           <span
-            className={`px-3 py-1 text-sm font-semibold rounded-full flex items-center gap-1 ${getStatusBadge(decisionData?.status)} backdrop-blur-sm`}
-            title={`Status: ${decisionData?.status || "Unknown"}`}
+            className={`px-3 py-1 text-sm font-semibold rounded-full flex items-center gap-1 ${getStatusBadge(currentDecision?.status)} backdrop-blur-sm`}
+            title={`Status: ${currentDecision?.status || "Unknown"}`}
           >
             {loading ? (
               <>
@@ -261,37 +173,62 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
             ) : (
               <>
                 <CheckCircle className="w-4 h-4" />
-                {decisionData?.status || "Unknown"}
+                {currentDecision?.status || "Unknown"}
               </>
             )}
           </span>
         </div>
       </div>
 
-      {/* Auto-refresh Status */}
-      {autoRefresh && (
-        <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-3 backdrop-blur-sm">
+      {/* Persistent Timer Status */}
+      {isTimerActive && backgroundTimer && (
+        <div className="bg-green-900/30 border border-green-700/50 rounded-lg p-3 backdrop-blur-sm">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
-              {!isTabVisible || connectionStatus === 'offline' ? (
-                <>
-                  <Pause className="w-4 h-4 text-orange-400" />
-                  <span className="text-orange-400">
-                    Auto-refresh paused ({!isTabVisible ? 'tab hidden' : 'offline'})
-                  </span>
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4 text-blue-400 animate-spin" />
-                  <span className="text-blue-400">Auto-refresh active</span>
-                </>
-              )}
+              <Clock className="w-4 h-4 text-green-400" />
+              <span className="text-green-400">
+                {connectionStatus === 'online' ? 'Next auto-fetch in:' : 'Next auto-fetch (when online):'}
+              </span>
             </div>
-            {autoRefresh && isTabVisible && connectionStatus === 'online' && timeUntilRefresh > 0 && (
-              <div className="text-gray-400">
-                Next: {formatCountdown(timeUntilRefresh)}
-              </div>
-            )}
+            <div className="text-green-300 font-mono">
+              {formatCountdown(timeUntilNextFetch)}
+            </div>
+          </div>
+          <div className="w-full bg-green-900/50 rounded-full h-1 mt-2">
+            <div 
+              className="h-1 rounded-full bg-green-400 transition-all duration-1000"
+              style={{ 
+                width: `${((DECISION_REFRESH_INTERVAL / 1000 - timeUntilNextFetch) / (DECISION_REFRESH_INTERVAL / 1000)) * 100}%` 
+              }}
+            />
+          </div>
+          <div className="flex items-center gap-2 mt-2 text-xs text-green-300">
+            <Shield className="w-3 h-3" />
+            <span>Timer persists across all navigation</span>
+          </div>
+        </div>
+      )}
+
+      {/* Connection Status */}
+      {connectionStatus === 'offline' && (
+        <div className="bg-orange-900/30 border border-orange-700/50 rounded-lg p-3 backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-sm">
+            <WifiOff className="w-4 h-4 text-orange-400" />
+            <span className="text-orange-400">
+              Offline - Timer continues, will fetch when reconnected
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Tab Visibility Status */}
+      {!isTabVisible && (
+        <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-3 backdrop-blur-sm">
+          <div className="flex items-center gap-2 text-sm">
+            <EyeOff className="w-4 h-4 text-blue-400" />
+            <span className="text-blue-400">
+              Tab hidden - Background timer active, showing persisted decision
+            </span>
           </div>
         </div>
       )}
@@ -309,16 +246,21 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
           {/* Main Signal Display */}
           <div className="space-y-3 relative z-10">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg bg-gray-800/50 backdrop-blur-sm ${getTradeColor(decisionData?.tradePick)}`}>
-                {getTradeIcon(decisionData?.tradePick)}
+              <div className={`p-2 rounded-lg bg-gray-800/50 backdrop-blur-sm ${getTradeColor(currentDecision?.tradePick)}`}>
+                {getTradeIcon(currentDecision?.tradePick)}
               </div>
-              <div>
-                <p className={`text-2xl font-bold tracking-wide ${getTradeColor(decisionData?.tradePick)}`}>
-                  {decisionData?.tradePick || "No Signal"}
+              <div className="flex-1">
+                <p className={`text-2xl font-bold tracking-wide ${getTradeColor(currentDecision?.tradePick)}`}>
+                  {currentDecision?.tradePick || "No Signal"}
                 </p>
                 <p className="text-sm text-gray-400 flex items-center gap-1">
                   <Clock className="w-4 h-4" /> 
-                  {decisionData?.lastUpdated || "N/A"}
+                  {currentDecision?.lastUpdated || "N/A"}
+                  {persistedDecision && decisionTimestamp && (
+                    <span className="ml-2 px-2 py-0.5 bg-green-900/50 text-green-300 rounded text-xs">
+                      PERSISTENT
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
@@ -331,7 +273,7 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
                 <Info className="w-4 h-4 text-blue-400" />
                 Rationale:
               </p>
-              {decisionData?.rationale && decisionData.rationale.length > 100 && (
+              {currentDecision?.rationale && currentDecision.rationale.length > 100 && (
                 <button
                   onClick={() => setExpandedRationale(!expandedRationale)}
                   className="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1"
@@ -344,7 +286,7 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
             <p className="italic flex gap-2 items-start leading-relaxed">
               <AlertCircle className="w-4 h-4 text-yellow-400 mt-1 flex-shrink-0" />
               <span className={expandedRationale ? '' : 'line-clamp-3'}>
-                {decisionData?.rationale || "No rationale provided."}
+                {currentDecision?.rationale || "No rationale provided."}
               </span>
             </p>
           </div>
@@ -357,25 +299,25 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
                 Confidence:
               </span>
               <span className={`${confidenceGlow} font-bold text-lg`} title="Confidence Score">
-                {decisionData?.confidence !== undefined ? `${decisionData.confidence}%` : "N/A"}
+                {currentDecision?.confidence !== undefined ? `${currentDecision.confidence}%` : "N/A"}
               </span>
             </div>
             
             {/* Confidence Bar */}
-            {decisionData?.confidence !== undefined && (
+            {currentDecision?.confidence !== undefined && (
               <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
                 <div 
                   className={`h-2 rounded-full transition-all duration-500 ${
-                    decisionData.confidence >= 90 ? 'bg-green-400' :
-                    decisionData.confidence >= 70 ? 'bg-yellow-400' :
-                    decisionData.confidence >= 50 ? 'bg-orange-400' : 'bg-red-400'
+                    currentDecision.confidence >= 90 ? 'bg-green-400' :
+                    currentDecision.confidence >= 70 ? 'bg-yellow-400' :
+                    currentDecision.confidence >= 50 ? 'bg-orange-400' : 'bg-red-400'
                   }`}
-                  style={{ width: `${decisionData.confidence}%` }}
+                  style={{ width: `${currentDecision.confidence}%` }}
                 />
               </div>
             )}
             
-            {decisionData?.confidence >= 90 && (
+            {currentDecision?.confidence >= 90 && (
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-green-400" />
                 <span className="text-green-400 text-xs bg-green-900/30 px-2 py-0.5 rounded-md animate-pulse">
@@ -386,7 +328,7 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
           </div>
 
           {/* Refresh History */}
-          {refreshHistory.length > 0 && (
+          {refreshHistory && refreshHistory.length > 0 && (
             <div className="bg-gray-800/20 p-3 rounded-lg border border-gray-700/30 backdrop-blur-sm">
               <p className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
                 <Signal className="w-4 h-4 text-blue-400" />
@@ -412,35 +354,43 @@ export default function MotherAIDecisionCard({ isLive, decisionData, loading, er
             </div>
           )}
 
-          {!loading && decisionData?.status === "Active" && !autoRefresh && (
+          {!loading && currentDecision?.status === "Active" && !isTimerActive && (
             <p className="text-sm text-gray-400 italic mt-2 text-center">
-              Next manual update available in {Math.ceil(POLL_INTERVAL_MS / 60000)} minutes...
+              Background timer disabled. Use manual refresh to get new decisions.
             </p>
           )}
         </>
       )}
 
-      {/* Enhanced Refresh Button */}
-      <button
-        onClick={handleRefresh}
-        disabled={loading || connectionStatus === 'offline'}
-        className={`mt-4 px-6 py-3 rounded-lg flex items-center gap-2 mx-auto transition-all duration-300 relative overflow-hidden ${
-          loading || connectionStatus === 'offline'
-            ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-            : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-blue-500/25"
-        }`}
-      >
-        <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity" />
-        <RefreshCw className={`w-4 h-4 relative z-10 ${loading ? "animate-spin" : ""}`} />
-        <span className="relative z-10">
-          {loading ? "Refreshing..." : connectionStatus === 'offline' ? "Offline" : "Refresh Now"}
-        </span>
-        {lastRefreshTime && (
-          <span className="text-xs opacity-75 relative z-10">
-            • {lastRefreshTime.toLocaleTimeString()}
+      {/* Manual Refresh Button */}
+      <div className="flex gap-2">
+        <button
+          onClick={refreshDecision}
+          disabled={loading || connectionStatus === 'offline'}
+          className={`flex-1 px-6 py-3 rounded-lg flex items-center gap-2 justify-center transition-all duration-300 relative overflow-hidden ${
+            loading || connectionStatus === 'offline'
+              ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+              : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-blue-500/25"
+          }`}
+        >
+          <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity" />
+          <RefreshCw className={`w-4 h-4 relative z-10 ${loading ? "animate-spin" : ""}`} />
+          <span className="relative z-10">
+            {loading ? "Refreshing..." : 
+             connectionStatus === 'offline' ? "Offline" : "Manual Refresh"}
           </span>
-        )}
-      </button>
+        </button>
+      </div>
+
+      {/* Last Update Info */}
+      {decisionTimestamp && (
+        <div className="flex items-center justify-between text-xs text-gray-400">
+          <span>Decision from: {decisionTimestamp.toLocaleString()}</span>
+          {refreshHistory && refreshHistory.length > 0 && refreshHistory[0].type === 'manual' && (
+            <span className="text-blue-400">• Manual refresh</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

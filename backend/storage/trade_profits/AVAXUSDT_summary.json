@@ -237,17 +237,6 @@
       "exit_value": 500.0,
       "pnl_dollars": 0.2285,
       "pnl_percentage": 0.05
-    },
-    {
-      "entry_time": "2025-08-06T00:06:49.059406",
-      "entry_price": 21.87,
-      "exit_time": "2025-08-06T13:14:15.713918",
-      "exit_price": 21.87,
-      "qty": 22.862369,
-      "entry_value": 500.0,
-      "exit_value": 500.0,
-      "pnl_dollars": 0.0,
-      "pnl_percentage": 0.0
     }
   ]
 }

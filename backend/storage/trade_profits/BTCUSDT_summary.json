@@ -1,11 +1,11 @@
 {
   "symbol": "BTCUSDT",
   "total_profit_dollars": 1.5447,
-  "avg_profit_per_trade": 0.0351,
-  "total_trades": 44,
-  "wins": 22,
+  "avg_profit_per_trade": 0.0343,
+  "total_trades": 45,
+  "wins": 23,
   "losses": 22,
-  "win_rate": 50.0,
+  "win_rate": 51.11,
   "trades": [
     {
       "entry_time": "2025-08-02T17:43:22.419624",

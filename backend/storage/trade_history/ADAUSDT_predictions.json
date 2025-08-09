@@ -7130,5 +7130,316 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6988481949510696,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6251740273868741,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:58:17.446418",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6252,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6988481949510696,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6988481949510698,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6988481949510698,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6988481949510696,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T01:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6988481949510696,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.5601187802446036,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.5601187802446036,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6881694722400888,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6849123293829459,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.688169472240089,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.688169472240089,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.688169472240089,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.688169472240089,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.688169472240089,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.4816597214030031,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.4816597214030031,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.4816597214030031,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6045489594763536,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6045489594763537,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T02:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.4816597214030031,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471562,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471562,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471561,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471562,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471562,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471562,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.5127913231346047,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:08:27.816527",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.5128,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471561,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471561,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6053406348471561,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.605340634847156,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
   }
 ]

@@ -41,18 +41,28 @@ class MotherAI:
         """
         self.agents_dir = agents_dir
         self.strategy_dir = strategy_dir
-        self.data_interval = data_interval  # Store configurable interval
+        self.data_interval = data_interval
         self.performance_tracker = PerformanceTracker("performance_logs")
         self.agent_symbols = agent_symbols or []
         self.meta_evaluator = MetaEvaluator()
-        self.loaded_agents = {}  # Cache loaded agent instances
-        self.risk_manager = RiskManager()  # Enhanced risk management
-        self.cooldown_manager = CooldownManager()  # Separate cooldown management
+        self.loaded_agents = {}
+        self.risk_manager = RiskManager()
+        self.cooldown_manager = CooldownManager()
+        
+        # NEW: Track last exit check time to prevent too frequent exit checks
+        self.last_exit_check = {}
+        self.exit_check_interval = 300  # 5 minutes between exit checks (configurable)
+        
+        # NEW: Track trade entry times to enforce minimum hold periods
+        self.position_entry_times = {}
+        self.minimum_hold_time = 600  # 10 minutes minimum hold (configurable)
         
         # Initialize agents on startup
         self._initialize_agents()
         
         print(f"🔧 MotherAI initialized with {self.data_interval} data interval")
+        print(f"🔧 Exit check interval: {self.exit_check_interval}s")
+        print(f"🔧 Minimum hold time: {self.minimum_hold_time}s")
 
     def _initialize_agents(self):
         """Initialize and cache agent instances"""
@@ -113,32 +123,22 @@ class MotherAI:
         return agent_class
 
     def _fetch_agent_data(self, symbol: str):
-        """
-        Fetch OHLCV data using configured interval to match agent predictions
-        FIXED: Now uses configurable interval instead of hardcoded "1h"
-        """
+        """Fetch OHLCV data using configured interval to match agent predictions"""
         symbol = symbol if symbol.endswith("/USDT") else symbol.replace("USDT", "") + "/USDT"
-        # Use configured interval to match agent training data
         df = fetch_ohlcv(symbol, self.data_interval, 100)
         return df if not df.empty else None
 
     def _validate_data_compatibility(self, agent, ohlcv_data: pd.DataFrame) -> bool:
-        """
-        Validate that data interval matches agent's expected interval
-        From Solution 3: Add data validation
-        """
+        """Validate that data interval matches agent's expected interval"""
         if not hasattr(agent, 'model') or agent.model is None:
             return True
         
-        # Check if data frequency matches expected frequency
         if len(ohlcv_data) >= 2:
             time_diff = ohlcv_data.index[1] - ohlcv_data.index[0]
             interval_minutes = time_diff.total_seconds() / 60
             
-            # Check against configured interval
             expected_minutes = self._interval_to_minutes(self.data_interval)
             
-            # Warn if using different interval than configured
             if abs(interval_minutes - expected_minutes) > 0.1:
                 print(f"⚠️ Data interval mismatch for {agent.symbol}: "
                      f"got {interval_minutes}min, expected {expected_minutes}min")
@@ -155,57 +155,16 @@ class MotherAI:
         elif interval.endswith('d'):
             return int(interval[:-1]) * 1440
         else:
-            return 1  # Default to 1 minute
-
-    def debug_data_intervals(self):
-        """
-        Debug method to check data intervals across the system
-        From Solution 4: Debug logging to identify issues
-        """
-        print(f"\n🔍 DEBUGGING DATA INTERVALS (Config: {self.data_interval})")
-        print("=" * 60)
-        
-        for symbol in list(self.agent_symbols)[:3]:  # Check first 3 symbols
-            # Check what mother_ai gets
-            mother_df = self._fetch_agent_data(symbol)
-            if mother_df is not None and len(mother_df) >= 2:
-                mother_interval = (mother_df.index[1] - mother_df.index[0]).total_seconds() / 60
-                print(f"MotherAI {symbol}: {mother_interval}min intervals")
-            
-            # Check what agent predictions would get (simulate)
-            symbol_formatted = symbol if "/" in symbol else symbol.replace("USDT", "") + "/USDT"
-            agent_df = fetch_ohlcv(symbol_formatted, "1m", 100)
-            if agent_df is not None and len(agent_df) >= 2:
-                agent_interval = (agent_df.index[1] - agent_df.index[0]).total_seconds() / 60
-                print(f"Agent Pred {symbol}: {agent_interval}min intervals")
-            
-            # Check if agent has model
-            agent = self.get_agent_by_symbol(symbol)
-            if agent:
-                has_model = agent.model is not None
-                model_info = f"Has ML model: {has_model}"
-                
-                # Check data compatibility
-                if mother_df is not None:
-                    is_compatible = self._validate_data_compatibility(agent, mother_df)
-                    model_info += f", Data compatible: {is_compatible}"
-                
-                print(f"Agent {symbol}: {model_info}")
-        
-        print("=" * 60)
+            return 1
 
     def _safe_evaluate_agent(self, agent, ohlcv):
         """Enhanced agent evaluation with data compatibility checks"""
         try:
-            # Validate data compatibility first
             if not self._validate_data_compatibility(agent, ohlcv):
                 print(f"⚠️ Data compatibility issue for {agent.symbol}, using fallback strategy")
-                # Could implement fallback logic here if needed
             
-            # Use the agent's evaluate method which returns full decision dict
             decision = agent.evaluate(ohlcv)
         
-            # Enhanced debugging information
             ml_data = decision.get("ml", {})
             rule_data = decision.get("rule_based", {})
         
@@ -215,9 +174,7 @@ class MotherAI:
             print(f"   Rule: {rule_data.get('action', 'N/A')} ({rule_data.get('confidence', 0.0):.3f})")
             print(f"   Source: {decision.get('source', 'unknown')}")
             print(f"   Position: {decision.get('position_state', 'None')}")
-            print(f"   Data Interval: {self.data_interval}")
         
-            # Convert agent's decision format to what MotherAI expects
             result = {
                 "symbol": agent.symbol,
                 "signal": decision.get("action", "hold").lower(),
@@ -228,8 +185,8 @@ class MotherAI:
                 "ml_confidence": decision.get("ml", {}).get("confidence", 0.0),
                 "rule_confidence": decision.get("rule_based", {}).get("confidence", 0.0),
                 "timestamp": decision.get("timestamp"),
-                "data_interval": self.data_interval,  # Track what interval was used
-                "full_decision": decision  # Preserve full agent decision
+                "data_interval": self.data_interval,
+                "full_decision": decision
             }
         
             return result
@@ -249,133 +206,6 @@ class MotherAI:
                 "full_decision": {}
             }
 
-    # INTEGRATED ERROR HANDLING METHODS FROM FIRST DOCUMENT
-
-    def execute_trade_with_error_handling(self, symbol, signal, price, confidence, live=False):
-        """Trade execution with comprehensive error handling for RiskManager"""
-        
-        try:
-            # Risk Manager operations with error handling
-            df = self._fetch_agent_data(symbol)
-            
-            # 1. Market conditions check with fallback
-            try:
-                market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df)
-                if not market_ok:
-                    print(f"❌ Market conditions check failed: {market_reason}")
-                    return None
-            except Exception as e:
-                print(f"⚠️ Market conditions check failed with error: {e}, using conservative fallback")
-                # Conservative fallback - allow trade but log warning
-                if df is None or len(df) < 5:
-                    print(f"❌ Insufficient data for conservative fallback")
-                    return None
-            
-            # 2. Position sizing with fallback
-            try:
-                position_size = self.risk_manager.calculate_dynamic_position_size(symbol, price, df)
-            except Exception as e:
-                print(f"⚠️ Dynamic position sizing failed: {e}, using default")
-                position_size = 0.02  # Conservative 2% fallback
-            
-            # 3. Portfolio limits with fallback
-            try:
-                current_positions = self.get_current_positions()
-                portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
-                    symbol, position_size, current_positions
-                )
-                if not portfolio_ok:
-                    print(f"❌ Portfolio limits exceeded: {portfolio_reason}")
-                    return None
-            except Exception as e:
-                print(f"⚠️ Portfolio limits check failed: {e}, using conservative limits")
-                # Simple fallback - check if we have too many positions
-                try:
-                    current_positions = self.get_current_positions()
-                    active_count = len([p for p in current_positions.values() 
-                                      if p.get('position_state') == 'long'])
-                    if active_count >= 3:  # Conservative limit
-                        print(f"❌ Too many active positions for fallback mode: {active_count}")
-                        return None
-                except:
-                    print(f"❌ Cannot determine current positions, rejecting trade")
-                    return None
-            
-            # 4. Trade attempt logging with fallback
-            try:
-                self.risk_manager.log_trade_attempt()
-            except Exception as e:
-                print(f"⚠️ Could not log trade attempt: {e}")
-                # Continue without logging - non-critical
-            
-            # Continue with trade execution...
-            print(f"✅ All risk checks passed, proceeding with trade")
-            
-            # Rest of trade execution logic...
-            return self._execute_actual_trade(symbol, signal, price, position_size, live)
-            
-        except Exception as e:
-            print(f"❌ Critical error in trade execution: {e}")
-            return None
-
-    def _execute_actual_trade(self, symbol, signal, price, position_size, live):
-        """Separate method for actual trade execution logic"""
-        # Use the existing execute_trade method implementation
-        return self.execute_trade(symbol, signal, price, 1.0, live)
-
-    def make_portfolio_decision_robust(self, min_score=0.8):
-        """Portfolio decision making with robust risk manager integration"""
-        
-        try:
-            # Try to get current positions and risk metrics
-            current_positions = self.get_current_positions()
-            self.risk_manager.update_portfolio_metrics(current_positions)
-            risk_metrics = self.risk_manager.get_risk_metrics()
-            
-            print(f"📊 Portfolio Value: ${risk_metrics['portfolio_value']:.2f}")
-            print(f"📊 Current Drawdown: {risk_metrics['current_drawdown']:.3f}")
-            
-        except Exception as e:
-            print(f"⚠️ Risk metrics calculation failed: {e}")
-            # Use conservative fallbacks
-            risk_metrics = {
-                "portfolio_value": 1000.0,
-                "current_drawdown": 0.0,
-                "daily_pnl": 0.0,
-                "hourly_trades": 0,
-                "drawdown_limit": 0.10,
-                "daily_loss_limit": 50.0
-            }
-            print(f"📊 Using fallback risk metrics")
-        
-        # Emergency checks with error handling
-        try:
-            if risk_metrics["current_drawdown"] > risk_metrics["drawdown_limit"]:
-                print("🚨 Portfolio drawdown limit exceeded")
-                return {"decision": [], "status": "emergency_drawdown", 
-                       "data_interval": self.data_interval}
-        except Exception as e:
-            print(f"⚠️ Drawdown check failed: {e}, assuming safe to continue")
-        
-        # Continue with trade decisions...
-        return self._make_trade_decisions_with_risk_checks(min_score, risk_metrics)
-
-    def _make_trade_decisions_with_risk_checks(self, min_score, risk_metrics):
-        """Helper method for making trade decisions with risk checks"""
-        # Use the existing make_portfolio_decision logic but with error handling
-        try:
-            return self.make_portfolio_decision(min_score)
-        except Exception as e:
-            print(f"⚠️ Trade decision failed: {e}, returning safe response")
-            return {
-                "decision": [], 
-                "status": "error_fallback", 
-                "data_interval": self.data_interval,
-                "error": str(e)
-            }
-
-    # END OF INTEGRATED ERROR HANDLING METHODS
-
     def evaluate_agents(self, agents):
         """Evaluate agents using their full decision output with data consistency checks"""
         results = []
@@ -388,12 +218,10 @@ class MotherAI:
             if ohlcv is None:
                 continue
                 
-            # Use the agent's full evaluation result with compatibility check
             prediction = self._safe_evaluate_agent(agent, ohlcv)
             health = StrategyHealth(trade_tracker.get_agent_log(agent.symbol)).summary()
             score = self._calculate_score(prediction, health)
             
-            # Preserve all agent decision data
             result = {
                 **prediction,
                 "score": round(score, 3),
@@ -425,7 +253,7 @@ class MotherAI:
             "qty": round(qty, 6) if qty is not None else None,
             "timestamp": timestamp,
             "source": source,
-            "data_interval": self.data_interval  # Track what interval was used for this trade
+            "data_interval": self.data_interval
         }
 
         try:
@@ -437,6 +265,11 @@ class MotherAI:
 
         with open(path, "w") as f:
             json.dump(history, f, indent=2)
+        
+        # NEW: Track entry times for minimum hold period enforcement
+        if signal == "buy":
+            self.position_entry_times[symbol] = datetime.now()
+            print(f"📝 Recorded entry time for {symbol}: {self.position_entry_times[symbol]}")
 
     def update_agent_position_state(self, symbol: str, signal: str):
         """Update agent's position state after successful trade execution"""
@@ -448,6 +281,10 @@ class MotherAI:
                 agent.position_state = "long"
             elif signal == "sell":
                 agent.position_state = None
+                # NEW: Clear entry time when position is closed
+                if symbol in self.position_entry_times:
+                    del self.position_entry_times[symbol]
+                    print(f"🗑️ Cleared entry time for {symbol}")
                 
             print(f"🔄 Updated {symbol} agent position: {old_state} → {agent.position_state}")
         else:
@@ -462,12 +299,17 @@ class MotherAI:
                 'position_state': getattr(agent, 'position_state', None),
                 'exposure': 0.0,
                 'unrealized_pnl': 0.0,
-                'data_interval': self.data_interval  # Track interval for each position
+                'data_interval': self.data_interval,
+                'entry_time': self.position_entry_times.get(symbol),  # NEW: Track entry time
+                'hold_duration': None  # NEW: Track how long we've held
             }
             
-            # Estimate exposure if in position
+            # Calculate hold duration if we have entry time
+            if position_info['entry_time'] and position_info['position_state'] == 'long':
+                hold_duration = (datetime.now() - position_info['entry_time']).total_seconds()
+                position_info['hold_duration'] = hold_duration
+            
             if position_info['position_state'] == 'long':
-                # Try to get last trade size or estimate
                 position_info['exposure'] = self.risk_manager.get_symbol_config(symbol)["risk_per_trade"]
                 
             positions[symbol] = position_info
@@ -475,29 +317,24 @@ class MotherAI:
         return positions
 
     def execute_trade(self, symbol, signal, price, confidence, live=False):
-        """Enhanced trade execution with comprehensive risk checks and data interval awareness"""
+        """Enhanced trade execution with comprehensive risk checks"""
         if signal not in ("buy", "sell") or not price:
             print(f"❌ Invalid trade parameters: signal={signal}, price={price}")
             return None
 
-        # Get market data for risk calculations using configured interval
         df = self._fetch_agent_data(symbol)
         
         print(f"📈 Executing trade with {self.data_interval} data interval")
 
-        # 1. Check market conditions
+        # Risk checks (keeping existing logic)
         market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df) 
         if not market_ok:
             print(f"❌ Market conditions check failed for {symbol}: {market_reason}")
             return None
 
-        # 2. Calculate dynamic position size 
         position_size = self.risk_manager.calculate_dynamic_position_size(symbol, price, df)
-
-        # 3. Get current positions for portfolio checks
         current_positions = self.get_current_positions()
 
-        # 4. Check portfolio limits (for buy orders)
         if signal == "buy":
             portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
                 symbol, position_size, current_positions
@@ -506,22 +343,20 @@ class MotherAI:
                 print(f"❌ Portfolio limits check failed for {symbol}: {portfolio_reason}")
                 return None
 
-        # 5. Log trade attempt for rate limiting
         self.risk_manager.log_trade_attempt()
 
-        # Get current trading mode from binance_api.py
+        # Continue with existing trade execution logic...
         from backend.utils.binance_api import get_trading_mode, get_binance_client
         current_mode = get_trading_mode()
 
         print(f"🚀 Executing {signal.upper()} order for {symbol} at ${price:.4f} | Mode: {current_mode.upper()}")
-        print(f"📊 Risk-adjusted position size: {position_size:.3f} (dynamic sizing applied)")
-        print(f"⏱️ Using {self.data_interval} data interval for analysis")
+        print(f"📊 Risk-adjusted position size: {position_size:.3f}")
 
         qty = None
-        executed_qty = None  # Track the actual executed quantity
+        executed_qty = None
 
         try:
-            # Check actual account balance before placing order
+            # Account balance check for live trading
             if current_mode == "live":
                 try:
                     client = get_binance_client()
@@ -529,73 +364,57 @@ class MotherAI:
                     balances = {b['asset']: float(b['free']) for b in account_info['balances']}
                     usdt_balance = balances.get('USDT', 0)
                     print(f"💰 Current USDT balance: ${usdt_balance:.2f}")
-                
+            
                     if signal == "buy" and usdt_balance < 10:
-                        print(f"❌ Insufficient USDT balance for buy order. Need at least $10, have ${usdt_balance:.2f}")
+                        print(f"❌ Insufficient USDT balance for buy order")
                         return None
             
-                    # Use dynamic position sizing with actual balance
-                    available_balance = min(usdt_balance * 0.9, 50)  # Use 90% of balance, max $50
+                    available_balance = min(usdt_balance * 0.9, 50)
                     trade_amount = available_balance * position_size
-                    print(f"💡 Using ${trade_amount:.2f} for this trade (dynamic sizing)")
-            
+                    print(f"💡 Using ${trade_amount:.2f} for this trade")
                 except Exception as balance_err:
                     print(f"⚠️ Could not check balance: {balance_err}")
                     trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
             else:
                 trade_amount = self.risk_manager.config["default_balance_usd"] * position_size
 
-            # Format symbol for Binance API
             binance_symbol = symbol if "/" in symbol else symbol.replace("USDT", "/USDT")
 
             if signal == "buy":
                 config = self.risk_manager.get_symbol_config(symbol)
-        
-                # FIXED CALCULATION: Use percentage-based SL/TP
-                sl_percent = config["sl_percent"] / 100.0  # Convert to decimal
+                sl_percent = config["sl_percent"] / 100.0
                 tp_ratio = config["tp_ratio"]
-        
-                # Calculate stop loss and take profit correctly
-                sl = price * (1 - sl_percent)  # 1% below entry
-                tp_distance = (price - sl) * tp_ratio  # 2x the risk distance
-                tp = price + tp_distance  # Take profit above entry
-    
-                # Calculate quantity based on trade amount
+                
+                sl = price * (1 - sl_percent)
+                tp_distance = (price - sl) * tp_ratio
+                tp = price + tp_distance
                 qty = trade_amount / price
 
                 if qty <= 0:
-                    print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}, skipping.")
+                    print(f"⚠️ Computed qty is zero or negative for BUY on {symbol}")
                     return None
 
-                print(f"📊 Buying {symbol} | Entry: {price:.4f}, SL: {sl:.4f}, TP: {tp:.4f}, Qty: {qty:.6f}")
-                print(f"📊 Risk amount: ${trade_amount:.2f}, Total cost: ${qty * price:.2f}")
-
-                # Use the updated place_market_order function
+                print(f"📊 Buying {symbol} | Entry: {price:.4f}, SL: {sl:.4f}, TP: {tp:.4f}")
                 order = place_market_order(binance_symbol, signal, qty)
 
                 if order and order.get("status") != "mock":
                     self.cooldown_manager.set_cooldown(symbol)
-                    # Update agent's position state
                     self.update_agent_position_state(symbol, signal)
-                    # Extract executed quantity from order response
                     executed_qty = order.get("executedQty", qty)
-                    print(f"✅ BUY order executed for {symbol} in {current_mode.upper()} mode")
+                    print(f"✅ BUY order executed for {symbol}")
                 elif order and order.get("status") == "mock":
-                    # Mock order - still update agent position state
                     self.cooldown_manager.set_cooldown(symbol)
                     self.update_agent_position_state(symbol, signal)
-                    executed_qty = qty  # For mock trades, use the calculated qty
+                    executed_qty = qty
                     print(f"✅ MOCK BUY order logged for {symbol}")
                 else:
                     print(f"❌ BUY order failed for {symbol}")
                     return None
 
             elif signal == "sell":
-                # For sell orders, try to determine quantity
                 agent = self.get_agent_by_symbol(symbol)
                 qty = 0
             
-                # First check if we can get quantity from agent or previous trades
                 if current_mode == "live":
                     try:
                         client = get_binance_client()
@@ -607,60 +426,73 @@ class MotherAI:
                             qty = actual_qty
                             print(f"💡 Found {qty:.6f} {base_asset} in account")
                         else:
-                            print(f"❌ No {base_asset} holdings found in account")
+                            print(f"❌ No {base_asset} holdings found")
                             return None
                     except Exception as e:
                         print(f"⚠️ Could not check holdings: {e}")
                         return None
                 else:
-                    # For mock, use trade amount calculation
                     qty = trade_amount / price
 
                 if qty <= 0:
-                    print(f"⚠️ Computed qty is zero or negative for SELL on {symbol}, skipping.")
+                    print(f"⚠️ Computed qty is zero or negative for SELL on {symbol}")
                     return None
 
                 print(f"📊 Selling {symbol} | Qty: {qty:.6f} at ${price:.4f}")
-
-                # Use the updated place_market_order function
                 order = place_market_order(binance_symbol, signal, qty)
 
                 if order and order.get("status") != "mock":
                     self.cooldown_manager.set_cooldown(symbol)
-                    # Update agent's position state
                     self.update_agent_position_state(symbol, signal)
-                    # Extract executed quantity from order response
                     executed_qty = order.get("executedQty", qty)
-                    print(f"✅ SELL order executed for {symbol} in {current_mode.upper()} mode")
+                    print(f"✅ SELL order executed for {symbol}")
                 elif order and order.get("status") == "mock":
-                    # Mock order - still update agent position state
                     self.cooldown_manager.set_cooldown(symbol)
                     self.update_agent_position_state(symbol, signal)
-                    executed_qty = qty  # For mock trades, use the calculated qty
+                    executed_qty = qty
                     print(f"✅ MOCK SELL order logged for {symbol}")
                 else:
                     print(f"❌ SELL order failed for {symbol}")
                     return None
 
-            # Return the executed quantity for logging
             return executed_qty
 
         except Exception as e:
             print(f"❌ Trade execution error for {symbol}: {e}")
             return None
 
-    def check_exit_conditions_for_agents(self):
-        """Enhanced exit conditions with dynamic stop losses and portfolio protection"""
-        print(f"🔍 Checking exit conditions using agent states (Data: {self.data_interval})...")
+    # NEW: More intelligent exit condition checking
+    def should_check_exit_conditions(self, symbol: str) -> bool:
+        """Determine if we should check exit conditions for a symbol"""
+        current_time = datetime.now()
         
-        # Update portfolio metrics first
+        # Check if enough time has passed since last exit check
+        last_check = self.last_exit_check.get(symbol)
+        if last_check and (current_time - last_check).total_seconds() < self.exit_check_interval:
+            return False
+        
+        # Check if position meets minimum hold time
+        entry_time = self.position_entry_times.get(symbol)
+        if entry_time:
+            hold_duration = (current_time - entry_time).total_seconds()
+            if hold_duration < self.minimum_hold_time:
+                print(f"⏰ {symbol} hasn't met minimum hold time ({hold_duration:.0f}s < {self.minimum_hold_time}s)")
+                return False
+        
+        return True
+
+    def check_exit_conditions_for_agents(self, force_check=False):
+        """Enhanced exit conditions with intelligent timing and minimum hold periods"""
+        if not force_check:
+            print(f"🔍 Checking exit conditions (Min hold: {self.minimum_hold_time}s, Check interval: {self.exit_check_interval}s)...")
+        else:
+            print(f"🔍 FORCED exit condition check...")
+        
         current_positions = self.get_current_positions()
         self.risk_manager.update_portfolio_metrics(current_positions)
-        
-        # Get risk metrics
         risk_metrics = self.risk_manager.get_risk_metrics()
         
-        # Emergency portfolio protection
+        # Emergency portfolio protection (always check these)
         if risk_metrics["current_drawdown"] > risk_metrics["drawdown_limit"]:
             print(f"🚨 EMERGENCY: Maximum drawdown exceeded ({risk_metrics['current_drawdown']:.3f})")
             self._emergency_close_all_positions()
@@ -671,41 +503,46 @@ class MotherAI:
             self._emergency_close_all_positions()
             return
         
+        # Check individual positions with intelligent timing
         for symbol, agent in self.loaded_agents.items():
             if not hasattr(agent, 'position_state') or agent.position_state != "long":
                 continue
+            
+            # NEW: Skip if not time to check yet (unless forced)
+            if not force_check and not self.should_check_exit_conditions(symbol):
+                continue
                 
-            # Agent thinks it has a long position, check if we should exit
+            # Update last check time
+            self.last_exit_check[symbol] = datetime.now()
+            
             df = self._fetch_agent_data(symbol)
             if df is None or df.empty:
                 continue
                 
             current_price = df["close"].iloc[-1]
             
-            # Enhanced exit condition checking
+            # Check exit conditions with enhanced logic
             exit_reason = self._check_enhanced_exit_conditions(agent, symbol, current_price, df)
             
             if exit_reason:
                 print(f"💡 Agent {symbol} exit condition met: {exit_reason}")
                 timestamp = self.performance_tracker.current_time()
                 
-                # Execute sell order
                 executed_qty = self.execute_trade(symbol, "sell", current_price, confidence=1.0)
                 
-                # Log the exit trade  
-                self._log_trade_execution(
-                    symbol=symbol,
-                    signal="sell",
-                    price=current_price,
-                    confidence=1.0,
-                    score=1.0,
-                    timestamp=timestamp,
-                    qty=executed_qty,
-                    source=f"exit_{exit_reason}"
-                )
-                
-                # Calculate profits
-                compute_trade_profits(symbol)
+                if executed_qty:
+                    self._log_trade_execution(
+                        symbol=symbol,
+                        signal="sell",
+                        price=current_price,
+                        confidence=1.0,
+                        score=1.0,
+                        timestamp=timestamp,
+                        qty=executed_qty,
+                        source=f"exit_{exit_reason}"
+                    )
+                    
+                    compute_trade_profits(symbol)
 
     def _emergency_close_all_positions(self):
         """Emergency close all open positions"""
@@ -718,34 +555,64 @@ class MotherAI:
                     current_price = df["close"].iloc[-1]
                     print(f"🚨 Emergency closing {symbol} at ${current_price:.4f}")
                     
-                    # Force execute sell order
                     executed_qty = self.execute_trade(symbol, "sell", current_price, confidence=1.0)
                     
-                    # Log emergency exit
-                    timestamp = self.performance_tracker.current_time()
-                    self._log_trade_execution(
-                        symbol=symbol,
-                        signal="sell",
-                        price=current_price,
-                        confidence=1.0,
-                        score=0.0,
-                        timestamp=timestamp,
-                        qty=executed_qty,
-                        source="emergency_exit"
-                    )
+                    if executed_qty:
+                        timestamp = self.performance_tracker.current_time()
+                        self._log_trade_execution(
+                            symbol=symbol,
+                            signal="sell",
+                            price=current_price,
+                            confidence=1.0,
+                            score=0.0,
+                            timestamp=timestamp,
+                            qty=executed_qty,
+                            source="emergency_exit"
+                        )
 
     def _check_enhanced_exit_conditions(self, agent, symbol: str, current_price: float, df) -> Optional[str]:
-        """Enhanced exit conditions with dynamic stops and time limits"""
+        """Enhanced exit conditions with minimum hold time consideration"""
         config = self.risk_manager.get_symbol_config(symbol)
-    
-        # Get last buy trade to determine entry price and time
+        
+        # NEW: Check minimum hold time first
+        entry_time = self.position_entry_times.get(symbol)
+        if entry_time:
+            hold_duration = (datetime.now() - entry_time).total_seconds()
+            if hold_duration < self.minimum_hold_time:
+                # Only allow emergency exits during minimum hold period
+                profit_loss_percent = 0.0
+                try:
+                    path = f"backend/storage/performance_logs/{symbol}_trades.json"
+                    if os.path.exists(path):
+                        with open(path, "r") as f:
+                            trades = json.load(f)
+                        
+                        last_buy = None
+                        for trade in reversed(trades):
+                            if trade.get("signal") == "buy":
+                                last_buy = trade
+                                break
+                        
+                        if last_buy:
+                            entry_price = last_buy.get("price", current_price)
+                            profit_loss_percent = (current_price - entry_price) / entry_price
+                except:
+                    pass
+                
+                # Only emergency stop loss during minimum hold period
+                if profit_loss_percent < -0.05:  # 5% emergency stop loss
+                    return f"emergency_stop_loss_{profit_loss_percent:.3f}"
+                
+                print(f"⏰ {symbol} in minimum hold period ({hold_duration:.0f}s/{self.minimum_hold_time}s)")
+                return None
+        
+        # Proceed with normal exit conditions after minimum hold time
         try:
             path = f"backend/storage/performance_logs/{symbol}_trades.json"
             if os.path.exists(path):
                 with open(path, "r") as f:
                     trades = json.load(f)
             
-                # Find last buy trade
                 last_buy = None
                 for trade in reversed(trades):
                     if trade.get("signal") == "buy":
@@ -755,15 +622,12 @@ class MotherAI:
                 if last_buy:
                     entry_price = last_buy.get("price", current_price)
                     entry_time_str = last_buy.get("timestamp", "")
-                    trade_interval = last_buy.get("data_interval", self.data_interval)
-                
-                    # FIXED CALCULATIONS: Use percentage-based SL/TP
-                    sl_percent = config["sl_percent"] / 100.0  # Convert to decimal
+                    
+                    sl_percent = config["sl_percent"] / 100.0
                     tp_ratio = config["tp_ratio"]
-                
-                    # 1. Stop Loss Check (enhanced with volatility)
+                    
+                    # Dynamic stop loss with ATR
                     if len(df) >= 20:
-                        # Dynamic stop loss based on ATR
                         high_low = df['high'] - df['low']
                         atr = high_low.rolling(14).mean().iloc[-1]
                         dynamic_sl_percent = max(sl_percent, atr / current_price * 2)
@@ -775,47 +639,37 @@ class MotherAI:
                         loss_percent = (entry_price - current_price) / entry_price
                         return f"stop_loss_hit_{loss_percent:.3f}"
                 
-                    # 2. Take Profit Check (FIXED)
-                    sl_distance = entry_price * dynamic_sl_percent  # Distance in dollars
-                    tp_distance = sl_distance * tp_ratio  # 2x the SL distance
-                    take_profit = entry_price + tp_distance  # Add to entry price
+                    # Take profit check
+                    sl_distance = entry_price * dynamic_sl_percent
+                    tp_distance = sl_distance * tp_ratio
+                    take_profit = entry_price + tp_distance
                 
                     if current_price >= take_profit:
                         profit_percent = (current_price - entry_price) / entry_price
                         return f"take_profit_hit_{profit_percent:.3f}"
                 
-                    # 3. Time-based Exit (adjusted for data interval)
+                    # Time-based exit (only after minimum hold time)
                     if entry_time_str:
                         try:
-                            entry_time = dateutil.parser.parse(entry_time_str)
-                            now = datetime.now(entry_time.tzinfo) if entry_time.tzinfo else datetime.now()
-                            hold_duration = (now - entry_time).total_seconds()
-                            
-                            # Adjust max hold time based on data interval
-                            interval_multiplier = self._interval_to_minutes(self.data_interval) / 60.0  # Convert to hours
+                            entry_time_parsed = dateutil.parser.parse(entry_time_str)
+                            now = datetime.now(entry_time_parsed.tzinfo) if entry_time_parsed.tzinfo else datetime.now()
+                            hold_duration = (now - entry_time_parsed).total_seconds()
+                            profit_percent = (current_price - entry_price) / entry_price
+                            interval_multiplier = self._interval_to_minutes(self.data_interval) / 60.0
                             adjusted_max_hold = config["max_hold_seconds"] * max(1.0, interval_multiplier)
                         
                             if hold_duration > adjusted_max_hold:
-                                return f"max_hold_time_{hold_duration/3600:.1f}h"
-                        except:
-                            pass
+                                return f"trailing_stop_{profit_percent:.3f}"
+                        
+                        except Exception as e:
+                            print(f"Error: {e}")
                 
-                    # 4. Trailing Stop (if profitable)
-                    profit_percent = (current_price - entry_price) / entry_price
-                    if profit_percent > 0.02:  # 2% profit threshold for trailing stop
-                        # Check if price dropped more than 1% from recent high
-                        lookback_periods = max(6, int(6 * 60 / self._interval_to_minutes(self.data_interval)))  # Adjust for interval
-                        recent_high = df['high'].tail(lookback_periods).max()
-                        if current_price < recent_high * 0.99:
-                            return f"trailing_stop_{profit_percent:.3f}"
-                
-                    # 5. Volatility-based Exit (adjusted for interval)
+                    # Volatility-based exit (adjusted for interval)
                     if len(df) >= 6:
                         lookback_periods = max(6, int(6 * 60 / self._interval_to_minutes(self.data_interval)))
                         recent_volatility = df['close'].pct_change().tail(lookback_periods).std()
                         volatility_threshold = config.get("exit_volatility_threshold", 0.08)
                         
-                        # Adjust volatility threshold for different intervals
                         adjusted_threshold = volatility_threshold * np.sqrt(self._interval_to_minutes(self.data_interval) / 60.0)
                         
                         if recent_volatility > adjusted_threshold:
@@ -835,8 +689,14 @@ class MotherAI:
         except:
             return False
 
-    def make_portfolio_decision(self, min_score=0.8):
-        """Enhanced portfolio decision making with comprehensive risk management and data consistency"""
+    # NEW: Separate method for strategic exit checks (called less frequently)
+    def check_strategic_exits(self):
+        """Check for strategic exit opportunities - called separately from regular decision making"""
+        print(f"🎯 Running strategic exit analysis...")
+        self.check_exit_conditions_for_agents(force_check=True)
+
+    def make_portfolio_decision(self, min_score=0.7):
+        """Enhanced portfolio decision making - SEPARATED EXIT LOGIC FROM NEW TRADE LOGIC"""
         auto_cleanup_logs()
         
         # Update portfolio metrics
@@ -852,7 +712,7 @@ class MotherAI:
         print(f"   Daily P&L: ${risk_metrics['daily_pnl']:.2f} (limit: ${-risk_metrics['daily_loss_limit']:.2f})")
         print(f"   Hourly Trades: {risk_metrics['hourly_trades']}")
 
-        # Emergency checks
+        # Emergency portfolio checks
         if risk_metrics["current_drawdown"] > risk_metrics["drawdown_limit"]:
             print("🚨 Portfolio in emergency mode - no new trades allowed")
             return {"decision": [], "timestamp": self.performance_tracker.current_time(), 
@@ -863,18 +723,27 @@ class MotherAI:
             return {"decision": [], "timestamp": self.performance_tracker.current_time(), 
                    "status": "daily_loss_limit", "data_interval": self.data_interval}
 
-        # Sync agent positions before making decisions
+        # Sync agent positions
         self.sync_agent_positions()
-
         timestamp = self.performance_tracker.current_time()
 
-        # Step 1: Check exit conditions using agent states
-        self.check_exit_conditions_for_agents()
+        # NEW: Only check exits occasionally, not every decision cycle
+        last_strategic_check = getattr(self, '_last_strategic_exit_check', None)
+        strategic_check_interval = 900  # 15 minutes between strategic exit checks
+        
+        if (not last_strategic_check or 
+            (datetime.now() - last_strategic_check).total_seconds() > strategic_check_interval):
+            print(f"🎯 Time for strategic exit check (every {strategic_check_interval}s)")
+            self.check_exit_conditions_for_agents(force_check=False)
+            self._last_strategic_exit_check = datetime.now()
+        else:
+            time_since_check = (datetime.now() - last_strategic_check).total_seconds()
+            print(f"⏭️ Skipping exit check (last check {time_since_check:.0f}s ago)")
 
-        # Step 2: Evaluate new trades with enhanced filtering
+        # Evaluate new trade opportunities
         top = self.decide_trades(min_score=min_score)
         if not top:
-            print("📭 No trades meet enhanced criteria")
+            print("📭 No new trades meet criteria")
             return {"decision": [], "timestamp": timestamp, "risk_metrics": risk_metrics, 
                    "data_interval": self.data_interval}
 
@@ -886,14 +755,11 @@ class MotherAI:
         print(f"🎯 Top decision: {decision['symbol']} {decision['signal']} "
               f"(score: {decision['score']:.3f}, confidence: {decision['confidence']:.3f})")
         print(f"    Source: {decision.get('source')}, ML Available: {decision.get('ml_available')}")
-        print(f"    Data Interval: {decision.get('data_interval', self.data_interval)}")
 
         if decision["signal"] in ("buy", "sell") and price:
-            # Execute the trade (enhanced with risk management)
             executed_qty = self.execute_trade(decision["symbol"], decision["signal"], price, decision["confidence"])
             
             if executed_qty:
-                # Log the trade
                 self._log_trade_execution(
                     symbol=decision["symbol"],
                     signal=decision["signal"],
@@ -905,7 +771,6 @@ class MotherAI:
                     source=f"agent_{decision.get('source', 'unknown')}"
                 )
                 
-                # Calculate profits for sell orders
                 if decision["signal"] == "sell":
                     compute_trade_profits(decision["symbol"])
 
@@ -933,7 +798,7 @@ class MotherAI:
         return predictions
 
     def get_agent_status_summary(self) -> Dict:
-        """Enhanced agent status summary with risk metrics and data interval info"""
+        """Enhanced agent status summary with hold times and exit check status"""
         current_positions = self.get_current_positions()
         self.risk_manager.update_portfolio_metrics(current_positions)
         risk_metrics = self.risk_manager.get_risk_metrics()
@@ -941,30 +806,47 @@ class MotherAI:
         summary = {
             "total_agents": len(self.loaded_agents),
             "data_interval": self.data_interval,
+            "minimum_hold_time": self.minimum_hold_time,
+            "exit_check_interval": self.exit_check_interval,
             "risk_metrics": risk_metrics,
             "cooldown_status": self.cooldown_manager.get_cooldown_status(),
             "agents": {}
         }
         
+        current_time = datetime.now()
+        
         for symbol, agent in self.loaded_agents.items():
+            position_info = current_positions.get(symbol, {})
+            
             agent_info = {
                 "symbol": symbol,
                 "position_state": getattr(agent, 'position_state', None),
                 "has_ml_model": getattr(agent, 'model', None) is not None,
                 "in_cooldown": self.cooldown_manager.is_in_cooldown(symbol),
                 "cooldown_remaining": self.cooldown_manager.get_cooldown_remaining(symbol),
-                "exposure": current_positions.get(symbol, {}).get('exposure', 0.0),
+                "exposure": position_info.get('exposure', 0.0),
+                "entry_time": position_info.get('entry_time'),
+                "hold_duration": position_info.get('hold_duration'),
+                "meets_min_hold": False,
+                "next_exit_check": None,
                 "data_interval": self.data_interval
             }
             
-            if hasattr(agent, 'get_model_info'):
-                model_info = agent.get_model_info()
-                agent_info.update({
-                    "model_loaded": model_info.get("model_loaded", False),
-                    "model_classes": model_info.get("classes", [])
-                })
+            # Check if position meets minimum hold time
+            if agent_info['entry_time'] and agent_info['position_state'] == 'long':
+                hold_duration = (current_time - agent_info['entry_time']).total_seconds()
+                agent_info['meets_min_hold'] = hold_duration >= self.minimum_hold_time
+                
+                # Calculate when next exit check is allowed
+                last_check = self.last_exit_check.get(symbol)
+                if last_check:
+                    next_check_time = last_check + timedelta(seconds=self.exit_check_interval)
+                    if next_check_time > current_time:
+                        agent_info['next_exit_check'] = (next_check_time - current_time).total_seconds()
+                    else:
+                        agent_info['next_exit_check'] = 0
             
-            # Check data compatibility
+            # Data compatibility check
             try:
                 df = self._fetch_agent_data(symbol)
                 if df is not None:
@@ -979,31 +861,53 @@ class MotherAI:
         return summary
 
     def sync_agent_positions(self):
-        """Enhanced position synchronization with validation and correction"""
+        """Enhanced position synchronization with entry time recovery"""
         print(f"🔄 Syncing agent positions (Data interval: {self.data_interval})...")
     
         for symbol, agent in self.loaded_agents.items():
             if not hasattr(agent, 'position_state'):
                 continue
             
-            # Get current position state
             current_state = agent.position_state
-            
-            # Validate against trade history
             validated_state = self._validate_agent_position(symbol, current_state)
             
             if validated_state != current_state:
                 print(f"🔧 Correcting {symbol} position: {current_state} → {validated_state}")
                 agent.position_state = validated_state
             
+            # NEW: Recover entry times from trade history if missing
+            if (agent.position_state == 'long' and 
+                symbol not in self.position_entry_times):
+                self._recover_entry_time(symbol)
+            
             print(f"📊 {symbol} agent position: {agent.position_state}")
+
+    def _recover_entry_time(self, symbol: str):
+        """Recover entry time from trade history for existing positions"""
+        try:
+            path = f"backend/storage/performance_logs/{symbol}_trades.json"
+            if os.path.exists(path):
+                with open(path, "r") as f:
+                    trades = json.load(f)
+                
+                # Find last buy trade
+                for trade in reversed(trades):
+                    if trade.get("signal") == "buy":
+                        timestamp_str = trade.get("timestamp", "")
+                        if timestamp_str:
+                            entry_time = dateutil.parser.parse(timestamp_str)
+                            self.position_entry_times[symbol] = entry_time
+                            print(f"🔄 Recovered entry time for {symbol}: {entry_time}")
+                            break
+        except Exception as e:
+            print(f"⚠️ Could not recover entry time for {symbol}: {e}")
 
     def _validate_agent_position(self, symbol: str, claimed_state: Union[str, None]) -> Optional[str]:
         """Validate agent position state against trade history"""
         try:
             path = f"backend/storage/performance_logs/{symbol}_trades.json"
             if not os.path.exists(path):
-                return None  # No trade history, assume flat
+                return None
         
             with open(path, "r") as f:
                 trades = json.load(f)
@@ -1011,12 +915,10 @@ class MotherAI:
             if not trades:
                 return None
         
-            # Get the last trade signal
             last_trade = trades[-1]
             last_signal = last_trade.get("signal", "")
             last_timestamp = last_trade.get("timestamp", "")
     
-            # Determine correct position based on last signal
             if last_signal == "buy":
                 correct_state = "long"
             elif last_signal == "sell":
@@ -1024,7 +926,7 @@ class MotherAI:
             else:
                 correct_state = None
         
-            # Additional validation: check if position is too old (safety mechanism)
+            # Check if position is stale
             if correct_state == "long" and self._is_position_stale(last_timestamp):
                 print(f"⚠️ {symbol} position appears stale, resetting to flat")
                 correct_state = None
@@ -1036,15 +938,16 @@ class MotherAI:
             return None
 
     def decide_trades(self, top_n=1, min_score=0.5, min_confidence=0.7):
-        """Enhanced trade decision with comprehensive risk filtering and data consistency checks"""
+        """Enhanced trade decision with comprehensive filtering including hold time checks"""
         agents = self.load_agents()
         evaluations = self.evaluate_agents(agents)
         
-        # Get current positions for additional filtering
         current_positions = self.get_current_positions()
+        current_time = datetime.now()
 
         print(f"\n🔍 ENHANCED TRADE DECISION ANALYSIS (Data: {self.data_interval})")
         print(f"📊 Filters: min_score={min_score}, min_confidence={min_confidence}")
+        print(f"⏰ Minimum hold time: {self.minimum_hold_time}s")
         print("=" * 80)
 
         approved_trades = []
@@ -1055,55 +958,48 @@ class MotherAI:
             confidence = e["confidence"]
             score = e["score"]
             position_state = e.get("position_state")
-            source = e.get("source", "unknown")
 
             print(f"\n📊 {symbol}:")
             print(f"   Signal: {signal.upper()} | Confidence: {confidence:.3f} | Score: {score:.3f}")
-            print(f"   Position: {position_state} | Source: {source}")
-            print(f"   ML Available: {e.get('ml_available', False)} | ML Conf: {e.get('ml_confidence', 0.0):.3f}")
-            print(f"   Rule Conf: {e.get('rule_confidence', 0.0):.3f}")
-            print(f"   Data Interval: {e.get('data_interval', self.data_interval)}")
+            print(f"   Position: {position_state}")
 
-            # Enhanced filtering with risk management
             skip_reason = None
 
-            # Check score threshold
+            # Existing checks
             if score < min_score:
                 skip_reason = f"score too low ({score:.3f} < {min_score})"
-
-            # Check cooldown using CooldownManager
             elif self.cooldown_manager.is_in_cooldown(symbol):
                 cooldown_remaining = self.cooldown_manager.get_cooldown_remaining(symbol)
                 skip_reason = f"in cooldown ({cooldown_remaining:.0f}s remaining)"
-
-            # Check confidence threshold
             elif confidence < min_confidence:
                 skip_reason = f"confidence too low ({confidence:.3f} < {min_confidence})"
-
-            # Check if signal is actionable
             elif signal not in ["buy", "sell"]:
                 skip_reason = f"signal is '{signal}' (not actionable)"
+            
+            # NEW: Check minimum hold time for sell signals
+            elif signal == "sell" and position_state == "long":
+                entry_time = self.position_entry_times.get(symbol)
+                if entry_time:
+                    hold_duration = (current_time - entry_time).total_seconds()
+                    if hold_duration < self.minimum_hold_time:
+                        skip_reason = f"minimum hold time not met ({hold_duration:.0f}s < {self.minimum_hold_time}s)"
 
-            # Enhanced market condition checks
             elif signal == "buy":
                 df = self._fetch_agent_data(symbol)
                 market_ok, market_reason = self.risk_manager.check_market_conditions(symbol, df)
                 if not market_ok:
                     skip_reason = f"market conditions: {market_reason}"
                 elif position_state == "long":
-                    # Double-check the position state
                     actual_state = self._validate_agent_position(symbol, position_state)
                     if actual_state == "long":
                         skip_reason = f"already in long position"
                     else:
-                        # Position state was wrong, correct it and allow trade
                         agent = self.get_agent_by_symbol(symbol)
                         if agent:
                             agent.position_state = actual_state
                             print(f"   🔧 Corrected position state to: {actual_state}")
                 else:
-                    # Portfolio-level checks for new positions
-                    position_size = self.risk_manager.calculate_dynamic_position_size(symbol, 0, df)  # Estimate
+                    position_size = self.risk_manager.calculate_dynamic_position_size(symbol, 0, df)
                     portfolio_ok, portfolio_reason = self.risk_manager.check_portfolio_limits(
                         symbol, position_size, current_positions
                     )
@@ -1111,12 +1007,10 @@ class MotherAI:
                         skip_reason = f"portfolio limit: {portfolio_reason}"
 
             elif signal == "sell" and position_state is None:
-                # Double-check the position state  
                 actual_state = self._validate_agent_position(symbol, position_state)
                 if actual_state is None:
                     skip_reason = f"no position to sell"
                 else:
-                    # Position state was wrong, correct it and allow trade
                     agent = self.get_agent_by_symbol(symbol)
                     if agent:
                         agent.position_state = actual_state
@@ -1129,110 +1023,140 @@ class MotherAI:
                 approved_trades.append(e)
 
         print(f"\n📈 ENHANCED SUMMARY:")
-        print(f"   Data Interval: {self.data_interval}")
         print(f"   Total evaluated: {len(evaluations)}")
         print(f"   Approved trades: {len(approved_trades)}")
-        print(f"   Symbols approved: {[f'{t['symbol']}-{t['signal'].upper()}' for t in approved_trades]}")
+        print(f"   Minimum hold time: {self.minimum_hold_time}s")
         
-        # Display current risk metrics
         risk_metrics = self.risk_manager.get_risk_metrics()
         print(f"   Portfolio Status:")
         print(f"     Value: ${risk_metrics['portfolio_value']:.2f}")
         print(f"     Drawdown: {risk_metrics['current_drawdown']:.3f}")
-        print(f"     Daily P&L: ${risk_metrics['daily_pnl']:.2f}")
-        print(f"     Hourly Trades: {risk_metrics['hourly_trades']}")
         print("=" * 80)
 
         return approved_trades[:top_n]
 
+    # NEW: Configuration methods for dynamic adjustment
+    def set_minimum_hold_time(self, seconds: int):
+        """Dynamically adjust minimum hold time"""
+        self.minimum_hold_time = seconds
+        print(f"🔧 Minimum hold time set to {seconds}s ({seconds/60:.1f} minutes)")
 
-# Utility functions for external usage
-def enhanced_trading_loop_example():
-    """Example of how to use the enhanced system in your trading loop"""
-    from backend.utils.binance_api import get_trading_mode
-    
-    # Initialize MotherAI with configurable data interval
+    def set_exit_check_interval(self, seconds: int):
+        """Dynamically adjust exit check interval"""
+        self.exit_check_interval = seconds
+        print(f"🔧 Exit check interval set to {seconds}s ({seconds/60:.1f} minutes)")
+
+    def get_position_hold_times(self) -> Dict:
+        """Get current hold times for all positions"""
+        hold_times = {}
+        current_time = datetime.now()
+        
+        for symbol, entry_time in self.position_entry_times.items():
+            if entry_time:
+                hold_duration = (current_time - entry_time).total_seconds()
+                hold_times[symbol] = {
+                    'entry_time': entry_time,
+                    'hold_duration_seconds': hold_duration,
+                    'hold_duration_minutes': hold_duration / 60,
+                    'meets_minimum_hold': hold_duration >= self.minimum_hold_time,
+                    'remaining_hold_time': max(0, self.minimum_hold_time - hold_duration)
+                }
+        
+        return hold_times
+
+
+# NEW: Enhanced utility functions
+def enhanced_trading_loop_with_smart_exits():
+    """Enhanced trading loop with intelligent exit timing"""
     mother_ai = MotherAI(
         agent_symbols=["BTCUSDT", "ETHUSDT", "ADAUSDT"],
-        data_interval="1m"  # Use 1-minute data to match agent predictions
+        data_interval="1m"
     )
     
-    # Debug data intervals on startup
-    mother_ai.debug_data_intervals()
+    # Configure timing
+    mother_ai.set_minimum_hold_time(600)  # 10 minutes
+    mother_ai.set_exit_check_interval(300)  # 5 minutes
     
-    # Main trading loop
     import time
+    
+    decision_count = 0
     
     while True:
         try:
-            # Make trading decision - now with error handling option
-            decision_result = mother_ai.make_portfolio_decision_robust(min_score=0.6)
-            print(f"📊 Decision result: {decision_result}")
+            decision_count += 1
+            print(f"\n{'='*80}")
+            print(f"DECISION CYCLE #{decision_count}")
+            print(f"{'='*80}")
             
-            # Wait before next iteration
-            time.sleep(300)  # 5 minutes
+            # Show current hold times
+            hold_times = mother_ai.get_position_hold_times()
+            if hold_times:
+                print(f"📊 Current Position Hold Times:")
+                for symbol, info in hold_times.items():
+                    print(f"   {symbol}: {info['hold_duration_minutes']:.1f}min "
+                          f"(Min hold: {'✅' if info['meets_minimum_hold'] else '❌'})")
+            
+            # Make decision (with smart exit logic)
+            decision_result = mother_ai.make_portfolio_decision(min_score=0.6)
+            
+            # Every 5th cycle, run strategic exits
+            if decision_count % 5 == 0:
+                print(f"\n🎯 Running strategic exit analysis (cycle #{decision_count})")
+                mother_ai.check_strategic_exits()
+            
+            print(f"📊 Decision result: {decision_result}")
+            time.sleep(180)  # 3 minutes between decisions
             
         except KeyboardInterrupt:
             print("🛑 Trading loop stopped by user")
             break
         except Exception as e:
             print(f"❌ Error in trading loop: {e}")
-            time.sleep(60)  # Wait 1 minute before retrying
+            time.sleep(60)
 
 
-def get_risk_report_cli():
-    """CLI command to get risk report with data interval info"""
+def get_position_status_report(): 
+    """Get detailed position status including hold times"""
     mother_ai = MotherAI()
-    current_positions = mother_ai.get_current_positions()
-    report = mother_ai.risk_manager.get_risk_report(current_positions)
     
-    print(f"\n📊 RISK REPORT (Data Interval: {mother_ai.data_interval})")
+    print("\n📊 POSITION STATUS REPORT")
     print("=" * 60)
-    print(f"Timestamp: {report['timestamp']}")
-    print(f"Portfolio Value: ${report['portfolio_metrics']['portfolio_value']:.2f}")
-    print(f"Current Drawdown: {report['portfolio_metrics']['current_drawdown']:.3f}")
-    print(f"Daily P&L: ${report['portfolio_metrics']['daily_pnl']:.2f}")
     
-    print(f"\nActive Positions: {report['position_summary']['total_positions']}")
-    print(f"Total Exposure: {report['position_summary']['total_exposure']:.3f}")
+    status = mother_ai.get_agent_status_summary()
+    hold_times = mother_ai.get_position_hold_times()
     
-    if report['warnings']:
-        print(f"\n⚠️ Warnings:")
-        for warning in report['warnings']:
-            print(f"   - {warning}")
-    else:
-        print(f"\n✅ No warnings")
+    print("Configuration:")
+    print(f"  Minimum hold time: {status['minimum_hold_time']}s ({status['minimum_hold_time']/60:.1f}min)")
+    print(f"  Exit check interval: {status['exit_check_interval']}s ({status['exit_check_interval']/60:.1f}min)")
     
-    return report
-
-
-def debug_data_intervals_cli():
-    """CLI command to debug data intervals"""
-    mother_ai = MotherAI()
-    mother_ai.debug_data_intervals()
-
-
-def test_different_intervals():
-    """Test function to compare different data intervals"""
-    intervals = ["1m", "5m", "15m", "1h"]
+    active_positions = [s for s, info in status['agents'].items() 
+                        if info['position_state'] == 'long']
     
-    for interval in intervals:
-        print(f"\n{'='*60}")
-        print(f"TESTING WITH {interval.upper()} DATA INTERVAL")
-        print(f"{'='*60}")
+    print(f"\nActive Positions: {len(active_positions)}")
+    
+    for symbol in active_positions:
+        info = status['agents'][symbol]
+        hold_info = hold_times.get(symbol, {})
         
-        mother_ai = MotherAI(
-            agent_symbols=["BTCUSDT", "ETHUSDT"],  # Test with 2 symbols
-            data_interval=interval
-        )
-        
-        # Debug intervals
-        mother_ai.debug_data_intervals()
-        
-        # Get agent status
-        status = mother_ai.get_agent_status_summary()
-        print(f"\nAgent Status Summary:")
-        for symbol, info in status["agents"].items():
-            print(f"  {symbol}: Data Compatible: {info.get('data_compatible', 'Unknown')}")
-        
-        print(f"\nCompleted test with {interval} interval")
+        print(f"\n{symbol}:")
+        print(f"  Position: {info['position_state']}")
+        print(f"  Hold time: {hold_info.get('hold_duration_minutes', 0):.1f} minutes")
+        print(f"  Meets min hold: {'✅' if hold_info.get('meets_minimum_hold', False) else '❌'}")
+        print(f"  Remaining hold: {hold_info.get('remaining_hold_time', 0):.0f}s")
+        print(f"  Next exit check: {info.get('next_exit_check', 0):.0f}s")
+        print(f"  In cooldown: {'Yes' if info['in_cooldown'] else 'No'}")
+    
+    return status, hold_times
+
+def trailing_stop_logic(self, current_price, entry_price, df):
+    """Example trailing stop calculation."""
+    try:
+        profit_percent = (current_price - entry_price) / entry_price
+        if profit_percent > 0.02:
+            lookback_periods = max(6, int(6 * 60 / self._interval_to_minutes(self.data_interval)))
+            recent_high = df['high'].tail(lookback_periods).max()
+            if current_price < recent_high * 0.99:
+                return "Exit - trailing stop triggered"
+    except Exception as e:
+        print(f"Error in trailing stop logic: {e}")
+    return None

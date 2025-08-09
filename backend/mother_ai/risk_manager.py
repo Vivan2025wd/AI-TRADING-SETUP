@@ -9,26 +9,46 @@ import pandas as pd
 RISK_CONFIG_FILE = "backend/storage/risk_config.json"
 
 # Enhanced Risk Configuration
-DEFAULT_RISK_CONFIG = { 
-  "trade_cooldown_seconds": 90,
-  "max_hold_seconds": 14400,
+DEFAULT_RISK_CONFIG = {
+  "trade_cooldown_seconds": 60,
+  "max_hold_seconds": 7200,
   "risk_per_trade": 0.1,
   "default_balance_usd": 1000,
-  "tp_ratio": 1.5,
-  "sl_percent": 0.8,
-  "max_portfolio_exposure": 60,
-  "max_daily_loss": 4,
-  "max_drawdown": 12,
-  "max_concurrent_positions": 7,
-  "max_correlation_exposure": 40,
-  "volatility_lookback": 20,
-  "volatility_multiplier": 1.5,
-  "min_position_size": 0.1,
-  "max_position_size": 1.5,
-  "emergency_stop_loss": 0.04,
-  "max_trades_per_hour": 20,
-  "market_volatility_threshold": 0.06,
-  "symbol_overrides": {}
+  "tp_ratio": 2.0,
+  "sl_percent": 1.2,
+  "max_portfolio_exposure": 45,
+  "max_daily_loss": 3,
+  "max_drawdown": 8,
+  "max_concurrent_positions": 5,
+  "max_correlation_exposure": 30,
+  "volatility_lookback": 14,
+  "volatility_multiplier": 1.2,
+  "min_position_size": 0.08,
+  "max_position_size": 1.0,
+  "emergency_stop_loss": 0.03,
+  "max_trades_per_hour": 15,
+  "market_volatility_threshold": 0.05,
+  "exit_volatility_threshold": 0.06,
+  "symbol_overrides": {
+    "BTCUSDT": {
+      "risk_per_trade": 0.1,
+      "tp_ratio": 1.8,
+      "sl_percent": 1.0,
+      "max_hold_seconds": 5400
+    },
+    "ETHUSDT": {
+      "risk_per_trade": 0.1,
+      "tp_ratio": 2.2,
+      "sl_percent": 1.4,
+      "max_hold_seconds": 7200
+    },
+    "ADAUSDT": {
+      "risk_per_trade": 0.1,
+      "tp_ratio": 2.5,
+      "sl_percent": 1.6,
+      "max_hold_seconds": 9000
+    }
+  }
 }
 
 
