@@ -4544,5 +4544,23 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.8262883565809902,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T04:00:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7817478679356629,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
   }
 ]

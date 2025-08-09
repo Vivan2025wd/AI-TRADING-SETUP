@@ -6,7 +6,7 @@ TRADE_LOG_DIR = "backend/storage/performance_logs"
 PROFIT_LOG_DIR = "backend/storage/trade_profits"
 os.makedirs(PROFIT_LOG_DIR, exist_ok=True)
 
-def compute_trade_profits(symbol: str):
+def compute_trade_profits(symbol: str, trading_fee_percent: float = 0.1):
     path = os.path.join(TRADE_LOG_DIR, f"{symbol}_trades.json")
     if not os.path.exists(path):
         print(f"⚠️ No trade log found for {symbol}")
@@ -52,11 +52,15 @@ def compute_trade_profits(symbol: str):
                 
                 print(f"📊 Calculated qty for {symbol}: {qty:.6f} (risk: ${risk_amount})")
 
+            # Calculate buy fee
+            entry_value = price * qty
+            buy_fee = entry_value * (trading_fee_percent / 100)
+            
             position = {
                 "entry_price": price,
                 "entry_time": timestamp,
                 "qty": qty,
-                "capital_invested": price * qty  # Track actual capital invested
+                "capital_invested": entry_value  # Track actual capital invested
             }
 
         # Sell: close position if one is open
@@ -67,7 +71,14 @@ def compute_trade_profits(symbol: str):
             # Calculate ACTUAL profit in dollars
             entry_value = position["entry_price"] * sell_qty
             exit_value = price * sell_qty
-            pnl_dollars = exit_value - entry_value
+            
+            # Calculate fees and deduct from profit
+            buy_fee = entry_value * (trading_fee_percent / 100)
+            sell_fee = exit_value * (trading_fee_percent / 100)
+            total_fees = buy_fee + sell_fee
+            
+            # Net profit after fees
+            pnl_dollars = (exit_value - entry_value) - total_fees
             
             # Calculate percentage return on invested capital
             pnl_percentage = (pnl_dollars / entry_value) * 100 if entry_value > 0 else 0
@@ -118,3 +129,25 @@ def compute_trade_profits(symbol: str):
 
     print(f"✅ Profit summary saved: {output_path}")
     return summary
+
+
+# Alternative function with different fee structures
+def compute_trade_profits_advanced_fees(symbol: str, maker_fee: float = 0.1, taker_fee: float = 0.1, 
+                                       bnb_discount: bool = False):
+    """
+    Advanced version with separate maker/taker fees and BNB discount option.
+    
+    Args:
+        symbol: Trading pair symbol
+        maker_fee: Maker fee percentage (default 0.1%)
+        taker_fee: Taker fee percentage (default 0.1%)
+        bnb_discount: Whether to apply 25% BNB discount (default False)
+    """
+    # Apply BNB discount if enabled
+    if bnb_discount:
+        maker_fee *= 0.75  # 25% discount
+        taker_fee *= 0.75
+    
+    # For simplicity, assume all trades are taker orders (market orders)
+    # You could enhance this by adding order type detection
+    return compute_trade_profits(symbol, trading_fee_percent=taker_fee)

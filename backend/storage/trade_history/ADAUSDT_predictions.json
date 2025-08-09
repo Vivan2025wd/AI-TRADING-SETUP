@@ -7441,5 +7441,23 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T03:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6204007233987058,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-09T04:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6712718088585018,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
   }
 ]

@@ -11,7 +11,7 @@ const MotherAIDecisionCard = lazy(() => import("./components/MotherAIDecisionCar
 const StrategyBuilder = lazy(() => import("./components/StrategyBuilder"));
 const StrategyPerformance = lazy(() => import("./components/StrategyPerformance"));
 
-const DECISION_REFRESH_INTERVAL = 10 * 60 * 1000; // 15 minutes
+const DECISION_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
 const getNavClass = ({ isActive }) =>
   isActive

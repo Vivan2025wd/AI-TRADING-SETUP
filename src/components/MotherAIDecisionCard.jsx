@@ -23,7 +23,7 @@ import {
   Shield
 } from "lucide-react";
 
-const DECISION_REFRESH_INTERVAL = 10 * 60 * 1000; // 15 minutes
+const DECISION_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
 export default function MotherAIDecisionCard({ 
   isLive, 

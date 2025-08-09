@@ -430,5 +430,17 @@
     "timestamp": "2025-08-09T03:29:08.724675",
     "source": "exit_trailing_stop_0.003",
     "data_interval": "30m"
+  },
+  {
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.7817,
+    "score": 0.782,
+    "last_price": 4.004,
+    "price": 4.004,
+    "qty": 24.920758,
+    "timestamp": "2025-08-09T04:17:37.395717",
+    "source": "agent_ml_primary",
+    "data_interval": "30m"
   }
 ]
