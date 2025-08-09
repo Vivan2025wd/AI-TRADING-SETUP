@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2025-08-09T04:30:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7806895517218891,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  }
+]

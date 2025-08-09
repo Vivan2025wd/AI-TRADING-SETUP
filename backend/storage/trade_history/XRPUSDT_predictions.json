@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2025-08-09T04:30:00",
+    "symbol": "XRPUSDT",
+    "signal": "searching",
+    "confidence": 0.5536433293156361,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  }
+]

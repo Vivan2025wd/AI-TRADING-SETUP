@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2025-08-09T04:30:00",
+    "symbol": "AVAXUSDT",
+    "signal": "buy",
+    "confidence": 0.8323763458763458,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  }
+]

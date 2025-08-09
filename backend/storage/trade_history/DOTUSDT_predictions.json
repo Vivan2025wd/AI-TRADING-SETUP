@@ -1,0 +1,11 @@
+[
+  {
+    "timestamp": "2025-08-09T04:30:00",
+    "symbol": "DOTUSDT",
+    "signal": "buy",
+    "confidence": 0.6718331262642023,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  }
+]
