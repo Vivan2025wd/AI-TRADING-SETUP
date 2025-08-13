@@ -1,0 +1,22 @@
+{
+  "symbol": "BCHUSDT",
+  "total_profit_dollars": -0.1181,
+  "avg_profit_per_trade": -0.1181,
+  "total_trades": 1,
+  "wins": 0,
+  "losses": 1,
+  "win_rate": 0.0,
+  "trades": [
+    {
+      "entry_time": "2025-08-13T02:16:14.966679",
+      "entry_price": 614.6,
+      "exit_time": "2025-08-13T02:31:15.611875",
+      "exit_price": 615.1,
+      "qty": 0.161912,
+      "entry_value": 99.5111,
+      "exit_value": 99.5921,
+      "pnl_dollars": -0.1181,
+      "pnl_percentage": -0.12
+    }
+  ]
+}

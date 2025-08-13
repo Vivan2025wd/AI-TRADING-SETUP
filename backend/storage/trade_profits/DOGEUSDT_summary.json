@@ -1,0 +1,44 @@
+{
+  "symbol": "DOGEUSDT",
+  "total_profit_dollars": 0.5824,
+  "avg_profit_per_trade": 0.1941,
+  "total_trades": 3,
+  "wins": 1,
+  "losses": 2,
+  "win_rate": 33.33,
+  "trades": [
+    {
+      "entry_time": "2025-08-12T11:25:01.630442",
+      "entry_price": 0.2205,
+      "exit_time": "2025-08-12T11:43:55.688871",
+      "exit_price": 0.2208,
+      "qty": 450.40277,
+      "entry_value": 99.3138,
+      "exit_value": 99.4489,
+      "pnl_dollars": -0.0636,
+      "pnl_percentage": -0.06
+    },
+    {
+      "entry_time": "2025-08-13T01:46:14.955743",
+      "entry_price": 0.233,
+      "exit_time": "2025-08-13T02:01:15.678314",
+      "exit_price": 0.232,
+      "qty": 429.014141,
+      "entry_value": 99.9603,
+      "exit_value": 99.5313,
+      "pnl_dollars": -0.6285,
+      "pnl_percentage": -0.63
+    },
+    {
+      "entry_time": "2025-08-13T02:31:14.979340",
+      "entry_price": 0.2326,
+      "exit_time": "2025-08-13T03:16:33.412538",
+      "exit_price": 0.2361,
+      "qty": 420.459562,
+      "entry_value": 97.7989,
+      "exit_value": 99.2705,
+      "pnl_dollars": 1.2745,
+      "pnl_percentage": 1.3
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 614.6,
+    "price": 614.6,
+    "qty": 0.162032,
+    "timestamp": "2025-08-13T02:16:14.966679",
+    "source": "agent_rule_conflict_resolution",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 615.1,
+    "price": 615.1,
+    "qty": 0.161912,
+    "timestamp": "2025-08-13T02:31:15.611875",
+    "source": "exit_trailing_stop_0.001",
+    "data_interval": "30m"
+  }
+]

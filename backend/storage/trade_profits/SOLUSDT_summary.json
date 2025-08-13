@@ -1,0 +1,22 @@
+{
+  "symbol": "SOLUSDT",
+  "total_profit_dollars": 1.1947,
+  "avg_profit_per_trade": 1.1947,
+  "total_trades": 1,
+  "wins": 1,
+  "losses": 0,
+  "win_rate": 100.0,
+  "trades": [
+    {
+      "entry_time": "2025-08-12T18:02:54.097669",
+      "entry_price": 186.33,
+      "exit_time": "2025-08-12T18:17:54.970969",
+      "exit_price": 188.98,
+      "qty": 0.5252,
+      "entry_value": 97.8605,
+      "exit_value": 99.2523,
+      "pnl_dollars": 1.1947,
+      "pnl_percentage": 1.22
+    }
+  ]
+}

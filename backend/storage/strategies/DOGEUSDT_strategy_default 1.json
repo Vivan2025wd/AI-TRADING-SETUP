@@ -3,8 +3,8 @@
   "indicators": {
     "rsi": {
       "period": 7,
-      "buy_below": 30,
-      "sell_above": 70
+      "buy_below": 35,
+      "sell_above": 65
     },
     "ema": {
       "period": 21,

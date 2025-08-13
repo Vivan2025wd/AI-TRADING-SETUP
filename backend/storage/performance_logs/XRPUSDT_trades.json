@@ -1,0 +1,38 @@
+[
+  {
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 3.2581,
+    "price": 3.2581,
+    "qty": 30.558912,
+    "timestamp": "2025-08-13T00:31:15.127637",
+    "source": "agent_rule_based",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 3.2411,
+    "price": 3.2411,
+    "qty": 30.734375,
+    "timestamp": "2025-08-13T01:01:15.576681",
+    "source": "exit_trailing_stop_-0.005",
+    "data_interval": "30m"
+  },
+  {
+    "symbol": "XRPUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 3.2361,
+    "price": 3.2361,
+    "qty": 30.779648,
+    "timestamp": "2025-08-13T01:31:14.959247",
+    "source": "agent_rule_based",
+    "data_interval": "30m"
+  }
+]
