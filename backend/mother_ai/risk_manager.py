@@ -13,9 +13,9 @@ DEFAULT_RISK_CONFIG = {
   "trade_cooldown_seconds": 60,
   "max_hold_seconds": 7200,
   "risk_per_trade": 0.1,
-  "default_balance_usd": 1000,
-  "tp_ratio": 2.0,
-  "sl_percent": 1.2,
+  "default_balance_usd": 10000,
+  "tp_ratio": 1.5,
+  "sl_percent": 0.5,
   "max_portfolio_exposure": 45,
   "max_daily_loss": 3,
   "max_drawdown": 8,
@@ -32,8 +32,8 @@ DEFAULT_RISK_CONFIG = {
   "symbol_overrides": {
     "BTCUSDT": {
       "risk_per_trade": 0.1,
-      "tp_ratio": 1.8,
-      "sl_percent": 1.0,
+      "tp_ratio": 1.5,
+      "sl_percent": 0.5,
       "max_hold_seconds": 5400
     },
     "ETHUSDT": {

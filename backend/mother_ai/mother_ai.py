@@ -55,8 +55,8 @@ class MotherAI:
         
         # NEW: Track trade entry times to enforce minimum hold periods
         self.position_entry_times = {}
-        self.minimum_hold_time = 600  # 10 minutes minimum hold (configurable)
-        
+        self.minimum_hold_time = 900  # 15 minutes minimum hold (configurable)
+
         # Initialize agents on startup
         self._initialize_agents()
         
@@ -1074,7 +1074,7 @@ def enhanced_trading_loop_with_smart_exits():
     )
     
     # Configure timing
-    mother_ai.set_minimum_hold_time(600)  # 10 minutes
+    mother_ai.set_minimum_hold_time(900)  # 15 minutes
     mother_ai.set_exit_check_interval(300)  # 5 minutes
     
     import time

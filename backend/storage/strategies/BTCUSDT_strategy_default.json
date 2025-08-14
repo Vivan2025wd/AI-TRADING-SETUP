@@ -2,12 +2,12 @@
   "symbol": "BTCUSDT",
   "indicators": {
     "rsi": {
-      "period": 7,
-      "buy_below": 30,
-      "sell_above": 70
+      "period": 10,
+      "buy_below": 32,
+      "sell_above": 68
     },
     "ema": {
-      "period": 21,
+      "period": 34,
       "price_crosses_above": true,
       "price_crosses_below": true
     },

@@ -2,19 +2,19 @@
   "symbol": "ETHUSDT",
   "indicators": {
     "rsi": {
-      "period": 7,
-      "buy_below": 30,
-      "sell_above": 70
+      "period": 6,
+      "buy_below": 32,
+      "sell_above": 68
     },
     "ema": {
-      "period": 21,
+      "period": 18,
       "price_crosses_above": true,
       "price_crosses_below": true
     },
     "macd": {
-      "fast_period": 12,
-      "slow_period": 26,
-      "signal_period": 9,
+      "fast_period": 10,
+      "slow_period": 24,
+      "signal_period": 7,
       "macd_crosses_above_signal": true,
       "macd_crosses_below_signal": true
     }

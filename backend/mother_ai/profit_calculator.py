@@ -42,9 +42,9 @@ def compute_trade_profits(symbol: str, trading_fee_percent: float = 0.1):
             # Calculate quantity if not provided
             if qty is None:
                 # Fallback calculation using the same logic as MotherAI
-                RISK_PER_TRADE = 2
-                DEFAULT_BALANCE_USD = 1000
-                SL_PERCENT = 1.0
+                RISK_PER_TRADE = 1.0
+                DEFAULT_BALANCE_USD = 10000
+                SL_PERCENT = 0.5
 
                 risk_amount = DEFAULT_BALANCE_USD * RISK_PER_TRADE / 100  # $100
                 sl_price = price * (1 - SL_PERCENT / 100)

@@ -20,10 +20,10 @@ class BacktestRunner:
         self,
         symbol: str,
         strategy_json: str,
-        initial_balance: float = 100.0,
+        initial_balance: float = 10000.0,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-        risk_per_trade: float = 0.10,     # Allocate 10% of balance per trade
+        risk_per_trade: float = 1.0,     # Allocate 100% of balance per trade
         leverage: float = 1.0             # Leverage multiplier (1.0 = no leverage)
     ):
         df = self.load_ohlcv(symbol)
