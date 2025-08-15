@@ -1,0 +1,12 @@
+{
+  "initial_balance_usd": 1000.0,
+  "last_updated": "2025-08-04T11:03:17.522019",
+  "balance_usd": 1000.0,
+  "holdings": {},
+  "total_invested": 0.0,
+  "total_realized_pnl": 0.0,
+  "unrealized_pnl": 0.0,
+  "portfolio_value": 1000.0,
+  "max_historical_balance": 1000.0,
+  "trading_mode": "mock"
+}

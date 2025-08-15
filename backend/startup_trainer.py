@@ -31,7 +31,7 @@ class AutoTrainingSystem:
         
         # Training configuration
         self.symbols = [
-            "DOGEUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT",
+            "ATOMUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT",
             "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"
         ]
         

@@ -1,0 +1,92 @@
+[
+  {
+    "timestamp": "2025-08-14T14:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7908874396650093,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7506160716667946,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7506160716667946,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7674354786748808,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7674354786748808,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7997286320017853,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7997286320017853,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7997286320017853,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7997286320017853,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ETHUSDT",
+    "signal": "searching",
+    "confidence": 0.7997286320017853,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  }
+]

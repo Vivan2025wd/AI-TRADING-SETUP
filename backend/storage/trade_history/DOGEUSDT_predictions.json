@@ -1,0 +1,92 @@
+[
+  {
+    "timestamp": "2025-08-14T14:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.6756413504001455,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.7168036061608666,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.7168036061608666,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6461512590636054,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6461512590636054,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.8964497041421098,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 0.8076890738295066,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "sell",
+    "confidence": 0.8076890738295066,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": "long"
+  }
+]

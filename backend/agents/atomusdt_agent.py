@@ -3,8 +3,8 @@ from backend.strategy_engine.strategy_parser import StrategyParser
 from backend.strategy_engine.json_strategy_parser import load_strategy_for_symbol
 from typing import Optional
 
-class DOGEUSDTAgent(GenericAgent):
-    symbol: str = "DOGEUSDT"
+class ATOMUSDTAgent(GenericAgent):
+    symbol: str = "ATOMUSDT"
 
     def __init__(self, symbol: Optional[str] = None, strategy_logic: Optional[StrategyParser] = None):
         resolved_symbol = symbol or self.symbol

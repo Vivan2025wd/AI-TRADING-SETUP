@@ -1,0 +1,92 @@
+[
+  {
+    "timestamp": "2025-08-14T14:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7988045977011495,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7905940713853601,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7905940713853601,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7905940713853601,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7905940713853601,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7580777583792883,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7580777583792883,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7580777583792883,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7580777583792883,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.7580777583792883,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  }
+]

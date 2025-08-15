@@ -1,0 +1,92 @@
+[
+  {
+    "timestamp": "2025-08-14T14:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6139025641025642,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6727628815628816,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6727628815628816,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6096358974358975,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.6096358974358975,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.7567555555555555,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.7567555555555556,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.7567555555555556,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.7567555555555555,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "ADAUSDT",
+    "signal": "searching",
+    "confidence": 0.7567555555555556,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  }
+]

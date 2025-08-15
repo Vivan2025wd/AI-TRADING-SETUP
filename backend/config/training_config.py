@@ -73,7 +73,7 @@ class SystemConfig:
     def __post_init__(self):
         if self.symbols is None:
             self.symbols = [
-                "DOGEUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT",
+                "ATOMUSDT", "SOLUSDT", "XRPUSDT", "DOTUSDT", "LTCUSDT",
                 "ADAUSDT", "BCHUSDT", "BTCUSDT", "ETHUSDT", "AVAXUSDT"
             ]
         

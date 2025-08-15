@@ -10,13 +10,20 @@ class CooldownManager:
         self.default_cooldown_seconds = default_cooldown_seconds
         self.symbol_specific_cooldowns: Dict[str, int] = {}
     
-    def set_cooldown(self, symbol: str, cooldown_seconds: Optional[int] = None):
-        """Set cooldown for a specific symbol"""
+    def set_cooldown(self, symbol: str, trade_type: str = "buy", cooldown_seconds: Optional[int] = None):
+        """
+        Set cooldown for a specific symbol.
+        Only triggers cooldown after a 'sell'.
+        """
+        if trade_type.lower() != "sell":
+            # No cooldown for buys
+            return
+        
         if cooldown_seconds is None:
             cooldown_seconds = self.symbol_specific_cooldowns.get(symbol, self.default_cooldown_seconds)
         
         self.cooldown_tracker[symbol] = time.time()
-        print(f"⏰ Cooldown set for {symbol}: {cooldown_seconds}s")
+        print(f"⏰ Cooldown set for {symbol}: {cooldown_seconds}s after {trade_type}")
     
     def is_in_cooldown(self, symbol: str) -> bool:
         """Check if symbol is currently in cooldown"""

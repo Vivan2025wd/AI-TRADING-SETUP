@@ -7,7 +7,7 @@ SYMBOLS = [
     "ADAUSDT",
     "XRPUSDT",
     "SOLUSDT",
-    "DOGEUSDT",
+    "ATOMUSDT",
     "DOTUSDT",
     "LTCUSDT", 
     "BCHUSDT",

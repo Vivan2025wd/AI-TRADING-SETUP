@@ -71,7 +71,7 @@ def get_full_capital_curve(
     all_trades.sort(key=lambda x: x.get("exit_time") or "")
 
     # Calculate running capital curve starting from initial capital
-    initial_capital = 1000.0
+    initial_capital = 10000.0
     running_balance = initial_capital
     capital_curve = []
 

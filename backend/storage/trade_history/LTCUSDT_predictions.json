@@ -1,0 +1,92 @@
+[
+  {
+    "timestamp": "2025-08-14T14:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.7793904208998412,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T14:30:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.7233429394812575,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.7553956834532357,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-14T15:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "buy",
+    "confidence": 0.9060402684563741,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "searching",
+    "confidence": 0.7184952380952382,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "searching",
+    "confidence": 0.7184952380952381,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "searching",
+    "confidence": 0.7184952380952381,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "searching",
+    "confidence": 0.7184952380952381,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-15T08:00:00",
+    "symbol": "LTCUSDT",
+    "signal": "searching",
+    "confidence": 0.7184952380952381,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  }
+]
