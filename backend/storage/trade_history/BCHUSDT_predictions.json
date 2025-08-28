@@ -88,5 +88,271 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.633191440398763,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.633191440398763,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9238638466656013,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:26:02.982435",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9239,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9238638466656013,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:26:29.679974",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9239,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9238638466656015,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:26:35.081568",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9239,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8725067008862942,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:26:54.664078",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8725,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8725067008862942,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8725067008862942,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.5199106034639916,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.0,
+    "source": "GenericAgent/no_signal",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.0,
+    "source": "GenericAgent/no_signal",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:00",
+    "symbol": "BCHUSDT",
+    "signal": "searching",
+    "confidence": 0.0,
+    "source": "GenericAgent/no_signal",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8568831145707339,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:23.420468",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8569,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8703892092016923,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:29.264343",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8704,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8703892092016923,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:50.528278",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8704,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8703892092016923,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:51.502524",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8704,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8703892092016923,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:30:54.985421",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8704,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8703892092016922,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:31:00.479286",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.8704,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9049722864479309,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9049722864479309,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.9049722864479309,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:31:31.584984",
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 0.905,
+    "source": "agent_predictions_batch"
   }
 ]

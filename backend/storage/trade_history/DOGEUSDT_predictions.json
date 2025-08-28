@@ -88,5 +88,113 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": "long"
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6200224060566439,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6249505602213198,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6249505602213199,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6249505602213198,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-08-28T07:00:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.6249505602213198,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
   }
 ]
