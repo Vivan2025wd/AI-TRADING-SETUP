@@ -1,11 +1,11 @@
 {
   "symbol": "XRPUSDT",
-  "total_profit_dollars": -0.0798,
-  "avg_profit_per_trade": -0.0266,
-  "total_trades": 3,
+  "total_profit_dollars": -0.0965,
+  "avg_profit_per_trade": -0.0241,
+  "total_trades": 4,
   "wins": 2,
-  "losses": 1,
-  "win_rate": 66.67,
+  "losses": 2,
+  "win_rate": 50.0,
   "trades": [
     {
       "entry_time": "2025-08-02T21:03:22.429123",
@@ -39,6 +39,17 @@
       "exit_value": 20.0,
       "pnl_dollars": 0.0197,
       "pnl_percentage": 0.1
+    },
+    {
+      "entry_time": "2025-09-18T12:48:45.551881",
+      "entry_price": 3.1218,
+      "exit_time": "2025-09-18T12:55:51.293177",
+      "exit_price": 3.1192,
+      "qty": 6.4119,
+      "entry_value": 20.0167,
+      "exit_value": 20.0,
+      "pnl_dollars": -0.0167,
+      "pnl_percentage": -0.08
     }
   ]
 }

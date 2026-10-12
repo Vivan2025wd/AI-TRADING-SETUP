@@ -185,7 +185,7 @@ def main():
         
         # Start the server
         uvicorn.run(
-            "main:app",
+            "backend.main:app",
             host=host,
             port=port,
             reload=reload,

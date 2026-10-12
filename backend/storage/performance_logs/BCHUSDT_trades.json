@@ -166,5 +166,29 @@
     "timestamp": "2025-08-03T06:17:18.537864",
     "source": "exit_max_hold_time_5.6h",
     "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 647.2,
+    "price": 647.2,
+    "qty": 0.030902,
+    "timestamp": "2025-09-18T13:25:50.516057",
+    "source": "agent_rule_conflict_resolution",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "BCHUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 649.2,
+    "price": 649.2,
+    "qty": 0.030807,
+    "timestamp": "2025-09-18T13:35:51.832535",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
   }
 ]

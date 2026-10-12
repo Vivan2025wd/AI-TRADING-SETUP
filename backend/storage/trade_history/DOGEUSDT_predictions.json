@@ -1542,5 +1542,364 @@
     "source": "GenericAgent/ml_primary",
     "ml_available": true,
     "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:39:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7146313991602545,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:39:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7146313991602544,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:39:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7146313991602545,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:39:28.237125",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7146,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T12:39:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7179021974027664,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:39:36.482596",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7179,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T12:41:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7402133786950722,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:40:48.837394",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7402,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T12:41:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7402133786950722,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:40:55.009178",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7402,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T12:49:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7178990047940574,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:56:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7567836186322897,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:55:50.503699",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7568,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T12:56:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7567836186322897,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T12:56:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7567836186322897,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:06:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7570422585431036,
+    "source": "GenericAgent/ml",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:16:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7307919116320242,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:16:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7307919116320241,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:16:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7307919116320241,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:16:10.763332",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7308,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T13:16:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7307919116320242,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:16:17.397943",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7308,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T13:18:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7268620870706206,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:18:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7307919116320241,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:19:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7307919116320241,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:19:17.091811",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7308,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T13:19:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7215027574850804,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:19:25.953421",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7215,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T13:24:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:24:05.258914",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T13:24:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/rule_based",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:24:14.052333",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2025-09-18T13:26:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.718994821258295,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2025-09-18T13:36:00",
+    "symbol": "DOGEUSDT",
+    "signal": "searching",
+    "confidence": 0.7218320219641698,
+    "source": "GenericAgent/ml_primary",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2026-10-12T15:52:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9146043799170808,
+    "source": "GenericAgent/consensus",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2026-10-12T15:52:52.176238",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9146,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2026-10-12T15:52:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9086043799170807,
+    "source": "GenericAgent/consensus",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2026-10-12T15:52:57.381116",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9086,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2026-10-12T15:53:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9146043799170808,
+    "source": "GenericAgent/consensus",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2026-10-12T15:53:03.985895",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9146,
+    "source": "agent_predictions_batch"
+  },
+  {
+    "timestamp": "2026-10-12T15:53:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "source": "GenericAgent/consensus",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2026-10-12T15:53:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9088908905079391,
+    "source": "GenericAgent/consensus",
+    "ml_available": true,
+    "position_state": null
+  },
+  {
+    "timestamp": "2026-10-12T15:53:00",
+    "symbol": "DOGEUSDT",
+    "signal": "buy",
+    "confidence": 0.9088908905079391,
+    "source": "GenericAgent/consensus",
+    "ml_available": true,
+    "position_state": null
   }
 ]

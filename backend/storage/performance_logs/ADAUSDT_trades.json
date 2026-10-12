@@ -142,5 +142,29 @@
     "timestamp": "2025-08-03T06:27:18.385148",
     "source": "exit_max_hold_time_5.7h",
     "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "buy",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.9125,
+    "price": 0.9125,
+    "qty": 21.917808,
+    "timestamp": "2025-09-18T13:05:50.427064",
+    "source": "agent_rule_conflict_resolution",
+    "data_interval": "1m"
+  },
+  {
+    "symbol": "ADAUSDT",
+    "signal": "sell",
+    "confidence": 1.0,
+    "score": 1.0,
+    "last_price": 0.9169,
+    "price": 0.9169,
+    "qty": 21.81263,
+    "timestamp": "2025-09-18T13:15:51.814830",
+    "source": "exit_max_hold_time_5.7h",
+    "data_interval": "1m"
   }
 ]
