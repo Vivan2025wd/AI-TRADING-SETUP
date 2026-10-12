@@ -1,0 +1,133 @@
+{
+  "training_session": {
+    "timestamp": "2025-08-10T16:00:50.106624",
+    "total_symbols": 10,
+    "status_breakdown": {
+      "trained": {
+        "count": 0,
+        "symbols": []
+      },
+      "confidence_trained": {
+        "count": 0,
+        "symbols": []
+      },
+      "up_to_date": {
+        "count": 0,
+        "symbols": []
+      },
+      "training_failed": {
+        "count": 0,
+        "symbols": []
+      },
+      "label_failed": {
+        "count": 10,
+        "symbols": [
+          "DOGEUSDT",
+          "SOLUSDT",
+          "XRPUSDT",
+          "DOTUSDT",
+          "LTCUSDT",
+          "ADAUSDT",
+          "BCHUSDT",
+          "BTCUSDT",
+          "ETHUSDT",
+          "AVAXUSDT"
+        ]
+      },
+      "pending": {
+        "count": 0,
+        "symbols": []
+      }
+    }
+  },
+  "symbol_details": {
+    "DOGEUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820939.5204232
+    },
+    "SOLUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820939.9165485
+    },
+    "XRPUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820940.319793
+    },
+    "DOTUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820940.7263875
+    },
+    "LTCUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820941.1501882
+    },
+    "ADAUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820941.626216
+    },
+    "BCHUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820942.0846975
+    },
+    "BTCUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820942.6214187
+    },
+    "ETHUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820943.2590063
+    },
+    "AVAXUSDT": {
+      "status": "label_failed",
+      "data_available": true,
+      "label_files": 0,
+      "model_files": 0,
+      "last_updated": 1754820943.7447243
+    }
+  },
+  "recommendations": [
+    {
+      "type": "retry_failed",
+      "message": "Consider retrying training for failed symbols: DOGEUSDT, SOLUSDT, XRPUSDT, DOTUSDT, LTCUSDT, ADAUSDT, BCHUSDT, BTCUSDT, ETHUSDT, AVAXUSDT",
+      "symbols": [
+        "DOGEUSDT",
+        "SOLUSDT",
+        "XRPUSDT",
+        "DOTUSDT",
+        "LTCUSDT",
+        "ADAUSDT",
+        "BCHUSDT",
+        "BTCUSDT",
+        "ETHUSDT",
+        "AVAXUSDT"
+      ]
+    }
+  ]
+}

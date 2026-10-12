@@ -1,0 +1,22 @@
+{
+  "symbol": "DOGEUSDT",
+  "indicators": {
+    "rsi": {
+      "period": 14,
+      "buy_below": 40,
+      "sell_above": 45
+    },
+    "ema": {
+      "period": 20,
+      "price_crosses_above": 30,
+      "price_below": true
+    },
+    "macd": {
+      "fast_period": 12,
+      "slow_period": 26,
+      "signal_period": 9,
+      "macd_crosses_above_signal": true,
+      "macd_crosses_below_signal": true
+    }
+  }
+}
